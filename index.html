@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>黄金交易心理与策略工作台 · XAUUSD</title>
 <style>
-:root{--bg:#16130e;--panel:#201c14;--panel2:#282219;--border:#3a3223;--gold:#e8b33c;--gold2:#f5cd6e;--text:#ece5d3;--muted:#9a8f76;--red:#e05c4d;--red-bg:#3a1f1a;--green:#6dbf67;--green-bg:#1c2e1a}
+:root{--bg:#161310;--panel:#1d1913;--panel2:#252017;--border:#3b3324;--gold:#e9b949;--gold2:#f7d271;--text:#f1ead8;--muted:#b3a78c;--red:#e8624f;--red-bg:#3a1f1a;--green:#5fb868;--green-bg:#1c2e1a;--blue:#7fb3d5;--radius:14px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;font-size:14px;line-height:1.7}
 .wrap{max-width:1080px;margin:0 auto;padding:16px}
@@ -138,6 +138,42 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
 .newsMeta{font-size:11px;color:#6b6250}
 .newsSum{font-size:12px;color:#9a8f76;margin-top:5px;line-height:1.5}
 @media(max-width:900px){.mt5-wrap{grid-template-columns:1fr}.mt5-chart{height:420px}.mt5-quote{grid-template-columns:1fr}.mt5-center{border-top:1px solid #2a2520;border-bottom:1px solid #2a2520}}
+/* ===== 舒适化增强 ===== */
+*{transition:background-color .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}
+nav button{transition:.18s;border-radius:12px;font-weight:600;letter-spacing:.3px}
+nav button.on{box-shadow:inset 0 0 0 1px var(--gold),0 6px 18px rgba(233,185,73,.12)}
+.tbtn:hover{border-color:var(--gold);color:var(--gold2)}
+.btn,.chip,.quizOpt,.check,.quickPill{cursor:pointer}
+.card{box-shadow:0 4px 22px rgba(0,0,0,.32);border-radius:var(--radius)}
+.card h2{letter-spacing:.4px}
+input,button,select{outline:none}
+input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost:hover{background:rgba(233,185,73,.08)}
+.chip:hover{transform:translateY(-1px);color:var(--gold2);border-color:var(--gold)}
+.quickbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-2px 0 14px;padding:10px 14px;background:linear-gradient(90deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:12px}
+.qbLabel{font-size:12px;color:var(--muted);margin-right:2px}
+.quickPill{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:20px;padding:6px 14px;font-size:12.5px}
+.quickPill:hover{border-color:var(--gold);color:var(--gold2);transform:translateY(-1px)}
+/* 首页 */
+.homeHero{display:grid;grid-template-columns:1.45fr 1fr;gap:18px;align-items:stretch;background:linear-gradient(135deg,#221c13,#1a160f)}
+.heroKicker{display:inline-block;font-size:11px;letter-spacing:2px;color:var(--gold);border:1px solid var(--border);border-radius:20px;padding:3px 12px;margin-bottom:2px}
+.heroBtns{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.heroBtns .btn{margin-top:0}
+.homeHeroRight{display:flex}
+.snap{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;justify-content:center}
+.snapRow{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding-bottom:8px;border-bottom:1px dashed var(--border)}
+.snapRow:last-child{border-bottom:none;padding-bottom:0}
+.snapRow span{color:var(--muted)}
+.snapRow b{color:var(--gold2);font-size:15px}
+.stepList{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:6px}
+.step{display:flex;gap:12px;background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:14px}
+.stepNo{flex:none;width:30px;height:30px;border-radius:50%;background:var(--gold);color:#1a1408;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+.step b{color:var(--gold2)}
+.step p{font-size:12.5px;margin:4px 0 8px}
+.hint{font-size:11.8px;color:var(--muted);line-height:1.6;margin-top:10px;padding:9px 13px;background:var(--panel2);border-left:3px solid var(--gold);border-radius:6px}
+.mt5-note{font-size:11.5px;color:var(--muted);line-height:1.6}
+@media(max-width:760px){.homeHero{grid-template-columns:1fr}.quickbar{font-size:11px}.snapRow b{font-size:13px}}
 </style>
 </head>
 <body>
@@ -159,7 +195,8 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
 </div>
 
 <nav>
-  <button class="on" onclick="showTab('qa',this)">智能问答台</button>
+  <button class="on" onclick="showTab('home',this)">首页 · 新手指引</button>
+  <button onclick="showTab('qa',this)">智能问答台</button>
   <button onclick="showTab('candle',this)">阴阳烛学堂</button>
   <button onclick="showTab('psy',this)">交易心理实验室</button>
   <button onclick="showTab('fib',this)">斐波纳奇计算器</button>
@@ -168,9 +205,58 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
   <button onclick="showTab('mkt',this)">MT5实时盘</button>
   <button onclick="showTab('news',this)">新闻雷达</button>
 </nav>
+<div class="quickbar">
+  <span class="qbLabel">今日交易三步：</span>
+  <button class="quickPill" onclick="goStep('news')">① 看新闻 + 大势</button>
+  <button class="quickPill" onclick="goStep('fib')">② 找支撑位置</button>
+  <button class="quickPill" onclick="goStep('chk')">③ 开仓前自检</button>
+  <span class="qbLabel" style="margin-left:auto">卡住了？点「智能问答台」直接问我</span>
+</div>
+
+<!-- 首页 · 新手指引 -->
+<section id="home" class="on">
+  <div class="card homeHero">
+    <div class="homeHeroLeft">
+      <span class="heroKicker">黄金交易 · 新手训练台</span>
+      <h2 style="font-size:20px;margin:8px 0 6px;color:var(--gold2)">你好，我是你的黄金交易教练 👋</h2>
+      <p class="muted" style="line-height:1.8">这里把「看实时盘 + 学K线形态 + 算仓位风险 + 读黄金新闻」整合在一个工作台。你不需要一次学会所有功能——<b style="color:var(--text)">跟着下面三步走，先把第一笔「带止损」的单子做出来</b>，比什么都重要。</p>
+      <div class="heroBtns">
+        <button class="btn" onclick="goStep('news')">① 先看大势与新闻</button>
+        <button class="btn ghost" onclick="goStep('candle')">② 学形态 · 算位置</button>
+        <button class="btn ghost" onclick="goStep('chk')">③ 开仓前过自检</button>
+      </div>
+    </div>
+    <div class="homeHeroRight">
+      <div class="snap" id="homeSnap"><!-- JS 注入账户快照 --></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>新手三天上手路线</h2>
+    <div class="stepList">
+      <div class="step"><div class="stepNo">1</div><div><b>认识你的账户底线</b><p class="muted">先在顶部填好本金（你现在是 400U）。系统会算出每笔最多亏多少、该用多大手数——这是保命的底线，永远别超。</p><button class="tbtn" onclick="goStep('pos')">去设置本金 →</button></div></div>
+      <div class="step"><div class="stepNo">2</div><div><b>看懂一张K线图</b><p class="muted">去「阴阳烛学堂」认 3 个核心形态（锤子线 / 看涨吞噬 / 十字星），再做里面的看图测验，过关再实盘。</p><button class="tbtn" onclick="goStep('candle')">去学堂 →</button></div></div>
+      <div class="step"><div class="stepNo">3</div><div><b>算支撑 + 开仓自检</b><p class="muted">用「斐波纳奇计算器」找回调买点，开仓前把「开仓前自检」8 项全打勾，有一项不过就不动手。</p><button class="tbtn" onclick="goStep('chk')">去自检 →</button></div></div>
+    </div>
+    <p class="hint">💡 记住一条铁律：<b style="color:var(--gold2)">本金在，机会就在。</b> 新手前 30 天唯一目标不是赚钱，是「每单都带止损、不扛单」。活下来，你就赢了大多数人。</p>
+  </div>
+
+  <div class="card">
+    <h2>常用速查</h2>
+    <div class="chips">
+      <span class="chip" onclick="askChip('现在金价多少？')">现在金价多少？</span>
+      <span class="chip" onclick="askChip('锤子线是什么？')">锤子线是什么？</span>
+      <span class="chip" onclick="askChip('斐波纳奇怎么画？')">斐波纳奇怎么画？</span>
+      <span class="chip" onclick="askChip('我的本金该怎么做仓位？')">我该怎么仓位？</span>
+      <span class="chip" onclick="askChip('我总是扛单怎么办？')">扛单怎么办？</span>
+      <span class="chip" onclick="askChip('连亏三笔了，想翻本')">连亏想翻本</span>
+      <span class="chip" onclick="askChip('非农数据要来了怎么办？')">非农来了怎么办？</span>
+    </div>
+  </div>
+</section>
 
 <!-- 问答台 -->
-<section id="qa" class="on">
+<section id="qa">
   <div class="card">
     <h2>智能问答台</h2>
     <p class="muted">问我任何 XAUUSD 交易问题——实时金价、阴阳烛形态、斐波纳奇、支撑、止损仓位、情绪管理。金价实时联网取数，仓位回答按你设置的本金计算。</p>
@@ -408,6 +494,7 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
         <div class="mt5-spread">实时报价</div>
       </div>
     </div>
+    <p class="hint mt5-note">怎么读这块报价：<b style="color:var(--gold2)">SELL 卖出价</b>是你做空或平仓的成交价，<b style="color:var(--gold2)">BUY 买入价</b>是你做多的成交价，中间大号数字是实时现价。点差 = BUY − SELL，是你每笔的交易成本，越小越划算。</p>
     <div class="mt5-wrap">
       <div class="mt5-chart">
         <iframe id="mt5Frame" src="about:blank" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
@@ -435,6 +522,7 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
   <div class="card">
     <h2>新闻雷达 · 黄金利多/利空分析</h2>
     <p class="muted">聚合 FXStreet、Investing.com、Kitco 等公开 RSS 源，通过关键词规则判断每条新闻对黄金的利好、利空或中性。每 5 分钟自动刷新。</p>
+    <p class="hint">⚠️ 情绪判断是<b style="color:var(--gold2)">关键词规则</b>，不是 AI 语义分析，复杂标题可能误判。看「利好/利空」标签后，务必自己读一眼标题再下结论。顶部「市场情绪」只是参考，不是交易指令。</p>
     <div class="newsHead">
       <div class="newsSent neu" id="newsSent">市场情绪：计算中…</div>
       <button class="tbtn" onclick="loadNews(true)">刷新新闻</button>
@@ -443,7 +531,7 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.1 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.2 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 </div>
 
 <script>
@@ -479,6 +567,7 @@ function applySettings(){
   document.getElementById("pRisk").value = STATE.riskPct;
   document.getElementById("chkStopLbl").textContent = "止损价已确定，且止损亏损 ≤ " + riskAmt.toFixed(1) + " 美元（本金 " + STATE.riskPct + "%）";
   renderTierCard();
+  renderHome();
 }
 function tierInfo(eq){
   if(eq<200) return {name:"超微型账户",lot:"0.01（固定）",risk:"1-2%",
@@ -526,6 +615,7 @@ function refreshPrice(manual){
     if(STATE.prev!==null){var d=j.price-STATE.prev; arrow=d>=0?" ▲ +"+d.toFixed(1):" ▼ "+d.toFixed(1);}
     p.textContent="$"+Number(j.price).toFixed(2);
     m.textContent="XAU/USD 实时"+arrow+" · 更新于 "+new Date(j.updatedAt).toLocaleTimeString("zh-CN");
+    if(STATE.prev!==null){ var d=j.price-STATE.prev; m.style.color = d>=0?"var(--red)":"var(--green)"; }
   }).catch(function(){
     clearTimeout(timer);
     dot.className="dot off";
@@ -1027,13 +1117,33 @@ function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").r
 function startNewsTimer(){ if(NEWS.timer) return; NEWS.timer=setInterval(function(){ var sec=document.getElementById("news"); if(sec&&sec.className==="on") loadNews(false); },300000); }
 function stopNewsTimer(){ if(NEWS.timer){clearInterval(NEWS.timer);NEWS.timer=null;} }
 
+/* ===== 首页 / 新手指引 ===== */
+function goStep(id){
+  var btns=document.querySelectorAll("nav button");
+  var target=null;
+  for(var i=0;i<btns.length;i++){ if((btns[i].getAttribute("onclick")||"").indexOf("'"+id+"'")>=0){target=btns[i];break;} }
+  showTab(id, target||btns[0]);
+}
+function renderHome(){
+  var el=document.getElementById("homeSnap");
+  if(!el) return;
+  var eq=STATE.equity, rp=STATE.riskPct, risk=eq*rp/100, t=tierInfo(eq);
+  el.innerHTML =
+     '<div class="snapRow"><span>账户本金</span><b>'+eq+' U</b></div>'
+   + '<div class="snapRow"><span>单笔风险预算</span><b style="color:var(--green)">'+risk.toFixed(1)+' U</b></div>'
+   + '<div class="snapRow"><span>账户档位</span><b>'+t.name+'</b></div>'
+   + '<div class="snapRow"><span>0.01手最大止损</span><b>'+risk.toFixed(1)+' 美元</b></div>'
+   + '<div class="snapRow"><span>今日熔断线</span><b style="font-size:12.5px">'+t.daily+'</b></div>';
+}
+
 /* ===== 启动 ===== */
 loadSettings();
 refreshPrice(false);
 renderGalleries();
+renderHome();
 setDir("up");
 nextQuiz();
-bubble("你好，我是你的黄金交易教练。\n我可以<b>实时联网查金价</b>，教你认<b>阴阳烛形态</b>，还能按你设置的本金算仓位和策略。\n\n先点上方「保存并生成策略」确认你的本金，然后去「阴阳烛学堂」上第一课。", "bot");
+bubble("你好，我是你的黄金交易教练 👋\n先去顶部填好你的本金（现在 "+STATE.equity+"U），系统会自动算出你每笔最多亏多少。\n\n然后跟着首页的<b>「新手三天路线」</b>走：① 看新闻大势 ② 学K线形态 ③ 开仓前过自检。哪里不懂，随时在「智能问答台」问我。", "bot");
 </script>
 </body>
 </html>
