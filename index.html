@@ -812,13 +812,14 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       </select></div>
       <div class="row"><label>API地址</label><input id="aiGptBase" placeholder="https://api.deepseek.com" style="flex:1"></div>
       <div class="row"><label>API Key</label><input id="aiGptKey" type="password" placeholder="sk-..." style="flex:1"></div>
+      <div class="row"><label>本地代理</label><input type="checkbox" id="aiGptProxy" onchange="STATE.aiUseProxy=this.checked;saveAiGpt();aiGptBadge()"><input id="aiGptProxyUrl" placeholder="http://localhost:3000" style="flex:1;min-width:0;margin-left:8px" onchange="STATE.aiProxy=this.value.trim();saveAiGpt()"></div>
       <div class="row"><button onclick="testAiConn()">🔌 测试连接</button><button onclick="saveAiGpt()">保存并连接</button><a class="dsOpen" href="https://chat.deepseek.com/" target="_blank" rel="noopener">🌐 打开 DeepSeek 网页</a><span id="aiGptStat" class="muted"></span></div>
       <div class="kbBlock">
         <div style="color:var(--muted);font-size:11px;margin:2px 0 4px">📝 我的知识笔记（会一起教给 AI，让它更懂你的风格）</div>
         <textarea id="aiKbNotes" placeholder="把你的黄金交易心得、常用策略、口诀贴到这里，AI 回答时会一并参考…" rows="3"></textarea>
         <div class="row" style="margin-top:5px"><button onclick="saveKbNotes()">保存笔记</button><span id="aiKbStat" class="muted"></span></div>
       </div>
-      <div class="muted" style="font-size:11px;line-height:1.5">密钥仅存你本机浏览器(localStorage)，不上传第三方。浏览器直连可能被跨域(CORS)拦截；若失败可改用 DeepSeek / Moonshot 等兼容接口或自建代理。未联网时自动用内置知识库回答。</div>
+      <div class="muted" style="font-size:11px;line-height:1.5">密钥仅存你本机浏览器(localStorage)，不上传第三方。浏览器直连可能被跨域(CORS)拦截；勾选「本地代理」并本地运行 <b style="color:var(--gold2)">node cors-proxy.js</b>（随工作台附带），可彻底绕开跨域，联网回答不再偶发失败。未联网时自动用内置知识库回答。</div>
     </div>
     <div class="aiT-chat" id="aiTChat"></div>
     <div class="aiT-chips">
@@ -888,13 +889,13 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.13 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.14 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
 <script>
 var PRICE_API = "https://api.gold-api.com/price/XAU";
-var STATE = { price: null, prev: null, ts: null, equity: 400, riskPct: 1.5 };
+var STATE = { price: null, prev: null, ts: null, equity: 400, riskPct: 1.5, aiUseProxy:false, aiProxy:"http://localhost:3000" };
 
 /* ===== 设置（本金联动全站） ===== */
 function loadSettings(){
@@ -1881,7 +1882,7 @@ function aiTraderDeep(){
     +'；回测：'+bt.total+'笔，胜率'+(bt.winRate*100).toFixed(0)+'%，盈亏比'+bt.profitFactorTxt+'，净利润'+bt.netDollars.toFixed(2)+'U'
     +'。请以职业黄金期货交易员视角，用中文给出：1)当前全盘走势定性 2)支撑阻力与操作计划 3)风险控制提醒。控制在250字内，客观专业。';
   out.innerHTML='<div class="warn">🧠 正在调用你的大模型生成 '+tfName(d.tf)+' 深度解读…</div>';
-  var url=STATE.aiBase.replace(/\/+$/,"")+"/chat/completions";
+  var url=aiEffectiveBase()+"/chat/completions";
   var body=JSON.stringify({model:"deepseek-chat",temperature:0.3,messages:[
     {role:"system",content:"你是资深黄金期货交易员。根据给出的实时行情与回测数据，用中文输出：1)走势定性 2)关键支撑阻力与操作计划 3)风控提醒。控制在250字内，客观专业。"},
     {role:"user",content:snap}
@@ -2150,9 +2151,13 @@ function aiSystemPrompt(){
     +"⑥ 若用户要画线/投射/回测等动作，告诉他可在工作台用指令让系统直接画线，你也可以描述做法。\n"
     +"⑦ 你必须综合上述「黄金知识体系」与「实时盘面上下文」来回答，结合二者给出有依据的判断与可执行的、带风控的交易建议；不要脱离当前行情空谈理论。用简体中文回答。";
 }
+function aiEffectiveBase(){
+  if(STATE.aiUseProxy && STATE.aiProxy) return STATE.aiProxy.replace(/\/+$/,"");
+  return (STATE.aiBase||"https://api.deepseek.com").replace(/\/+$/,"");
+}
 function chatDeepseek(question){
   openAiIfNeeded();
-  var base=(STATE.aiBase||"https://api.deepseek.com").replace(/\/+$/,"");
+  var base=aiEffectiveBase();
   var key=(STATE.aiKey||"").trim();
   if(!key){ aiChat('<div class="warn">未配置 API Key，已用本地知识库回答。</div>','ai'); aiCommand(question); return; }
   var sys=aiSystemPrompt();
@@ -2502,7 +2507,7 @@ function renderNews(list){
 /* 可选：用自己的大模型做真·语义判断（DeepSeek 兼容接口） */
 function callAi(text){
   if(!STATE.aiKey||!STATE.aiBase) return Promise.reject("no key");
-  var url=STATE.aiBase.replace(/\/+$/,"")+"/chat/completions";
+  var url=aiEffectiveBase()+"/chat/completions";
   var body=JSON.stringify({model:"deepseek-chat",temperature:0.2,messages:[
     {role:"system",content:"你是黄金市场分析师。判断下面新闻对黄金价格是利好/利空/中性，并用一句中文说明原因。只输出JSON，如：{\"label\":\"利好\",\"reason\":\"...\"}"},
     {role:"user",content:text}
@@ -2530,19 +2535,23 @@ function saveAiSettings(){
   STATE.aiKey=(document.getElementById("aiKey").value||"").trim();
   var mm=document.getElementById("aiGptModel"); if(mm) STATE.aiModel=mm.value||"deepseek-chat";
   var om=document.getElementById("aiGptOnline"); if(om) STATE.aiOnline=om.checked;
-  try{localStorage.setItem("gold_ai",JSON.stringify({base:STATE.aiBase,key:STATE.aiKey,model:STATE.aiModel,online:STATE.aiOnline}));}catch(e){}
+  var ppx=document.getElementById("aiGptProxy"); if(ppx) STATE.aiUseProxy=ppx.checked;
+  var ppu=document.getElementById("aiGptProxyUrl"); if(ppu) STATE.aiProxy=ppu.value.trim()||"http://localhost:3000";
+  try{ var ex=JSON.parse(localStorage.getItem("gold_ai")||"{}"); ex.base=STATE.aiBase; ex.key=STATE.aiKey; ex.model=STATE.aiModel; ex.online=STATE.aiOnline; ex.useProxy=STATE.aiUseProxy; ex.proxy=STATE.aiProxy; localStorage.setItem("gold_ai",JSON.stringify(ex)); }catch(e){}
   var gb=document.getElementById("aiGptBase"); if(gb) gb.value=STATE.aiBase;
   var gk=document.getElementById("aiGptKey"); if(gk) gk.value=STATE.aiKey;
   aiGptBadge();
   document.getElementById("aiStat").textContent=STATE.aiKey?"已保存（AI 复核可用）":"已清空";
 }
 function loadAiSettings(){
-  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"https://api.deepseek.com";STATE.aiKey=s.key||"";STATE.aiModel=s.model||"deepseek-chat";STATE.aiOnline=!!s.online;}catch(e){STATE.aiBase="https://api.deepseek.com";STATE.aiModel="deepseek-chat";STATE.aiOnline=false;}
+  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"https://api.deepseek.com";STATE.aiKey=s.key||"";STATE.aiModel=s.model||"deepseek-chat";STATE.aiOnline=!!s.online;STATE.aiUseProxy=!!s.useProxy;STATE.aiProxy=s.proxy||"http://localhost:3000";}catch(e){STATE.aiBase="https://api.deepseek.com";STATE.aiModel="deepseek-chat";STATE.aiOnline=false;STATE.aiUseProxy=false;STATE.aiProxy="http://localhost:3000";}
   var set=function(id,val){ var e=document.getElementById(id); if(e) e.value=val||""; };
   set("aiBase",STATE.aiBase); set("aiKey",STATE.aiKey);
   set("aiGptBase",STATE.aiBase); set("aiGptKey",STATE.aiKey);
   var om=document.getElementById("aiGptOnline"); if(om) om.checked=STATE.aiOnline;
   var mm=document.getElementById("aiGptModel"); if(mm) mm.value=STATE.aiModel||"deepseek-chat";
+  var px=document.getElementById("aiGptProxy"); if(px) px.checked=STATE.aiUseProxy;
+  var pu=document.getElementById("aiGptProxyUrl"); if(pu) pu.value=STATE.aiProxy||"http://localhost:3000";
   var kn=document.getElementById("aiKbNotes"); if(kn){ try{ USER_KB_NOTES=localStorage.getItem("gold_kb_notes")||""; }catch(e){ USER_KB_NOTES=""; } kn.value=USER_KB_NOTES; }
   rebuildKbPrompt();
   aiGptBadge();
@@ -2558,7 +2567,9 @@ function saveAiGpt(){
   STATE.aiKey=(document.getElementById("aiGptKey").value||"").trim();
   STATE.aiModel=document.getElementById("aiGptModel").value||"deepseek-chat";
   STATE.aiOnline=document.getElementById("aiGptOnline").checked;
-  try{ localStorage.setItem("gold_ai", JSON.stringify({base:STATE.aiBase,key:STATE.aiKey,model:STATE.aiModel,online:STATE.aiOnline})); }catch(e){}
+  STATE.aiUseProxy=document.getElementById("aiGptProxy").checked;
+  STATE.aiProxy=(document.getElementById("aiGptProxyUrl").value||"").trim()||"http://localhost:3000";
+  try{ localStorage.setItem("gold_ai", JSON.stringify({base:STATE.aiBase,key:STATE.aiKey,model:STATE.aiModel,online:STATE.aiOnline,useProxy:STATE.aiUseProxy,proxy:STATE.aiProxy})); }catch(e){}
   var nb=document.getElementById("aiBase"); if(nb) nb.value=STATE.aiBase;
   var nk=document.getElementById("aiKey"); if(nk) nk.value=STATE.aiKey;
   var ns=document.getElementById("aiStat"); if(ns) ns.textContent="已保存"+(STATE.aiKey?"（AI 复核可用）":"");
@@ -2567,15 +2578,20 @@ function saveAiGpt(){
   toast(STATE.aiOnline&&STATE.aiKey?"🔌 DeepSeek 已联网，直接问我问题吧":"已保存（联网未开启或缺失 Key，将用本地知识库）");
 }
 function testAiConn(){
-  var base=(STATE.aiBase||"https://api.deepseek.com").replace(/\/+$/,"");
+  var base=aiEffectiveBase();
+  var viaProxy=STATE.aiUseProxy&&STATE.aiProxy;
   var key=(STATE.aiKey||"").trim();
   var gs=document.getElementById("aiGptStat");
   if(!key){ if(gs) gs.textContent="请先填写 API Key"; return; }
   if(gs) gs.textContent="连接测试中…";
   fetch(base+"/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify({model:STATE.aiModel||"deepseek-chat",messages:[{role:"user",content:"ping"}],temperature:0,stream:false,max_tokens:5})})
     .then(function(r){ return r.text().then(function(t){ if(!r.ok) throw new Error("HTTP "+r.status+" "+(t||"").slice(0,120)); return t; }); })
-    .then(function(){ if(gs) gs.textContent="✅ 连接成功（"+(STATE.aiModel||"deepseek-chat")+"）"; toast("✅ DeepSeek 连接成功，可以问我问题了"); })
-    .catch(function(e){ if(gs) gs.textContent="❌ 失败："+(e.message||"").slice(0,90); toast("❌ 连接失败："+(e.message||"").slice(0,90)); });
+    .then(function(){ if(gs) gs.textContent="✅ 连接成功（"+(STATE.aiModel||"deepseek-chat")+(viaProxy?" · 经本地代理":"")+"）"; toast("✅ DeepSeek 连接成功，可以问我问题了"); })
+    .catch(function(e){
+      var m=(e&&e.message)||"";
+      if(viaProxy && /Failed to fetch|NetworkError|ECONNREFUSED|net::/i.test(m)){ if(gs) gs.textContent="❌ 代理连不上：请先在本地运行 node cors-proxy.js"; toast("❌ 本地代理未启动：终端里运行 node cors-proxy.js 再试"); }
+      else { if(gs) gs.textContent="❌ 失败："+m.slice(0,90); toast("❌ 连接失败："+m.slice(0,90)); }
+    });
 }
 function saveKbNotes(){
   var ta=document.getElementById("aiKbNotes");
