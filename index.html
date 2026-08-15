@@ -178,8 +178,7 @@ body.mt5-zoomed .mt5-dtools{position:absolute;left:12px;top:66px;z-index:25}
 .mt5-ol-text{font-size:11px;font-family:system-ui,-apple-system,"Microsoft YaHei",sans-serif;fill:#ece5d3}
 .mt5-ol-resize{position:absolute;right:8px;bottom:8px;z-index:20;background:rgba(20,17,13,.85);border:1px solid #2a2520;border-radius:6px;padding:3px 8px;font-size:11px;color:#6b6250;pointer-events:none}
 /* AI 分析面板（集成到 MT5 工作区） */
-.aiT-panel{display:none;background:#14110d;border:1px solid #2a2520;border-radius:10px;margin:12px 0;overflow:hidden}
-.aiT-panel.open{display:block}
+/* (旧内嵌面板容器样式已移除，统一使用下方独立浮动小窗 .aiT-panel) */
 .aiT-panel .aiT-head{position:relative;display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid #2a2520;background:#1b160f;flex-wrap:wrap}
 .aiT-panel .aiT-head h3{margin:0;font-size:14px;color:var(--gold2)}
 .aiT-panel .aiT-tabs{display:flex;gap:6px;margin-left:auto;margin-right:32px}
@@ -197,9 +196,7 @@ body.mt5-zoomed .mt5-dtools{position:absolute;left:12px;top:66px;z-index:25}
 .aiT-panel .aiT-bar{margin-top:10px}
 .mt5-dtools .dt-btn.primary{background:#3a2c10;border-color:var(--gold);color:var(--gold2)}
 .mt5-dtools .dt-btn.primary:hover{background:#4d3a14}
-#aiTrader{display:none!important}
-#aiTrader{position:fixed;top:0;right:0;height:100vh;width:380px;max-width:92vw;background:#14110d;border-left:1px solid var(--gold);box-shadow:-12px 0 40px rgba(0,0,0,.45);z-index:60;display:none;flex-direction:column}
-#aiTrader.open{display:flex}
+/* (旧 #aiTrader 内嵌面板已改为独立浮动小窗 #aiTPanel) */
 .aiT-head{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid #2a2520;background:#1b160f}
 .aiT-head .dot-ai{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold)}
 .aiT-head h3{font-size:14px;color:var(--gold2);margin:0}
@@ -796,6 +793,8 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <span class="aiT-chip" onclick="aiQuick('把关键位投射到走势图')">🎯 投射关键位</span>
       <span class="aiT-chip" onclick="aiQuick('斐波那契怎么用')">📚 斐波那契知识</span>
       <span class="aiT-chip" onclick="aiQuick('清除AI画线')">🧹 清AI画线</span>
+      <span class="aiT-chip" onclick="aiDailyBrief()">📰 每日简报</span>
+      <span class="aiT-chip" onclick="SOUND_ON=!SOUND_ON;toast(SOUND_ON?'🔔 预警声音：开':'🔇 预警声音：关')">🔔 声音开关</span>
     </div>
     <div class="aiT-input">
       <input id="aiTCmd" type="text" placeholder="对 AI 交易员下指令，例如：画斐波那契线并分析支撑…" onkeydown="if(event.key==='Enter')aiSendCmd()" />
@@ -813,6 +812,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
     <div class="newsHead">
       <div class="newsSent neu" id="newsSent">市场情绪：计算中…</div>
       <button class="tbtn" onclick="loadNews(true)">刷新新闻</button>
+      <button class="tbtn" onclick="aiDailyBrief()">🤖 AI 每日多空简报</button>
     </div>
     <div id="newsList" class="newsList">正在加载新闻…</div>
     <div class="aiBox">
@@ -840,6 +840,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
     <div class="replayCtrl">
       <button class="btn" onclick="replayGrade()" style="display:none" id="replayConfirmBtn">确认支撑位并看结果</button>
       <button class="tbtn" onclick="nextReplay()">换一段行情 ▶</button>
+      <button class="btn ghost" id="realReplayBtn" onclick="loadRealReplay()">📡 用AI真实历史K线复盘</button>
       <span class="muted" id="replayTol"></span>
     </div>
     <svg class="replayChart" id="replayChart" viewBox="0 0 720 320" preserveAspectRatio="none" onclick="replayClick(event)"></svg>
@@ -849,7 +850,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.9 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.10 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -2127,7 +2128,7 @@ function aiDrawFib(){
   if(!(hi>lo)){ aiChat('<div class="warn">区间不足，无法画斐波那契。</div>','ai'); return; }
   var lines=fibLevels(lo,hi);
   AI_FIB={min:lo*0.999, max:hi*1.001, lines:lines};
-  renderDrawings();
+  renderDrawings(); beep(880,0.16);
   var txt='<div class="blk"><h4>📐 斐波那契线已画到走势图（区间 '+fmtPrice(lo)+' ~ '+fmtPrice(hi)+'）</h4>';
   lines.forEach(function(L){ txt+='<div class="row"><span>Fib '+(L.r*100).toFixed(1)+'%</span><b style="color:#9b7bff">'+fmtPrice(L.p)+'</b></div>'; });
   txt+='<div class="warn">回踩 38.2%~61.8% 不破且出现反转K线，可顺势做多；跌破 61.8% 原趋势大概率失效。说「斐波那契怎么用」看原理。</div></div>';
@@ -2140,7 +2141,7 @@ function aiDrawGann(){
   if(!(hi>lo)){ var d=buildTfData(AI_STATE.tf); if(d){ lo=d.lo; hi=d.hi; } }
   if(!(hi>lo)){ aiChat('<div class="warn">区间不足，无法画江恩线。</div>','ai'); return; }
   AI_GANN={min:lo*0.999, max:hi*1.001, pivotPrice:hi, px:0.62, angles:[75,71.6,63.4,45,26.6,18.4,14]};
-  renderDrawings();
+  renderDrawings(); beep(990,0.16);
   aiChat('<div class="blk"><h4>📏 江恩扇形已画到走势图（枢轴='+fmtPrice(hi)+'）</h4>'
     +'<p class="aiT-plan">从区间高点作枢轴，按标准角度（1×1=45°、2×1、1×2、3×1、1×3、4×1）发散。价格沿 1×1 线运行趋势健康；跌破 1×1 转弱、跌破 1×2 警惕反转。说「江恩怎么用」看原理。</p>'
     +'<div class="warn">江恩扇形为示意角度，精确比例需按真实时间刻度；用于学习形态，开仓仍以支撑阻力+确认K线为主。</div></div>','ai');
@@ -2196,6 +2197,59 @@ function aiCommand(text){
   if(has('帮助','help','你能','会做','功能')){ aiHelp(); return; }
   if(has('知识','黄金','怎么看','入门')){ aiKb('general'); return; }
   aiChat('我还没完全理解这条指令。试试：<b>画斐波那契线</b> / <b>画江恩线</b> / <b>分析当前走势</b> / <b>给我交易建议</b> / <b>怎么做风险管理</b> / <b>把关键位投射到走势图</b> / <b>清除AI画线</b>。也可说「帮助」。','ai');
+}
+/* ===== 预警声音 + 真实K线复盘 + 每日简报 ===== */
+var SOUND_ON=true;
+function beep(freq,dur){
+  try{
+    if(!SOUND_ON) return;
+    var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    if(!beep._ac) beep._ac=new AC();
+    if(beep._ac.state==="suspended") beep._ac.resume();
+    var o=beep._ac.createOscillator(), g=beep._ac.createGain();
+    o.type="sine"; o.frequency.value=freq||880; o.connect(g); g.connect(beep._ac.destination);
+    var t0=beep._ac.currentTime;
+    g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(0.2,t0+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+(dur||0.18));
+    o.start(t0); o.stop(t0+(dur||0.18)+0.02);
+  }catch(e){}
+}
+function openAiIfNeeded(){ try{ var p=document.getElementById("aiTPanel"); if(p&&!p.classList.contains("open")) toggleAiPanel(); }catch(e){} }
+function loadRealReplay(){
+  var btn=document.getElementById("realReplayBtn");
+  if(btn){ btn.disabled=true; btn.textContent="📡 拉取真实历史K线中…"; }
+  fetchHistory("XAUUSD","day").then(function(candles){
+    if(!candles||candles.length<20){ if(btn){ btn.disabled=false; btn.textContent="📡 用AI真实历史K线复盘（获取失败，点此重试）"; } toast("真实K线获取失败，请用「换一段行情」模拟练习"); return; }
+    var data=candles.slice(-42).map(function(c){ return {o:Number(c.o),c:Number(c.c),h:Number(c.h),l:Number(c.l)}; });
+    var sup=Math.min.apply(null, data.map(function(d){ return d.l; }));
+    REPLAY.data=data; REPLAY.support=sup; REPLAY.guess=null; REPLAY.answered=false; REPLAY.real=true;
+    var rn=document.getElementById("roundNo"); if(rn) rn.textContent="真实";
+    var res=document.getElementById("replayResult"); if(res){ res.className="replayResult"; res.textContent="已载入真实历史K线（近42根）。在图上点出你认为金价会获得支撑的位置。"; }
+    var cb=document.getElementById("replayConfirmBtn"); if(cb) cb.style.display="none";
+    renderReplay();
+    if(btn){ btn.disabled=false; btn.textContent="✅ 已载入真实K线（可再点换段）"; }
+    toast("已载入真实历史K线，请在图上点出你判断的支撑位");
+  }).catch(function(){ if(btn){ btn.disabled=false; btn.textContent="📡 用AI真实历史K线复盘（获取失败，点此重试）"; } toast("真实K线获取失败，请用「换一段行情」模拟练习"); });
+}
+function aiDailyBrief(){
+  if(!NEWS.items.length) loadNews(true);
+  var items=NEWS.items||[], bull=0,bear=0,neu=0;
+  items.forEach(function(it){ if(it.cls==="bull")bull++; else if(it.cls==="bear")bear++; else neu++; });
+  var bias = bull>bear ? "偏多" : bear>bull ? "偏空" : "震荡";
+  var sen = bull>bear*1.3 ? "明显利多" : bear>bull*1.3 ? "明显利空" : "多空均衡";
+  var html='<div class="aiT-out"><div class="blk"><h4>📰 今日黄金多空简报</h4>'
+    +'<div class="row"><span>样本新闻</span><b>'+items.length+' 条</b></div>'
+    +'<div class="row"><span>偏多 / 偏空 / 中性</span><b class="bt-good">'+bull+'</b> / <b class="bt-bad">'+bear+'</b> / '+neu+'</div>'
+    +'<div class="row"><span>综合情绪</span><b>'+sen+'</b></div>'
+    +'<div class="bias '+(bull>bear?'up':bear>bull?'dn':'mid')+'">📡 盘面消息面整体<b>'+bias+'</b>：利多 '+bull+' 条 vs 利空 '+bear+' 条。'
+    + (bull>bear?' 消息偏支撑金价，回踩支撑可偏多思路，但仍须等确认K线并设止损。':'')
+    + (bear>bull?' 消息偏压制金价，反弹至阻力可偏空思路，严格止损不扛单。':'')
+    + ' 本简报由内置语义引擎对公开新闻按多主题打分生成，<b>仅供参考，不构成交易建议</b>。</div>'
+    +'<div class="warn">想更精准可开启「新闻雷达」里的 AI 深度分析（接你自己的大模型 Key）。说「分析当前走势」可看技术面印证。</div></div></div>';
+  openAiIfNeeded();
+  aiChat(html,"ai");
+  beep(720,0.16);
+  toast("已生成每日多空简报（见 AI 交易员窗口）");
 }
 function initAiDrag(){
   var panel=document.getElementById("aiTPanel"), head=document.getElementById("aiTHead");
@@ -2398,7 +2452,7 @@ function checkAlerts(price){
     if(cond && !a.fired){ a.fired=true; hit=true; msgs.push("金价"+(a.dir==="above"?"上破":"下破")+" "+a.price+"（现 "+price.toFixed(2)+"）"+(a.note?" · "+a.note:"")); }
     else if(!cond && a.fired){ a.fired=false; }
   });
-  if(hit){ saveAlerts(); renderAlerts(); msgs.forEach(function(m){ toast("📣 价格预警："+m); notify("黄金价格预警", m); }); }
+  if(hit){ saveAlerts(); renderAlerts(); msgs.forEach(function(m){ toast("📣 价格预警："+m); notify("黄金价格预警", m); }); beep(1040,0.25); }
 }
 function requestNotif(){ try{ if('Notification' in window && Notification.permission==="default") Notification.requestPermission(); }catch(e){} }
 function notify(title,body){ try{ if('Notification' in window && Notification.permission==="granted"){ new Notification(title,{body:body}); } }catch(e){} }
@@ -2511,18 +2565,20 @@ function renderHome(){
    + '<div class="snapRow"><span>今日熔断线</span><b style="font-size:12.5px">'+t.daily+'</b></div>';
 }
 
-/* ===== 启动 ===== */
+/* ===== 启动（每步容错，避免单点报错导致整页不可用） ===== */
+function bootSafe(fn,n){ try{ fn(); }catch(e){ console.error("boot:"+n,e); try{ var t=document.getElementById("toast"); if(t){ t.textContent="⚠️ 初始化出错("+n+")："+(e&&e.message||e); t.className="toast show"; } }catch(_){} } }
 loadSettings();
 if(/[?&]mode=live\b/.test(location.search)) enterLiveMode();
 loadAiSettings();
-bindOverlayEvents();
-loadAlerts();
-refreshPrice(false);
-renderGalleries();
-renderHome();
-setDir("up");
-nextQuiz();
-bubble("你好，我是你的黄金交易教练 👋\n先去顶部填好你的本金（现在 "+STATE.equity+"U），系统会自动算出你每笔最多亏多少。\n\n然后跟着首页的<b>「新手三天路线」</b>走：① 看新闻大势 ② 学K线形态 ③ 开仓前过自检。新加的<b>价格预警</b>可让你不用一直盯盘，<b>模拟复盘</b>能不花真钱练找支撑。哪里不懂，随时在「智能问答台」问我。", "bot");
+bootSafe(bindOverlayEvents,"bindOverlayEvents");
+bootSafe(loadAlerts,"loadAlerts");
+bootSafe(initAiDrag,"initAiDrag");
+bootSafe(function(){ refreshPrice(false); },"refreshPrice");
+bootSafe(renderGalleries,"renderGalleries");
+bootSafe(renderHome,"renderHome");
+bootSafe(function(){ setDir("up"); },"setDir");
+bootSafe(nextQuiz,"nextQuiz");
+bootSafe(function(){ bubble("你好，我是你的黄金交易教练 👋\n先去顶部填好你的本金（现在 "+STATE.equity+"U），系统会自动算出你每笔最多亏多少。\n\n跟着首页「新手三天路线」走：① 看新闻大势 ② 学K线形态 ③ 开仓前过自检。新加的「📡 用AI真实历史K线复盘」能不花真钱练找支撑，「🤖 AI每日多空简报」每天给你消息面研判。哪里不懂，随时在「智能问答台」或点 🤖 AI分析 问我。", "bot"); },"bubble");
 </script>
 </body>
 </html>
