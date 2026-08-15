@@ -235,6 +235,43 @@ body.mt5-zoomed .mt5-dtools{position:absolute;left:12px;top:66px;z-index:25}
 .aiT-note{font-size:11px;color:#6b6250;margin-top:6px;line-height:1.7}
 .aiT-out .warn b{color:var(--gold2)}
 .aiT-svg{width:100%;height:150px;background:#0a0807;border:1px solid #2a2520;border-radius:8px;margin:4px 0 8px;display:block}
+
+/* === AI 交易员 · 独立浮动小窗 + 对话 + 画线 === */
+.aiT-panel{display:none;position:fixed;top:84px;right:18px;width:384px;height:580px;min-width:320px;min-height:380px;background:#14110d;border:1px solid var(--gold);border-radius:14px;box-shadow:-10px 14px 44px rgba(0,0,0,.6);z-index:90;flex-direction:column;resize:both;overflow:hidden}
+.aiT-panel.open{display:flex}
+.aiT-panel .aiT-head{cursor:move;user-select:none}
+.aiT-panel .aiT-head h3{font-size:13.5px}
+.aiT-panel .aiT-tabs{margin-left:auto;margin-right:30px}
+.aiT-panel .aiT-body{padding:0;display:flex;flex-direction:column;overflow:hidden}
+.aiT-chat{flex:1;overflow-y:auto;padding:12px 13px;display:flex;flex-direction:column;gap:10px}
+.aiT-msg{font-size:12.5px;line-height:1.7;border-radius:10px;padding:9px 11px;border:1px solid #2a2520}
+.aiT-msg.ai{background:#0f0d0a;border-color:#2a2520;color:#ece5d3}
+.aiT-msg.me{background:#3a2c10;border-color:#5a4318;color:var(--gold2);align-self:flex-end;max-width:88%}
+.aiT-msg .who{font-size:10.5px;color:#8a7d63;margin-bottom:3px;font-weight:700;letter-spacing:.5px}
+.aiT-msg .aiT-plan{font-size:12px;margin:5px 0}
+.aiT-msg .blk{margin-bottom:9px}
+.aiT-msg .blk h4{font-size:12px;color:var(--gold);margin-bottom:5px;border-left:3px solid var(--gold);padding-left:7px}
+.aiT-msg .row{display:flex;justify-content:space-between;font-size:11.5px;padding:2px 0;border-bottom:1px dashed #241f17}
+.aiT-msg .row b{color:#ece5d3}
+.aiT-msg .sup{color:#7fd87a}.aiT-msg .res{color:#ff7a6e}
+.aiT-msg .bias{font-size:12px;padding:8px 10px;border-radius:8px;margin:5px 0;line-height:1.7}
+.aiT-msg .bias.up{background:#13261a;color:#9ad89a;border:1px solid #294d33}
+.aiT-msg .bias.dn{background:#2a1410;color:#ff9a8e;border:1px solid #5a2f28}
+.aiT-msg .bias.mid{background:#2a2410;color:#e8c66a;border:1px solid #4d431f}
+.aiT-msg .warn{font-size:11px;color:#9a8f76;background:#13110d;border:1px solid #2a2520;border-radius:8px;padding:7px 9px;margin-top:7px;line-height:1.65}
+.aiT-msg .bt-tab{width:100%;border-collapse:collapse;font-size:11.5px}
+.aiT-msg .bt-tab td{padding:3px 6px;border-bottom:1px solid #241f17}
+.aiT-msg .bt-good{color:#7fd87a}.aiT-msg .bt-bad{color:#ff7a6e}
+.aiT-input{display:flex;gap:7px;padding:9px 10px;border-top:1px solid #2a2520;background:#1b160f}
+.aiT-input input{flex:1;background:#0f0d0a;border:1px solid #3a3328;border-radius:8px;color:#ece5d3;padding:8px 10px;font-size:12.5px;outline:none}
+.aiT-input input:focus{border-color:var(--gold)}
+.aiT-input button{background:#3a2c10;border:1px solid var(--gold);color:var(--gold2);border-radius:8px;padding:0 14px;cursor:pointer;font-size:12px;font-weight:700}
+.aiT-input button:hover{background:#4a3813}
+.aiT-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 10px 9px;background:#1b160f}
+.aiT-chip{background:#241e16;border:1px solid #3a3328;color:#b9ab8a;border-radius:20px;padding:4px 10px;font-size:11px;cursor:pointer}
+.aiT-chip:hover{border-color:var(--gold);color:var(--gold2)}
+.aiT-ol-fib{stroke:#9b7bff;stroke-width:1.1;stroke-dasharray:4 3}
+.aiT-ol-gann{stroke:#5fd0c8;stroke-width:1.1}
 /* 盯盘弹出模式 */
 body.live-mode .wrap{max-width:none;padding:0}
 body.live-mode header,body.live-mode nav,body.live-mode .settings,body.live-mode footer,body.live-mode section:not(#mkt){display:none!important}
@@ -735,9 +772,9 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<!-- AI 分析面板（集成在 MT5 工作区内） -->
+<!-- AI 交易员 · 独立浮动小窗（可拖动 / 可缩放 / 可对话下指令） -->
 <div class="aiT-panel" id="aiTPanel">
-  <div class="aiT-head">
+  <div class="aiT-head" id="aiTHead">
     <span class="dot-ai"></span>
     <h3>🤖 AI 职业黄金交易员</h3>
     <div class="aiT-tabs" id="aiTTabs">
@@ -745,12 +782,24 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <button class="aiT-tab" onclick="selectAiTf('hour',this)">小时线</button>
       <button class="aiT-tab" onclick="selectAiTf('week',this)">周线</button>
     </div>
-    <span class="x" onclick="toggleAiPanel()" title="关闭">×</span>
+    <span class="x" onclick="toggleAiPanel()" title="收起（再点工具栏 🤖 AI分析 打开）">×</span>
   </div>
   <div class="aiT-body">
-    <div class="aiT-status" id="aiTStatus">点上方<b>日线 / 小时线 / 周线</b>拉取真实历史K线并回测。AI 会实时根据现价更新买卖信号。</div>
-    <div id="aiTOut" class="aiT-out">
-      <div class="warn">点上方<b>日线 / 小时线 / 周线</b>切换分析周期。系统读取实时价与对应周期区间，给出支撑/阻力、多空研判与操作建议。点<b>🎯 投射到走势图</b>可把关键位标到走势图上。</div>
+    <div class="aiT-status" id="aiTStatus">👋 我是你的 AI 黄金交易员，已学习<b>斐波那契</b>、<b>江恩</b>画线法与<b>风险管理</b>体系。点上方周期，或直接在下面对我下指令：<b>画斐波那契线</b> / <b>画江恩线</b> / <b>分析当前走势</b> / <b>给我交易建议</b> / <b>怎么做风险管理</b> / <b>把关键位投射到走势图</b>。</div>
+    <div class="aiT-chat" id="aiTChat"></div>
+    <div class="aiT-chips">
+      <span class="aiT-chip" onclick="aiQuick('画斐波那契线')">📐 画斐波那契</span>
+      <span class="aiT-chip" onclick="aiQuick('画江恩线')">📏 画江恩线</span>
+      <span class="aiT-chip" onclick="aiQuick('分析当前走势')">📊 分析走势</span>
+      <span class="aiT-chip" onclick="aiQuick('给我交易建议')">💡 交易建议</span>
+      <span class="aiT-chip" onclick="aiQuick('怎么做风险管理 止损 仓位')">🛡️ 风险管理</span>
+      <span class="aiT-chip" onclick="aiQuick('把关键位投射到走势图')">🎯 投射关键位</span>
+      <span class="aiT-chip" onclick="aiQuick('斐波那契怎么用')">📚 斐波那契知识</span>
+      <span class="aiT-chip" onclick="aiQuick('清除AI画线')">🧹 清AI画线</span>
+    </div>
+    <div class="aiT-input">
+      <input id="aiTCmd" type="text" placeholder="对 AI 交易员下指令，例如：画斐波那契线并分析支撑…" onkeydown="if(event.key==='Enter')aiSendCmd()" />
+      <button onclick="aiSendCmd()">发送</button>
     </div>
   </div>
 </div>
@@ -800,7 +849,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.8 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.9 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -1441,6 +1490,8 @@ function toggleAiPanel(){
   AI_STATE.open=!AI_STATE.open;
   if(AI_STATE.open){
     p.classList.add("open");
+    initAiDrag();
+    if(!AI_STATE.everOpen){ AI_STATE.everOpen=true; aiChat('👋 你好，我是你的 AI 黄金交易员。我已学习黄金期货的<b>斐波那契</b>、<b>江恩</b>画线法与<b>风险管理</b>体系，能实时读盘、画线、给建议并帮你控风险。点上方周期，或直接在下面对我下指令（说「帮助」看全部指令）。','ai'); }
     if(!AI_STATE.data) runAiAnalyze(AI_STATE.tf);
     if(AI_LIVE_TIMER) clearInterval(AI_LIVE_TIMER);
     AI_LIVE_TIMER=setInterval(aiLiveTick,15000);
@@ -1680,13 +1731,13 @@ function renderAi(tf, candles, price){
     +'<button class="ghost" onclick="runAiAnalyze(\''+tf+'\',true)">🔄 重新拉取K线</button>'
     +'<button class="ghost" onclick="aiTraderDeep()">🧠 大模型解读</button>'
     +'</div>';
-  out.innerHTML=html;
+  var _mid=aiChat(html,'ai'); if(_mid){ AI_STATE.signalHostId=_mid; }
 }
 function renderAiFallback(tf, d, price){
   var out=document.getElementById("aiTOut");
   var st=document.getElementById("aiTStatus");
   if(st) st.innerHTML='⚠️ 历史K线接口暂时限流，已用日内高低点估算（点「🔄 重新拉取K线」重试）。';
-  if(!d){ out.innerHTML='<div class="warn">计算失败，请确认实时价已获取后重试。</div>'; return; }
+  if(!d){ aiChat('<div class="warn">计算失败，请确认实时价已获取后重试。</div>','ai'); return; }
   AI_STATE.levels={sup:d.sup.p,sup2:d.sup2.p,res:d.res.p,res2:d.res2.p,PP:(d.hi+d.lo)/2,R1:d.res.p,S1:d.sup.p,R2:d.res2.p,S2:d.sup2.p,H:d.hi,L:d.lo};
   AI_STATE.trend={bias:d.bias,cls:d.biasCls,txt:d.biasTxt,pos:d.pct,ma20:price,ma50:price};
   AI_STATE.bt={total:0,winRate:0,profitFactorTxt:"—",netDollars:0,maxDD:0,expectancy:0,equitySvg:buildEquitySvg([]),trades:[]};
@@ -1703,7 +1754,7 @@ function renderAiFallback(tf, d, price){
   html+=aiPlanHtml(tf, price, AI_STATE.levels, AI_STATE.trend, riskAmt);
   html+='<div class="aiT-bar"><button onclick="projectAiToChart()">🎯 投射到走势图</button>'
     +'<button class="ghost" onclick="runAiAnalyze(\''+tf+'\',true)">🔄 重新拉取K线</button></div>';
-  out.innerHTML=html;
+  var _mid=aiChat(html,'ai'); if(_mid){ AI_STATE.signalHostId=_mid; }
 }
 function fibLevels(lo,hi){
   var diff=hi-lo, arr=[0,0.236,0.382,0.5,0.618,0.786,1];
@@ -1751,7 +1802,7 @@ function runAiAnalyze(tf, force){
     renderAi(tf, MT5_HIST[tf], price);
     return;
   }
-  if(!force) out.innerHTML='<div class="warn">🔄 正在拉取 '+tfName(tf)+' 真实历史K线并回测…（免费接口，约 1-3 秒）</div>';
+  if(!force) aiChat('<div class="warn">🔄 正在拉取 '+tfName(tf)+' 真实历史K线并回测…（免费接口，约 1-3 秒）</div>','ai');
   else { var s=document.getElementById("aiTStatus"); if(s) s.innerHTML='🔄 正在重新拉取 '+tfName(tf)+' K线…'; }
   fetchHistory(MT5.sym, tf).then(function(candles){
     if(candles&&candles.length){
@@ -1768,11 +1819,13 @@ function runAiAnalyze(tf, force){
 }
 function aiLiveTick(){
   if(!AI_STATE.open || !AI_STATE.levels) return;
-  var el=document.getElementById("aiTSignal");
-  if(el) el.innerHTML=aiSignalHtml(MT5.lastPrice, AI_STATE.levels, AI_STATE.trend);
+  var host=AI_STATE.signalHostId&&document.getElementById(AI_STATE.signalHostId);
+  if(!host) return;
+  var el=host.querySelector(".aiT-sig");
+  if(el) el.outerHTML=aiSignalHtml(MT5.lastPrice, AI_STATE.levels, AI_STATE.trend);
 }
 function aiTraderDeep(){
-  var out=document.getElementById("aiTOut");
+  var out={ set innerHTML(v){ aiChat(v,'ai'); } };
   if(!STATE.aiKey||!STATE.aiBase){
     out.innerHTML='<div class="warn">你还没填大模型 Key。去「智能问答台」底部填好 <b>API Base</b> 和 <b>Key</b> 后，这里就能调用你自己的模型做深度解读。</div>';
     return;
@@ -1834,7 +1887,7 @@ function toggleWorkspaceZoom(){
 
 // 画线状态
 var DRAW={tool:"pointer",drawing:false,items:[],current:null,ns:"http://www.w3.org/2000/svg"};
-var AI_STATE={tf:"day",data:null,open:false,levels:null,trend:null,bt:null,candles:null};
+var AI_STATE={tf:"day",data:null,open:false,levels:null,trend:null,bt:null,candles:null,everOpen:false,signalHostId:null};
 var AI_PROJ_RANGE=null;
 var AI_LIVE_TIMER=null;
 function selectDrawTool(tool,btn){
@@ -1909,7 +1962,7 @@ function renderDrawings(){
   var W=box.width, H=box.height;
   ol.setAttribute("viewBox","0 0 "+W+" "+H);
   var html="";
-  // 1) AI 投射线（底层，最多 5 条，避免画面乱）
+  // 1) AI 投射线（底层）
   if(AI_PROJECTION){
     var data=AI_PROJECTION;
     data.lines.forEach(function(L){
@@ -1917,6 +1970,31 @@ function renderDrawings(){
       html+='<line class="mt5-ol-line" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="'+L.col+'" stroke-width="'+L.width+'" stroke-dasharray="'+L.dash+'"/>';
       html+='<text class="mt5-ol-text" x="6" y="'+(y-5)+'" fill="'+L.col+'" font-weight="bold">'+L.label+' '+fmtPrice(L.p)+'</text>';
     });
+  }
+  // 1.5) AI 斐波那契线（紫色，区间摆动高低点）
+  if(AI_FIB){
+    var fmin=AI_FIB.min, fmax=AI_FIB.max;
+    AI_FIB.lines.forEach(function(L){
+      var y=H-((L.p-fmin)/(fmax-fmin))*H;
+      if(y<0||y>H) return;
+      html+='<line class="aiT-ol-fib" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'"/>';
+      html+='<text class="mt5-ol-text" x="6" y="'+(y-4)+'" fill="#9b7bff" font-weight="bold">Fib '+(L.r*100).toFixed(1)+'% '+fmtPrice(L.p)+'</text>';
+    });
+    html+='<text class="mt5-ol-text" x="'+(W-150)+'" y="14" fill="#9b7bff" font-size="11">📐 斐波那契(示意)</text>';
+  }
+  // 1.6) AI 江恩扇形（青色，枢轴点按标准角度）
+  if(AI_GANN){
+    var gmin=AI_GANN.min, gmax=AI_GANN.max;
+    var gpx=W*AI_GANN.px, gpy=H-((AI_GANN.pivotPrice-gmin)/(gmax-gmin))*H;
+    AI_GANN.angles.forEach(function(a){
+      var rad=a*Math.PI/180, dx=W, dy=dx*Math.tan(rad);
+      html+='<line class="aiT-ol-gann" x1="'+gpx+'" y1="'+gpy+'" x2="'+(gpx+dx)+'" y2="'+(gpy+dy)+'"/>';
+      html+='<line class="aiT-ol-gann" x1="'+gpx+'" y1="'+gpy+'" x2="'+(gpx-dx)+'" y2="'+(gpy+dy)+'"/>';
+      html+='<line class="aiT-ol-gann" x1="'+gpx+'" y1="'+gpy+'" x2="'+(gpx+dx)+'" y2="'+(gpy-dy)+'"/>';
+      html+='<line class="aiT-ol-gann" x1="'+gpx+'" y1="'+gpy+'" x2="'+(gpx-dx)+'" y2="'+(gpy-dy)+'"/>';
+    });
+    html+='<circle cx="'+gpx+'" cy="'+gpy+'" r="3" fill="#5fd0c8"/>';
+    html+='<text class="mt5-ol-text" x="6" y="'+(gpy-6)+'" fill="#5fd0c8" font-size="11">江恩枢轴 '+fmtPrice(AI_GANN.pivotPrice)+'</text>';
   }
   // 2) 用户手绘线（顶层）
   var all=DRAW.items.slice();
@@ -1938,7 +2016,7 @@ function renderDrawings(){
   });
   ol.innerHTML=html;
 }
-function clearDrawings(){ DRAW.items=[]; DRAW.current=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; renderDrawings(); var ptr=document.querySelector('#mt5Dtools .dt-btn[data-tool="pointer"]'); if(ptr) selectDrawTool('pointer',ptr); }
+function clearDrawings(){ DRAW.items=[]; DRAW.current=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_FIB=null; AI_GANN=null; renderDrawings(); var ptr=document.querySelector('#mt5Dtools .dt-btn[data-tool="pointer"]'); if(ptr) selectDrawTool('pointer',ptr); }
 function resizeOverlay(){ renderDrawings(); }
 function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
@@ -1987,6 +2065,158 @@ function renderAiProjection(){
   renderDrawings();
 }
 
+
+/* ===== AI 交易员 · 对话指令 / 画线 / 风险管理 / 知识库 ===== */
+var AI_FIB=null, AI_GANN=null;
+/* 内置黄金期货知识库（整理自公开资料：斐波那契、江恩、风险管理） */
+var GOLD_KB={
+  fib:'<div class="blk"><h4>📐 斐波那契回调（Fibonacci Retracement）</h4>'
+    +'<p class="aiT-plan">原理：趋势回撤常在 <b>23.6% / 38.2% / 50% / 61.8% / 78.6%</b> 这几条黄金比例位获得支撑或受阻。做法：取一段行情的<b>摆动低点→摆动高点</b>拉出区间，价格回踩到这些比例位且出现反转K线（锤子线、看涨吞噬）时，视为顺势入场点。</p>'
+    +'<p class="aiT-plan">用法：① 上涨趋势中，从低点到高点画；② 价格回踩 38.2%~61.8% 不破，配合确认K线做多；③ 跌破 61.8% 则原趋势大概率失效。我已把当前周期区间的斐波那契线画到走势图上（紫色），可直接对照。</p></div>',
+  gann:'<div class="blk"><h4>📏 江恩理论（Gann）</h4>'
+    +'<p class="aiT-plan">核心：<b>时间=价格</b>。江恩认为当价格与时间达成平方（1×1 即 45° 线）时市场最平衡。关键角度：1×1(45°)、2×1(63.4°)、1×2(26.6°)、3×1、1×3、4×1、1×4 等，从重要顶部/底部（枢轴点）向外发散成「江恩扇形」。</p>'
+    +'<p class="aiT-plan">用法：枢轴点上方扇形线为阻力、下方为支撑；价格沿 1×1 线运行代表趋势健康，跌破 1×1 转弱、跌破 1×2 则趋势可能反转。我已从区间高点作枢轴，画出标准角度扇形（青色，示意）供你学习对照。</p></div>',
+  risk:'<div class="blk"><h4>🛡️ 风险管理要点</h4>'
+    +'<p class="aiT-plan">① <b>单笔风险 ≤ 本金 1%~2%</b>：你 400U、风险 1.5% → 单笔最多亏 6U。② <b>先定止损再定仓位</b>：仓位 = 单笔风险 ÷（每手每点价值 × 止损距离）。XAUUSD 0.01 手每波动 1 美元 = 风险 1 美元。③ <b>止损放技术位外</b>：做多放支撑下方、做空放阻力上方，不扛单。④ <b>盈亏比 ≥ 2:1</b> 才出手。⑤ 总敞口同时不超过 2~3 笔。</p></div>',
+  general:'<div class="blk"><h4>📚 黄金交易核心驱动</h4>'
+    +'<p class="aiT-plan">黄金由 <b>美元</b>（美元弱→金强）、<b>实际利率</b>（利率降/通胀升→金强）、<b>避险情绪</b>（地缘、危机→金强）、<b>ETF与央行购金</b>流向共同驱动。看盘重点：美盘时段（北京时间 20:30 后）波动最大；关注美国 CPI、非农、美联储讲话。技术面配合支撑阻力与斐波/江恩，胜率更高。</p></div>'
+};
+function aiChat(html, who){
+  var box=document.getElementById("aiTChat"); if(!box) return null;
+  var mid="aiMsg_"+Date.now()+"_"+Math.floor(Math.random()*1000);
+  var div=document.createElement("div");
+  div.className="aiT-msg "+(who==="me"?"me":"ai");
+  div.id=mid;
+  div.innerHTML='<div class="who">'+(who==="me"?"你":"🤖 AI 交易员")+'</div>'+html;
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
+  return mid;
+}
+function aiQuick(t){ var i=document.getElementById("aiTCmd"); if(i) i.value=t; aiChat(escHtml(t),"me"); aiCommand(t); }
+function aiSendCmd(){
+  var i=document.getElementById("aiTCmd"); if(!i) return;
+  var v=i.value.trim(); if(!v) return; i.value="";
+  aiChat(escHtml(v),"me"); aiCommand(v);
+}
+function aiKb(topic){ aiChat(GOLD_KB[topic]||GOLD_KB.general,"ai"); }
+function aiHelp(){
+  aiChat('<div class="blk"><h4>💬 我可以帮你做这些（直接打字下指令）</h4>'
+    +'<p class="aiT-plan">· 画斐波那契线 / 画江恩线 —— 我在走势图上画线</p>'
+    +'<p class="aiT-plan">· 分析当前走势 / 全盘研判 —— 拉真实K线给支撑阻力+趋势+回测</p>'
+    +'<p class="aiT-plan">· 给我交易建议 —— 给入场/止损/目标计划</p>'
+    +'<p class="aiT-plan">· 怎么做风险管理 / 设止损 / 控仓 —— 算止损位与仓位</p>'
+    +'<p class="aiT-plan">· 把关键位投射到走势图 —— 标支撑阻力</p>'
+    +'<p class="aiT-plan">· 斐波那契怎么用 / 江恩怎么用 / 黄金知识 —— 讲原理</p>'
+    +'<p class="aiT-plan">· 清除AI画线 / 帮助</p></div>','ai');
+}
+function aiPlanToChat(){
+  var price=MT5.lastPrice, lv=AI_STATE.levels, tr=AI_STATE.trend;
+  if(!lv){ aiChat('<div class="warn">请先点上方周期运行分析，或说「分析当前走势」。</div>','ai'); return; }
+  var riskAmt=(STATE.equity||400)*((STATE.riskPct||1.5)/100);
+  aiChat(aiPlanHtml(AI_STATE.tf, price, lv, tr, riskAmt),'ai');
+}
+function aiGiveAdvice(){
+  if(!AI_STATE.levels){ aiChat('<div class="warn">先拉取K线并回测，稍等…</div>','ai'); runAiAnalyze(AI_STATE.tf); }
+  else { aiPlanToChat(); aiRiskPlan(); }
+}
+function aiDrawFib(){
+  var lv=AI_STATE.levels, price=MT5.lastPrice;
+  if(!lv||price==null){ aiChat('<div class="warn">请先点上方周期运行分析（拉真实K线），我再画斐波那契。</div>','ai'); return; }
+  var lo=lv.L, hi=lv.H;
+  if(!(hi>lo)){ var d=buildTfData(AI_STATE.tf); if(d){ lo=d.lo; hi=d.hi; } }
+  if(!(hi>lo)){ aiChat('<div class="warn">区间不足，无法画斐波那契。</div>','ai'); return; }
+  var lines=fibLevels(lo,hi);
+  AI_FIB={min:lo*0.999, max:hi*1.001, lines:lines};
+  renderDrawings();
+  var txt='<div class="blk"><h4>📐 斐波那契线已画到走势图（区间 '+fmtPrice(lo)+' ~ '+fmtPrice(hi)+'）</h4>';
+  lines.forEach(function(L){ txt+='<div class="row"><span>Fib '+(L.r*100).toFixed(1)+'%</span><b style="color:#9b7bff">'+fmtPrice(L.p)+'</b></div>'; });
+  txt+='<div class="warn">回踩 38.2%~61.8% 不破且出现反转K线，可顺势做多；跌破 61.8% 原趋势大概率失效。说「斐波那契怎么用」看原理。</div></div>';
+  aiChat(txt,"ai");
+}
+function aiDrawGann(){
+  var lv=AI_STATE.levels, price=MT5.lastPrice;
+  if(!lv||price==null){ aiChat('<div class="warn">请先点上方周期运行分析，我再画江恩线。</div>','ai'); return; }
+  var lo=lv.L, hi=lv.H;
+  if(!(hi>lo)){ var d=buildTfData(AI_STATE.tf); if(d){ lo=d.lo; hi=d.hi; } }
+  if(!(hi>lo)){ aiChat('<div class="warn">区间不足，无法画江恩线。</div>','ai'); return; }
+  AI_GANN={min:lo*0.999, max:hi*1.001, pivotPrice:hi, px:0.62, angles:[75,71.6,63.4,45,26.6,18.4,14]};
+  renderDrawings();
+  aiChat('<div class="blk"><h4>📏 江恩扇形已画到走势图（枢轴='+fmtPrice(hi)+'）</h4>'
+    +'<p class="aiT-plan">从区间高点作枢轴，按标准角度（1×1=45°、2×1、1×2、3×1、1×3、4×1）发散。价格沿 1×1 线运行趋势健康；跌破 1×1 转弱、跌破 1×2 警惕反转。说「江恩怎么用」看原理。</p>'
+    +'<div class="warn">江恩扇形为示意角度，精确比例需按真实时间刻度；用于学习形态，开仓仍以支撑阻力+确认K线为主。</div></div>','ai');
+}
+function aiRiskPlan(){
+  var price=MT5.lastPrice;
+  if(price==null){ aiChat('<div class="warn">实时价还没取到，请稍等几秒。</div>','ai'); return; }
+  var eq=(STATE.equity||400), rp=(STATE.riskPct||1.5)/100;
+  var riskAmt=eq*rp;
+  var html='<div class="blk"><h4>🛡️ 风险管理方案（本金 '+eq+'U · 单笔风险 '+(rp*100).toFixed(1)+'%）</h4>';
+  html+='<p class="aiT-plan">单笔最大可亏损：<b>'+riskAmt.toFixed(2)+'U</b>。先想亏多少，再决定仓位——这是活下来的关键。</p>';
+  var lv=AI_STATE.levels;
+  if(lv){
+    var S=lv.sup||lv.S1, R=lv.res||lv.R1;
+    var slLong=S-Math.max(1.5,(price-S)*0.25), distLong=price-slLong;
+    var slShort=R+Math.max(1.5,(R-price)*0.25), distShort=slShort-price;
+    function lotInfo(dist){
+      var real=Math.max(0.01, Math.round((riskAmt/(100*dist))/0.01)*0.01);
+      var realRisk=0.01*100*dist;
+      var ok=realRisk<=riskAmt*1.08;
+      return '建议仓位 <b>'+real.toFixed(2)+' 手</b>（最低 0.01）；0.01 手在此止损距离下实际风险 <b>'+realRisk.toFixed(2)+'U</b> '+(ok?':) 在预算内':':( 超预算，建议放弃或等更近入场');
+    }
+    html+='<div class="row"><span>做多止损位</span><b class="sup">'+fmtPrice(slLong)+'</b></div>';
+    html+='<p class="aiT-plan">'+lotInfo(distLong)+'</p>';
+    html+='<div class="row"><span>做空止损位</span><b class="res">'+fmtPrice(slShort)+'</b></div>';
+    html+='<p class="aiT-plan">'+lotInfo(distShort)+'</p>';
+    html+='<p class="aiT-plan">目标：做多看 '+fmtPrice(R)+'（距 '+(R-price).toFixed(2)+'）、做空看 '+fmtPrice(S)+'（距 '+(price-S).toFixed(2)+'）。开仓前确认盈亏比 ≥ 2:1。</p>';
+  } else {
+    html+='<p class="aiT-plan">先运行分析，我才能结合支撑/阻力算具体止损与仓位。通用：止损距离 = 单笔风险 ÷（100 × 手数）；0.01 手每波动 1 美元 = 风险 1 美元。</p>';
+  }
+  html+='<div class="warn">纪律：① 单笔风险 ≤1%~2%；② 止损必设技术位外、不扛单；③ 盈亏比 ≥2:1 才出手；④ 同时敞口 ≤2~3 笔。黄金波动大，务必轻仓。</div></div>';
+  aiChat(html,'ai');
+}
+function clearAiDrawings(){
+  AI_FIB=null; AI_GANN=null; AI_PROJECTION=null; AI_PROJ_RANGE=null;
+  renderDrawings();
+  aiChat('<div class="warn">🧹 已清除 AI 画的分析线（支撑/阻力、斐波那契、江恩）。你的手绘线保留。</div>','ai');
+}
+function aiCommand(text){
+  var t=(text||"").toLowerCase();
+  function has(){ for(var i=0;i<arguments.length;i++) if(t.indexOf(arguments[i])>=0) return true; return false; }
+  var know=has('怎么用','原理','知识','教程','是什么','如何','学习');
+  if(know && has('斐波','fib')){ aiKb('fib'); return; }
+  if(know && has('江恩','gann')){ aiKb('gann'); return; }
+  if(know && has('风险','仓位','控仓','止损','风控')){ aiKb('risk'); return; }
+  if(has('风险','止损','仓位','控仓','风控')){ aiRiskPlan(); return; }
+  if(has('斐波','fib')){ aiDrawFib(); return; }
+  if(has('江恩','gann')){ aiDrawGann(); return; }
+  if(has('投射','标到图','关键位','投影')){ projectAiToChart(); return; }
+  if(has('清','删','去') && has('线','画')){ clearAiDrawings(); return; }
+  if(has('分析','走势','盘面','研判','当前','全盘')){ aiChat('<div class="warn">🔄 正在拉取'+tfName(AI_STATE.tf)+'真实K线并回测…</div>','ai'); runAiAnalyze(AI_STATE.tf); return; }
+  if(has('建议','交易','信号','操作','怎么玩','买','卖')){ aiGiveAdvice(); return; }
+  if(has('帮助','help','你能','会做','功能')){ aiHelp(); return; }
+  if(has('知识','黄金','怎么看','入门')){ aiKb('general'); return; }
+  aiChat('我还没完全理解这条指令。试试：<b>画斐波那契线</b> / <b>画江恩线</b> / <b>分析当前走势</b> / <b>给我交易建议</b> / <b>怎么做风险管理</b> / <b>把关键位投射到走势图</b> / <b>清除AI画线</b>。也可说「帮助」。','ai');
+}
+function initAiDrag(){
+  var panel=document.getElementById("aiTPanel"), head=document.getElementById("aiTHead");
+  if(!panel||!head||panel._dragReady) return; panel._dragReady=true;
+  var sx=0,sy=0,ox=0,oy=0,drag=false;
+  head.addEventListener("mousedown",function(e){
+    if(e.target.tagName==="BUTTON"||e.target.classList.contains("x")) return;
+    drag=true; sx=e.clientX; sy=e.clientY;
+    var r=panel.getBoundingClientRect(); ox=r.left; oy=r.top;
+    panel.style.left=ox+"px"; panel.style.top=oy+"px"; panel.style.right="auto";
+    e.preventDefault();
+  });
+  window.addEventListener("mousemove",function(e){
+    if(!drag) return;
+    var nx=ox+(e.clientX-sx), ny=oy+(e.clientY-sy);
+    nx=Math.max(0,Math.min(window.innerWidth-panel.offsetWidth,nx));
+    ny=Math.max(0,Math.min(window.innerHeight-panel.offsetHeight,ny));
+    panel.style.left=nx+"px"; panel.style.top=ny+"px";
+  });
+  window.addEventListener("mouseup",function(){ drag=false; });
+}
 /* ===== 新闻雷达 · 智能语义引擎 v2 ===== */
 var NEWS={loaded:false,timer:null,items:[]};
 var NEWS_FEEDS=[
