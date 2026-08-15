@@ -814,7 +814,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <div class="row"><label>API地址</label><input id="aiGptBase" placeholder="https://open.bigmodel.cn/api/paas/v4" style="flex:1"></div>
       <div class="row"><label>API Key</label><input id="aiGptKey" type="password" placeholder="已预置 · 可替换/清空" style="flex:1"></div>
       <div class="row"><label>本地代理</label><input type="checkbox" id="aiGptProxy" onchange="STATE.aiUseProxy=this.checked;saveAiGpt();aiGptBadge()"><input id="aiGptProxyUrl" placeholder="http://localhost:3000" style="flex:1;min-width:0;margin-left:8px" onchange="STATE.aiProxy=this.value.trim();saveAiGpt()"></div>
-      <div class="row"><button onclick="testAiConn()">🔌 测试连接</button><button onclick="saveAiGpt()">保存并连接</button><a class="dsOpen" href="https://www.bigmodel.cn/console/overview?icode=RnR%2F%2BmCEyxooOvYk%2FbqmQZmwcr074zMJTpgMb8zZZvg%3D&from=invite" target="_blank" rel="noopener">🌐 打开智谱控制台(邀请)</a><span id="aiGptStat" class="muted"></span></div>
+      <div class="row"><button onclick="testAiConn()">🔌 测试连接</button><button onclick="saveAiGpt()">保存并连接</button><a class="dsOpen" href="https://bigmodel.cn/console/overview?icode=RnR%2F%2BmCEyxooOvYk%2FbqmQZmwcr074zMJTpgMb8zZZvg%3D&from=invite" target="_blank" rel="noopener">🌐 打开智谱控制台(邀请)</a><span id="aiGptStat" class="muted"></span></div>
       <div class="kbBlock">
         <div style="color:var(--muted);font-size:11px;margin:2px 0 4px">📝 我的知识笔记（会一起教给 AI，让它更懂你的风格）</div>
         <textarea id="aiKbNotes" placeholder="把你的黄金交易心得、常用策略、口诀贴到这里，AI 回答时会一并参考…" rows="3"></textarea>
@@ -890,7 +890,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.16 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.17 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -2567,7 +2567,7 @@ function saveAiSettings(){
   document.getElementById("aiStat").textContent=STATE.aiKey?"已保存（AI 复核可用）":"已清空";
 }
 function loadAiSettings(){
-  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"https://open.bigmodel.cn/api/paas/v4";STATE.aiKey=(s.key!==undefined&&s.key!=="")?s.key:BAKED_AI_KEY;STATE.aiModel=s.model||"glm-4-plus";STATE.aiOnline=(s.online!==undefined)?!!s.online:true;STATE.aiUseProxy=!!s.useProxy;STATE.aiProxy=s.proxy||"http://localhost:3000";}catch(e){STATE.aiBase="https://open.bigmodel.cn/api/paas/v4";STATE.aiModel="glm-4-plus";STATE.aiKey=BAKED_AI_KEY;STATE.aiOnline=true;STATE.aiUseProxy=false;STATE.aiProxy="http://localhost:3000";}
+  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"https://open.bigmodel.cn/api/paas/v4"; if(STATE.aiBase.indexOf("bigmodel")<0) STATE.aiBase="https://open.bigmodel.cn/api/paas/v4"; STATE.aiKey=(s.key!==undefined&&s.key!=="")?s.key:BAKED_AI_KEY;STATE.aiModel=s.model||"glm-4-plus";STATE.aiOnline=(s.online!==undefined)?!!s.online:true;STATE.aiUseProxy=!!s.useProxy;STATE.aiProxy=s.proxy||"http://localhost:3000";}catch(e){STATE.aiBase="https://open.bigmodel.cn/api/paas/v4";STATE.aiModel="glm-4-plus";STATE.aiKey=BAKED_AI_KEY;STATE.aiOnline=true;STATE.aiUseProxy=false;STATE.aiProxy="http://localhost:3000";}
   var set=function(id,val){ var e=document.getElementById(id); if(e) e.value=val||""; };
   set("aiBase",STATE.aiBase); set("aiKey",STATE.aiKey);
   set("aiGptBase",STATE.aiBase); set("aiGptKey",STATE.aiKey);
