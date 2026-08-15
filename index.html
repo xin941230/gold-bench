@@ -392,6 +392,43 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
 .aiGptSet input[type=checkbox]{width:16px;height:16px}
 .aiGptSet a.dsOpen{margin-left:auto;color:var(--gold2);text-decoration:none;font-size:11px;border:1px solid var(--gold);border-radius:6px;padding:4px 8px;white-space:nowrap}
 .aiGptSet a.dsOpen:hover{background:rgba(247,210,113,.12)}
+/* ===== AI 量化交易决策面板 ===== */
+.aiDec-panel{display:none;position:fixed;top:84px;left:18px;width:412px;height:624px;min-width:340px;min-height:420px;background:#14110d;border:1px solid var(--gold);border-radius:14px;box-shadow:-10px 14px 44px rgba(0,0,0,.6);z-index:91;flex-direction:column;resize:both;overflow:hidden}
+.aiDec-panel.open{display:flex}
+.aiDec-panel .aiDec-head{position:relative;display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid #2a2520;background:#1b160f}
+.aiDec-panel .aiDec-head h3{margin:0;font-size:14px;color:var(--gold2)}
+.aiDec-panel .x{position:absolute;right:12px;top:11px;cursor:pointer;color:var(--muted);font-size:20px;line-height:1}
+.aiDec-panel .x:hover{color:var(--red)}
+.aiDec-panel .aiDec-body{padding:10px 12px;overflow:auto;flex:1}
+.aiDec-sec{margin-bottom:9px;background:#13110d;border:1px solid #2a2520;border-radius:8px;padding:8px 9px}
+.aiDec-sec h5{margin:0 0 6px;font-size:12px;color:var(--gold);border-left:3px solid var(--gold);padding-left:6px}
+.aiDec-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
+.aiDec-f{display:flex;flex-direction:column;gap:2px}
+.aiDec-f label{font-size:10.5px;color:var(--muted)}
+.aiDec-f input,.aiDec-f select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--text);border-radius:6px;padding:4px 6px;font-size:12px;width:100%;box-sizing:border-box;font-family:inherit}
+.aiDec-f.full{grid-column:1/3}
+.aiDec-actions{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 8px}
+.aiDec-actions button{flex:1;min-width:84px;background:#3a2c10;border:1px solid var(--gold);color:var(--gold2);border-radius:8px;padding:8px 6px;cursor:pointer;font-size:12.5px;font-weight:600}
+.aiDec-actions button.ghost{background:#241e16;border-color:#3a3328;color:#b9ab8a;font-weight:400}
+.aiDec-actions button:hover{background:rgba(247,210,113,.16)}
+.aiDec-out{margin-top:4px}
+.dec-card{background:#16120c;border:1px solid #3a3328;border-radius:10px;padding:10px 12px;margin-bottom:4px}
+.dec-act{display:inline-block;font-size:14px;font-weight:700;padding:3px 12px;border-radius:20px;margin-bottom:8px}
+.dec-act.long{background:rgba(86,211,100,.18);color:#56d364;border:1px solid #56d364}
+.dec-act.short{background:rgba(255,107,107,.18);color:#ff6b6b;border:1px solid #ff6b6b}
+.dec-act.hold,.dec-act.flat{background:rgba(247,210,113,.16);color:#f7d271;border:1px solid #f7d271}
+.dec-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px dashed #221d16}
+.dec-row span:first-child{color:var(--muted)}
+.dec-row b{color:var(--text)}
+.dec-conf{height:8px;background:#241e16;border-radius:6px;overflow:hidden;margin:6px 0}
+.dec-conf i{display:block;height:100%;background:linear-gradient(90deg,#56d364,#f7d271,#ff6b6b)}
+.dec-reason{font-size:11.5px;color:#c9bb9a;line-height:1.6;background:#0f0d0a;border:1px solid #2a2520;border-radius:8px;padding:7px 9px;margin-top:7px}
+.dec-checks{margin-top:7px}
+.dec-check{font-size:11px;padding:3px 7px;border-radius:6px;margin:3px 0;line-height:1.5}
+.dec-check.ok{background:rgba(86,211,100,.12);color:#7fe39a;border:1px solid rgba(86,211,100,.3)}
+.dec-check.warn{background:rgba(247,210,113,.12);color:#f0cf86;border:1px solid rgba(247,210,113,.3)}
+.dec-check.fail{background:rgba(255,107,107,.12);color:#ff9a9a;border:1px solid rgba(255,107,107,.3)}
+.dec-json{font-family:monospace;font-size:10.5px;white-space:pre-wrap;color:#9fb6c9;background:#0f0d0a;border:1px solid #2a2520;border-radius:8px;padding:7px 9px;margin-top:7px;max-height:140px;overflow:auto}
 .aiThinking{color:var(--gold2);opacity:.85}
 .aiGptBody{white-space:normal;line-height:1.6;font-size:13px}
 .aiGptBody b{color:var(--gold2)}
@@ -832,6 +869,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <span class="aiT-chip" onclick="aiQuick('把关键位投射到走势图')">🎯 投射关键位</span>
       <span class="aiT-chip" onclick="aiQuick('斐波那契怎么用')">📚 斐波那契知识</span>
       <span class="aiT-chip" onclick="aiQuick('清除AI画线')">🧹 清AI画线</span>
+      <span class="aiT-chip" onclick="toggleAiDecision()">🎯 AI交易决策</span>
       <span class="aiT-chip" onclick="aiDailyBrief()">📰 每日简报</span>
       <span class="aiT-chip" onclick="showKbNotes()">📝 我的笔记</span>
       <span class="aiT-chip" onclick="SOUND_ON=!SOUND_ON;toast(SOUND_ON?'🔔 预警声音：开':'🔇 预警声音：关')">🔔 声音开关</span>
@@ -840,6 +878,72 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <input id="aiTCmd" type="text" placeholder="对 AI 交易员下指令，例如：画斐波那契线并分析支撑…" onkeydown="if(event.key==='Enter')aiSendCmd()" />
       <button onclick="aiSendCmd()">发送</button>
     </div>
+  </div>
+</div>
+
+<!-- AI 量化交易决策面板 -->
+<div class="aiDec-panel" id="aiDecPanel">
+  <div class="aiDec-head">
+    <span class="dot-ai"></span>
+    <h3>🎯 AI 量化交易决策</h3>
+    <span class="x" onclick="toggleAiDecision()" title="收起">×</span>
+  </div>
+  <div class="aiDec-body">
+    <div class="aiT-status">按你给定的「XAUUSD 量化交易员」指令：填好行情/指标/账户，AI 严格按「趋势→波动率→宏观风险→成本→风险约束」决策，<b>只输出 JSON</b>，并自动核对 6 条禁止行为。缺数据会变保守（hold/flat）。</div>
+
+    <div class="aiDec-sec">
+      <h5>① 行情与指标</h5>
+      <div class="aiDec-grid">
+        <div class="aiDec-f"><label>当前价格 XAUUSD</label><input id="decPrice" type="number" step="0.01" placeholder="如 2350.50"></div>
+        <div class="aiDec-f"><label>点差 (USD)</label><input id="decSpread" type="number" step="0.01" placeholder="如 0.30"></div>
+        <div class="aiDec-f"><label>时间(UTC)</label><input id="decTime" type="text" readonly></div>
+        <div class="aiDec-f"><label>ADX(可选)</label><input id="decAdx" type="number" step="0.1" placeholder="如 22"></div>
+        <div class="aiDec-f"><label>趋势研判</label><select id="decBias"><option value="震荡">震荡</option><option value="多头">多头</option><option value="空头">空头</option><option value="未知">未知</option></select></div>
+        <div class="aiDec-f"><label>MA20</label><input id="decMa20" type="number" step="0.01" placeholder="未知留空"></div>
+        <div class="aiDec-f"><label>MA50</label><input id="decMa50" type="number" step="0.01" placeholder="未知留空"></div>
+        <div class="aiDec-f"><label>RSI14</label><input id="decRsi" type="number" step="0.1" placeholder="0-100"></div>
+        <div class="aiDec-f"><label>ATR14</label><input id="decAtr" type="number" step="0.01" placeholder="未知留空"></div>
+        <div class="aiDec-f"><label>布林带上轨</label><input id="decBollU" type="number" step="0.01" placeholder="未知留空"></div>
+        <div class="aiDec-f"><label>布林带中轨</label><input id="decBollM" type="number" step="0.01" placeholder="未知留空"></div>
+        <div class="aiDec-f"><label>布林带下轨</label><input id="decBollL" type="number" step="0.01" placeholder="未知留空"></div>
+      </div>
+    </div>
+
+    <div class="aiDec-sec">
+      <h5>② 宏观数据</h5>
+      <div class="aiDec-grid">
+        <div class="aiDec-f"><label>美10Y实际利率(%)</label><input id="decReal" type="number" step="0.01" placeholder="如 1.8"></div>
+        <div class="aiDec-f"><label>美元指数 DXY</label><input id="decDxy" type="number" step="0.01" placeholder="如 104.5"></div>
+        <div class="aiDec-f full"><label>GLD ETF 持仓变化(吨/%)</label><input id="decGld" type="text" placeholder="如 +3.2吨 / -0.5% / 未知"></div>
+      </div>
+    </div>
+
+    <div class="aiDec-sec">
+      <h5>③ 持仓与账户</h5>
+      <div class="aiDec-grid">
+        <div class="aiDec-f"><label>当前持仓</label><select id="decPos"><option value="无">无</option><option value="多单">多单</option><option value="空单">空单</option></select></div>
+        <div class="aiDec-f"><label>持仓手数</label><input id="decPosLots" type="number" step="0.01" value="0.5" placeholder="如 0.5"></div>
+        <div class="aiDec-f"><label>账户净值(U)</label><input id="decEquity" type="number" step="1" value="400" placeholder="如 400"></div>
+        <div class="aiDec-f"><label>已用保证金(U)</label><input id="decUsed" type="number" step="1" value="0" placeholder="如 20"></div>
+        <div class="aiDec-f"><label>可用保证金(U)</label><input id="decFree" type="number" step="1" value="400" placeholder="如 380"></div>
+        <div class="aiDec-f"><label>杠杆倍数</label><input id="decLev" type="number" step="1" value="100" placeholder="如 100"></div>
+      </div>
+    </div>
+
+    <div class="aiDec-sec">
+      <h5>④ 未来24h经济日历</h5>
+      <div class="aiDec-grid">
+        <div class="aiDec-f"><label>重大数据</label><select id="decEvent"><option value="无">无</option><option value="非农NFP">非农 NFP</option><option value="CPI">CPI</option><option value="美联储决议">美联储决议</option><option value="其他">其他重大</option></select></div>
+        <div class="aiDec-f"><label>距公布(分钟)</label><input id="decEventMin" type="number" step="1" placeholder="无则留空"></div>
+      </div>
+    </div>
+
+    <div class="aiDec-actions">
+      <button onclick="aiTraderDecision()">🎯 生成交易决策</button>
+      <button class="ghost" onclick="aiDecPrefill()">📥 填实时价/点差</button>
+      <button class="ghost" onclick="aiDecClear()">🧹 清AI画线</button>
+    </div>
+    <div class="aiDec-out" id="aiDecOut"></div>
   </div>
 </div>
 
@@ -890,7 +994,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.17 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.18 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -2007,7 +2111,7 @@ function renderDrawings(){
   var html="";
   // 图例（顶部 HUD，固定，解决"看不清/混乱"）
   html+='<g><rect x="4" y="2" width="'+(W-8)+'" height="20" rx="6" fill="rgba(10,8,5,.55)"/>'
-      +'<text class="mt5-ol-leg" x="10" y="16">🤖 AI线：<tspan fill="#ffffff">●现价</tspan> <tspan fill="#ff6b6b">●阻力</tspan> <tspan fill="#56d364">●支撑</tspan> <tspan fill="#c4a7ff">●斐波</tspan> <tspan fill="#4dd0c4">●江恩</tspan> <tspan fill="#ffd166">●手绘</tspan></text></g>';
+      +'<text class="mt5-ol-leg" x="10" y="16">🤖 AI线：<tspan fill="#ffffff">●现价</tspan> <tspan fill="#ff6b6b">●阻力</tspan> <tspan fill="#56d364">●支撑</tspan> <tspan fill="#c4a7ff">●斐波</tspan> <tspan fill="#4dd0c4">●江恩</tspan> <tspan fill="#ffd166">●手绘</tspan> <tspan fill="#9b7bff">●🤖决策</tspan></text></g>';
   // 1) AI 投射线（底层，半透明，不抢手绘线）
   if(AI_PROJECTION){
     var data=AI_PROJECTION;
@@ -2055,6 +2159,23 @@ function renderDrawings(){
     html+='<circle cx="'+gpx+'" cy="'+gpy+'" r="3.5" fill="#4dd0c4" stroke="#0c1a18" stroke-width="1"/>';
     html+='<text class="mt5-ol-text" x="'+(gpx+8)+'" y="'+(gpy+3)+'" fill="#4dd0c4" font-size="10">江恩枢轴 '+fmtPrice(AI_GANN.pivotPrice)+'</text>';
   }
+  // 1.7) AI 量化交易决策线（白=入场、红虚=止损、绿虚=止盈；与走势图同一坐标系）
+  if(AI_DECISION){
+    (function(){
+      var d=AI_DECISION;
+      function _decLine(p,col,dash,lab){
+        if(typeof p!=="number"||!isFinite(p)) return "";
+        var y=priceToY(p,H); if(y<0||y>H) return "";
+        return '<line x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="'+col+'" stroke-width="1.6" stroke-dasharray="'+dash+'" opacity="0.95"/>'
+          +'<text class="mt5-ol-text" x="6" y="'+(y-5)+'" fill="'+col+'" font-weight="bold">'+lab+' '+fmtPrice(p)+'</text>';
+      }
+      html+=_decLine(d.entry,"#ffffff","0","🤖 入场");
+      if(d.action==="long"||d.action==="short"){
+        html+=_decLine(d.stop_loss,"#ff6b6b","6 4","🤖 止损SL");
+        html+=_decLine(d.take_profit,"#56d364","6 4","🤖 止盈TP");
+      }
+    })();
+  }
   // 2) 用户手绘线（顶层）
   var all=DRAW.items.slice();
   if(DRAW.current) all.push(DRAW.current);
@@ -2075,7 +2196,7 @@ function renderDrawings(){
   });
   ol.innerHTML=html;
 }
-function clearDrawings(){ DRAW.items=[]; DRAW.current=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_FIB=null; AI_GANN=null; renderDrawings(); var ptr=document.querySelector('#mt5Dtools .dt-btn[data-tool="pointer"]'); if(ptr) selectDrawTool('pointer',ptr); }
+function clearDrawings(){ DRAW.items=[]; DRAW.current=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_FIB=null; AI_GANN=null; AI_DECISION=null; renderDrawings(); var ptr=document.querySelector('#mt5Dtools .dt-btn[data-tool="pointer"]'); if(ptr) selectDrawTool('pointer',ptr); }
 function resizeOverlay(){ renderDrawings(); }
 function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
@@ -2127,6 +2248,7 @@ function renderAiProjection(){
 
 /* ===== AI 交易员 · 对话指令 / 画线 / 风险管理 / 知识库 ===== */
 var AI_FIB=null, AI_GANN=null;
+var AI_DECISION=null;
 /* 内置黄金期货知识库（整理自公开资料：斐波那契、江恩、风险管理） */
 var GOLD_KB={
   fib:'<div class="blk"><h4>📐 斐波那契回调（Fibonacci Retracement）</h4>'
@@ -2328,9 +2450,9 @@ function aiRiskPlan(){
   aiChat(html,'ai');
 }
 function clearAiDrawings(){
-  AI_FIB=null; AI_GANN=null; AI_PROJECTION=null; AI_PROJ_RANGE=null;
+  AI_FIB=null; AI_GANN=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_DECISION=null;
   renderDrawings();
-  aiChat('<div class="warn">🧹 已清除 AI 画的分析线（支撑/阻力、斐波那契、江恩）。你的手绘线保留。</div>','ai');
+  aiChat('<div class="warn">🧹 已清除 AI 画的分析线（支撑/阻力、斐波那契、江恩、决策线）。你的手绘线保留。</div>','ai');
 }
 function aiCommand(text){
   var t=(text||"").toLowerCase();
@@ -2349,6 +2471,297 @@ function aiCommand(text){
   if(has('帮助','help','你能','会做','功能')){ aiHelp(); return; }
   if(has('知识','黄金','怎么看','入门')){ aiKb('general'); return; }
   aiChat('我还没完全理解这条指令。试试：<b>画斐波那契线</b> / <b>画江恩线</b> / <b>分析当前走势</b> / <b>给我交易建议</b> / <b>怎么做风险管理</b> / <b>把关键位投射到走势图</b> / <b>清除AI画线</b>。也可说「帮助」。','ai');
+}
+/* ===== AI 量化交易决策（按用户给定的 XAUUSD 量化交易员指令） ===== */
+function toggleAiDecision(){
+  var p=document.getElementById("aiDecPanel"); if(!p) return;
+  if(p.classList.contains("open")) p.classList.remove("open");
+  else { p.classList.add("open"); aiDecPrefill(); }
+}
+function decNum(id){ var el=document.getElementById(id); if(!el) return null; var v=parseFloat((el.value||"").trim()); return isFinite(v)?v:null; }
+function decStr(id){ var el=document.getElementById(id); return el?(el.value||"").trim():""; }
+function aiDecPrefill(){
+  var p=document.getElementById("decPrice");
+  if(p && MT5.lastPrice!=null) p.value=MT5.lastPrice.toFixed(2);
+  var sp=document.getElementById("decSpread");
+  if(sp && MT5MAP[MT5.sym]) sp.value=MT5MAP[MT5.sym].spread;
+  var t=document.getElementById("decTime");
+  if(t) t.value=new Date().toISOString().replace("T"," ").slice(0,16)+" UTC";
+  var b=document.getElementById("decBias");
+  if(b && AI_STATE.trend && AI_STATE.trend.bias){
+    var bs=AI_STATE.trend.bias;
+    b.value = bs.indexOf("多")>=0?"多头":(bs.indexOf("空")>=0?"空头":"震荡");
+  }
+}
+function aiDecBuildInput(){
+  return {
+    price:decNum("decPrice"), spread:decNum("decSpread"),
+    time:decStr("decTime")||new Date().toISOString().slice(0,16),
+    bias:decStr("decBias"), adx:decNum("decAdx"),
+    ma20:decNum("decMa20"), ma50:decNum("decMa50"), rsi:decNum("decRsi"), atr:decNum("decAtr"),
+    bollU:decNum("decBollU"), bollM:decNum("decBollM"), bollL:decNum("decBollL"),
+    realRate:decNum("decReal"), dxy:decNum("decDxy"), gld:decStr("decGld")||"未知",
+    position:decStr("decPos"), posLots:decNum("decPosLots")||0,
+    equity:decNum("decEquity")||STATE.equity||400, usedMargin:decNum("decUsed")||0,
+    freeMargin:decNum("decFree"), leverage:decNum("decLev")||100,
+    event:decStr("decEvent"), eventMin:decNum("decEventMin")
+  };
+}
+function aiTraderSystemPrompt(){
+  return [
+"You是一名专业的 XAUUSD（现货黄金）量化交易员。",
+"你的任务是基于输入的市场数据，输出交易决策。",
+"你必须严格遵守风险规则，不预测无法预测的事件。",
+"",
+"[交易品种] XAUUSD（1 标准手 = 100 盎司）。",
+"",
+"[输入数据]（由用户以 JSON 提供）：当前价格、点差、时间(UTC)、过去100根15m K线OHLCV（若未提供则用下方指标）、技术指标 MA20/MA50/RSI14/ATR14/布林带、宏观数据（美国10Y实际利率、美元指数、GLD ETF持仓变化）、当前持仓（无/多单X手/空单X手）、账户（净值/已用保证金/可用保证金/杠杆倍数）、未来24h经济日历（是否有重大数据：非农/CPI/美联储决议）。",
+"",
+"[决策流程]",
+"1. 判断当前趋势：多头、空头、震荡（使用 MA20/MA50、ADX）。",
+"2. 判断波动率：ATR 是否处于合理区间，是否适合交易。",
+"3. 检查宏观风险：未来 24 小时是否有重大数据，若有则降低仓位或不开新仓。",
+"4. 检查成本：点差 + 隔夜利息是否在可接受范围。",
+"5. 检查风险约束：单笔风险不超过账户净值的 1%，总持仓保证金不超过净值的 20%。",
+"6. 输出决策。",
+"",
+"[禁止行为]",
+"- 禁止在无数据支撑时猜测方向。",
+"- 禁止单笔风险超过账户净值的 1%。",
+"- 禁止在重大数据公布前 15 分钟开新仓。",
+"- 禁止使用未来数据。",
+"- 禁止输出除 JSON 以外的内容。",
+"- 禁止让持仓过夜，除非明确计算了隔夜利息且认为可接受。",
+"",
+"[输出格式] 必须且仅输出如下 JSON（不要任何解释、不要 markdown 代码块、不要反引号）：",
+'{"action":"long" | "short" | "hold" | "flat", "position_size":0.5, "stop_loss":1850.00, "take_profit":1900.00, "confidence":0.70, "reasoning":"决策逻辑，不超过 50 字"}',
+"",
+"[字段与风险规则说明]",
+"- action：long=做多、short=做空、hold=观望、flat=空仓。",
+"- position_size：0 到 1，代表使用「可用风险预算（=账户净值×1%）」的比例。换算实际仓位后若单笔风险超过净值1%，必须自动下调到上限。",
+"- stop_loss / take_profit：止损价 / 止盈价（美元/盎司）。long 止损须在入场下方、short 止损须在入场上方。",
+"- confidence：0 到 1 的置信度。",
+"- reasoning：不超过 50 字的中文决策逻辑。",
+"- 单笔风险 = 仓位(标准手) × 100 × |入场价 − 止损价|（美元），必须 ≤ 账户净值 × 1%。",
+"- 总持仓保证金 = 所有持仓名义价值 ÷ 杠杆，必须 ≤ 账户净值 × 20%。",
+"- 若关键数据缺失（如指标/宏观/账户），不得臆测方向；优先输出 hold/flat，并在 reasoning 中说明缺哪些数据、置信度相应下调。",
+"- 重大数据公布前 15 分钟内不得开新仓（action 不得为 long/short）。"
+  ].join("\n");
+}
+function aiDecUserContent(m){
+  var input={
+    symbol:"XAUUSD", contract:"1标准手=100盎司",
+    current_price:m.price, spread:m.spread, time_utc:m.time,
+    klines_15m_100:"未提供（详见下方指标与上下文）",
+    indicators:{ MA20:m.ma20, MA50:m.ma50, RSI14:m.rsi, ATR14:m.atr,
+      bollinger:{ upper:m.bollU, middle:m.bollM, lower:m.bollL } },
+    macro:{ US10Y_real_rate_pct:m.realRate, DXY:m.dxy, GLD_ETF_change:m.gld },
+    current_position:(m.position==="无"?"无":(m.position+" "+m.posLots+"手")),
+    account:{ equity:m.equity, used_margin:m.usedMargin, free_margin:m.freeMargin, leverage:m.leverage },
+    calendar_24h:{ major_event:m.event, minutes_to_event:(m.eventMin==null?null:m.eventMin) }
+  };
+  return "以下是当前市场输入数据（JSON）：\n"+JSON.stringify(input,null,2)
+    +"\n\n请严格遵循你的角色定义与决策流程，只输出【输出格式】规定的决策 JSON（字段：action / position_size / stop_loss / take_profit / confidence / reasoning），不要输出任何 JSON 以外的文字、不要使用 markdown 代码块。";
+}
+function aiDecParse(c){
+  if(!c) return null;
+  var s=c.indexOf("{"); var e=c.lastIndexOf("}");
+  if(s<0||e<0||e<s) return null;
+  try{ return JSON.parse(c.slice(s,e+1)); }catch(err){ return null; }
+}
+function aiDecEnrich(dec,m){
+  dec=dec||{};
+  var eq=m.equity||400;
+  dec._eq=eq;
+  var action=(dec.action||"hold").toString().toLowerCase();
+  if(["long","short","hold","flat"].indexOf(action)<0) action="hold";
+  var checks=dec.checks?dec.checks.slice():[];
+  var entry=m.price;
+  dec.entry=entry;
+  var ps=parseFloat(dec.position_size); dec.position_size=(isFinite(ps)&&ps>=0&&ps<=1)?+ps.toFixed(3):0;
+  var sl=parseFloat(dec.stop_loss); dec.stop_loss=isFinite(sl)?sl:null;
+  var tp=parseFloat(dec.take_profit); dec.take_profit=isFinite(tp)?tp:null;
+  var conf=parseFloat(dec.confidence); dec.confidence=(isFinite(conf)&&conf>=0&&conf<=1)?+conf.toFixed(2):0.5;
+  if(action==="long"||action==="short"){
+    if(dec.stop_loss==null){
+      checks.push({lv:"fail",t:"⛔ 缺失止损价 stop_loss，违反风险规则，已强制 flat。"});
+      action="flat"; dec.stop_loss=null; dec.take_profit=null; dec.lotSize=0;
+    } else {
+      var dist = action==="long" ? (entry-dec.stop_loss) : (dec.stop_loss-entry);
+      if(!(dist>0)){
+        checks.push({lv:"fail",t:"⛔ 止损方向错误（"+action+" 止损应在"+(action==="long"?"入场下方":"入场上方")+"），已强制 flat。"});
+        action="flat"; dec.lotSize=0; dec.stop_loss=null; dec.take_profit=null;
+      } else {
+        var riskBudget=eq*0.01;
+        var idealLot=riskBudget/(100*dist); // 恰好用完 1% 净值风险的仓位
+        var lot=0;
+        if(idealLot < 0.01-1e-9){
+          // 即便最小 0.01 手，单笔风险也超过 1% 净值 → 无合规仓位，强制 flat
+          checks.push({lv:"fail",t:"⛔ 即便最小 0.01 手，单笔风险约 "+(0.01*100*dist).toFixed(2)+" U 也超过净值1%（"+(riskBudget).toFixed(2)+" U）。0.01 手合规最大止损距离≈"+(riskBudget).toFixed(2)+" 点。已强制 flat。"});
+          action="flat"; dec.lotSize=0; dec.stop_loss=null; dec.take_profit=null; dec.position_size=0; dec.dist=+dist.toFixed(2);
+        } else {
+          lot=dec.position_size*riskBudget/(100*dist);
+          lot=Math.max(0.01, Math.round(lot/0.01)*0.01);
+          var maxLot=riskBudget/(100*dist);
+          if(lot>maxLot+1e-9){ lot=Math.max(0.01,Math.round(maxLot/0.01)*0.01); checks.push({lv:"warn",t:"⚠️ 仓位超 1% 净值风险上限，已自动下调到上限。"}); }
+          var lev=m.leverage||100;
+          var addMargin=lot*100*entry/lev;
+          var cap20=eq*0.2;
+          if((m.usedMargin||0)+addMargin>cap20+1e-9){
+            var allowMargin=cap20-(m.usedMargin||0);
+            if(allowMargin>0){ var mcap=allowMargin*lev/(100*entry); lot=Math.max(0.01,Math.round(mcap/0.01)*0.01); }
+            else lot=0;
+            checks.push({lv:"warn",t:"⚠️ 总持仓保证金将超过净值 20%，已压缩仓位到限额内。"});
+          }
+          dec.lotSize=lot;
+          dec.allocatedRisk=+(lot*100*dist).toFixed(2);
+          dec.position_size=+((lot*100*dist)/riskBudget).toFixed(3);
+          dec.dist=+dist.toFixed(2);
+        }
+        if(m.event && m.event!=="无" && m.eventMin!=null && m.eventMin<=15 && m.position==="无"){
+          checks.push({lv:"fail",t:"⛔ 重大数据（"+m.event+"）公布前 "+m.eventMin+" 分钟，禁止开新仓，已强制 flat。"});
+          action="flat"; dec.lotSize=0; dec.stop_loss=null; dec.take_profit=null;
+        } else if(m.event && m.event!=="无" && m.eventMin!=null && m.eventMin<=15){
+          checks.push({lv:"warn",t:"⚠️ 重大数据前 "+m.eventMin+" 分钟：不开新仓；当前为已有持仓管理。"});
+        }
+        checks.push({lv:"warn",t:"📌 默认当日平仓，严禁持仓过夜（除非已算隔夜利息并确认可接受）。"});
+        if(dec.stop_loss!=null && dec.take_profit!=null && action!=="flat"){
+          var rr = action==="long" ? (dec.take_profit-entry)/(entry-dec.stop_loss) : (entry-dec.take_profit)/(dec.stop_loss-entry);
+          dec.rr=+rr.toFixed(2);
+          if(rr<2) checks.push({lv:"warn",t:"⚠️ 盈亏比 "+rr.toFixed(1)+":1 < 2:1，胜率要求更高，谨慎。"});
+          else checks.push({lv:"ok",t:"✅ 盈亏比 "+rr.toFixed(1)+":1 ≥ 2:1。"});
+        }
+      }
+    }
+  } else {
+    dec.lotSize=0; dec.stop_loss=null; dec.take_profit=null;
+    checks.push({lv:"ok",t:"🟡 本次为观望/空仓（"+action+"），无新开仓。"});
+  }
+  if(m.ma20==null||m.ma50==null||m.rsi==null) checks.push({lv:"warn",t:"⚠️ 部分技术指标(MA/RSI/ATR)未提供，趋势判断依据不足，置信度已打折。"});
+  if(m.realRate==null||m.dxy==null) checks.push({lv:"warn",t:"⚠️ 宏观数据(实际利率/DXY)未提供，已按中性处理。"});
+  dec.action=action;
+  dec.checks=checks;
+  return dec;
+}
+function aiDecLocal(m){
+  var entry=m.price, eq=m.equity||400, bias=m.bias||"震荡";
+  var checks=[];
+  var action="hold", ps=0, sl=null, tp=null, conf=0.45, reason="本地模式（未联网）：";
+  var atrU=(m.atr!=null&&m.atr>0)?m.atr:(entry*0.003);
+  if(bias==="多头"){
+    if(m.rsi!=null && m.rsi>72){ action="hold"; reason+="趋势多头但RSI超买("+m.rsi+")，观望。"; }
+    else {
+      action="long";
+      sl=+(entry-atrU*1.2).toFixed(2);
+      tp=+(entry+atrU*2.4).toFixed(2);
+      ps=(m.event&&m.event!=="无")?0.3:0.6;
+      reason+="趋势多头，回调做多"+(m.rsi!=null?("（RSI "+m.rsi+"）"):"")+"。";
+    }
+  } else if(bias==="空头"){
+    if(m.rsi!=null && m.rsi<28){ action="hold"; reason+="趋势空头但RSI超卖("+m.rsi+")，观望。"; }
+    else {
+      action="short";
+      sl=+(entry+atrU*1.2).toFixed(2);
+      tp=+(entry-atrU*2.4).toFixed(2);
+      ps=(m.event&&m.event!=="无")?0.3:0.6;
+      reason+="趋势空头，反弹做空"+(m.rsi!=null?("（RSI "+m.rsi+"）"):"")+"。";
+    }
+  } else {
+    action="hold"; reason+="震荡行情，无明确方向，观望为主。";
+  }
+  if(m.event&&m.event!=="无"&&m.eventMin!=null&&m.eventMin<=15&&m.position==="无"){
+    action="flat"; ps=0; reason="重大数据("+m.event+")前"+m.eventMin+"分钟，禁止开新仓。";
+    checks.push({lv:"fail",t:"⛔ 重大数据（"+m.event+"）公布前 "+m.eventMin+" 分钟，禁止开新仓，已强制 flat。"});
+  } else if(m.event&&m.event!=="无"&&m.eventMin!=null&&m.eventMin<=15){
+    checks.push({lv:"warn",t:"⚠️ 重大数据前 "+m.eventMin+" 分钟：不开新仓；当前为已有持仓管理。"});
+  }
+  var dec={action:action,position_size:ps,stop_loss:sl,take_profit:tp,confidence:conf,reasoning:reason.slice(0,50),checks:checks};
+  return aiDecEnrich(dec,m);
+}
+function aiTraderDecision(){
+  var m=aiDecBuildInput();
+  if(m.price==null){ alert("请先填写「当前价格」（点 📥 填实时价/点差 自动取实时价）。"); return; }
+  var out=document.getElementById("aiDecOut");
+  if(out) out.innerHTML='<div class="aiT-status">🤖 正在调用智谱 GLM 生成交易决策…</div>';
+  if(!(STATE.aiOnline && STATE.aiKey)){
+    var dl=aiDecLocal(m); AI_DECISION=dl; renderDrawings();
+    if(out) out.innerHTML=renderDecisionCard(dl)+'<div class="dec-check warn">⚠️ 当前未联网/未配置 Key，已用本地启发式决策（仅参考）。</div>';
+    return;
+  }
+  var base=aiEffectiveBase(), key=(STATE.aiKey||"").trim();
+  var messages=[{role:"system",content:aiTraderSystemPrompt()},{role:"user",content:aiDecUserContent(m)}];
+  fetch(base+"/chat/completions",{
+    method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:STATE.aiModel||"glm-4-plus",messages:messages,temperature:0.3,stream:false,max_tokens:600})
+  }).then(function(r){ if(!r.ok) return r.text().then(function(t){throw new Error("HTTP "+r.status+" "+(t||"").slice(0,160));}); return r.json(); })
+   .then(function(j){
+     var c=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
+     var dec=aiDecParse(c);
+     if(!dec){
+       if(out) out.innerHTML='<div class="dec-check fail">⚠️ 模型未返回有效决策 JSON，已用本地决策兜底。</div>';
+       dec=aiDecLocal(m);
+     }
+     dec=aiDecEnrich(dec,m);
+     AI_DECISION=dec; renderDrawings();
+     if(out) out.innerHTML=renderDecisionCard(dec);
+   })
+   .catch(function(err){
+     var msg=(err&&err.message)||"网络/跨域";
+     if(out) out.innerHTML='<div class="dec-check fail">⚠️ 联网失败（'+msg.slice(0,140)+'），已用本地决策兜底。</div>';
+     var d=aiDecLocal(m); AI_DECISION=d; renderDrawings(); if(out) out.innerHTML=renderDecisionCard(d);
+   });
+}
+function renderDecisionCard(dec){
+  var actMap={long:"做多 LONG",short:"做空 SHORT",hold:"观望 HOLD",flat:"空仓 FLAT"};
+  var actCls={long:"long",short:"short",hold:"hold",flat:"flat"};
+  var act=dec.action||"hold";
+  var conf=Math.round((dec.confidence||0)*100);
+  var html='<div class="dec-card">';
+  html+='<span class="dec-act '+(actCls[act]||"hold")+'">'+(actMap[act]||act)+'</span>';
+  html+='<div class="dec-row"><span>风险预算使用</span><b>'+(dec.position_size*100).toFixed(0)+'%（position_size '+dec.position_size+'）</b></div>';
+  html+='<div class="dec-row"><span>建议仓位</span><b style="color:var(--gold2)">'+(dec.lotSize!=null?dec.lotSize.toFixed(2):"0.00")+' 手</b></div>';
+  html+='<div class="dec-row"><span>入场价</span><b>'+fmtPrice(dec.entry)+'</b></div>';
+  html+='<div class="dec-row"><span>止损 SL</span><b style="color:#ff8a8a">'+(dec.stop_loss!=null?fmtPrice(dec.stop_loss):"—")+'</b></div>';
+  html+='<div class="dec-row"><span>止盈 TP</span><b style="color:#7fe39a">'+(dec.take_profit!=null?fmtPrice(dec.take_profit):"—")+'</b></div>';
+  if(dec.rr) html+='<div class="dec-row"><span>盈亏比</span><b>'+dec.rr+':1</b></div>';
+  if(dec.allocatedRisk!=null) html+='<div class="dec-row"><span>本次风险</span><b>'+dec.allocatedRisk+' U（上限 '+(dec._eq*0.01).toFixed(2)+'）</b></div>';
+  html+='<div class="dec-row"><span>置信度</span><b>'+conf+'%</b></div>';
+  html+='<div class="dec-conf"><i style="width:'+conf+'%"></i></div>';
+  html+='<div class="dec-reason">💡 '+escHtml(dec.reasoning||"（无 reasoning）")+'</div>';
+  if(dec.checks&&dec.checks.length){
+    html+='<div class="dec-checks">';
+    dec.checks.forEach(function(c){ html+='<div class="dec-check '+(c.lv==="ok"?"ok":c.lv==="warn"?"warn":"fail")+'">'+escHtml(c.t)+'</div>'; });
+    html+='</div>';
+  }
+  html+='<div class="aiDec-actions" style="margin-top:8px">'
+    +'<button class="ghost" onclick="aiDecDrawToggle()">🎯 画线到走势图</button>'
+    +'<button class="ghost" onclick="aiDecCopy()">📋 复制JSON</button>'
+    +'<button class="ghost" onclick="aiDecClear()">🧹 清除</button></div>';
+  var show={action:dec.action,position_size:dec.position_size,stop_loss:dec.stop_loss,take_profit:dec.take_profit,confidence:dec.confidence,reasoning:dec.reasoning};
+  html+='<div class="dec-json">'+escHtml(JSON.stringify(show,null,2))+'</div>';
+  html+='</div>';
+  return html;
+}
+function aiDecDrawToggle(){
+  if(!AI_DECISION){ toast("还没有决策可画，先点「🎯 生成交易决策」"); return; }
+  var d=AI_DECISION;
+  var ps=[d.entry,d.stop_loss,d.take_profit].filter(function(x){return typeof x==="number"&&isFinite(x);});
+  if(ps.length){ var mn=Math.min.apply(null,ps),mx=Math.max.apply(null,ps),pad=(mx-mn)*0.15||4; AI_PROJ_RANGE={min:mn-pad,max:mx+pad,price:d.entry}; }
+  renderDrawings();
+  toast("✅ 已将 AI 决策线（入场/止损/止盈）画到走势图");
+}
+function aiDecCopy(){
+  if(!AI_DECISION) return;
+  var show={action:AI_DECISION.action,position_size:AI_DECISION.position_size,stop_loss:AI_DECISION.stop_loss,take_profit:AI_DECISION.take_profit,confidence:AI_DECISION.confidence,reasoning:AI_DECISION.reasoning};
+  var txt=JSON.stringify(show,null,2);
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function(){toast("📋 决策 JSON 已复制");},function(){toast("复制失败，请手动选择");}); else toast("当前环境不支持自动复制"); }
+  catch(e){ toast("复制失败，请手动选择"); }
+}
+function aiDecClear(){
+  AI_DECISION=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_FIB=null; AI_GANN=null;
+  renderDrawings();
+  var out=document.getElementById("aiDecOut"); if(out) out.innerHTML="";
+  toast("🧹 已清除 AI 决策线");
 }
 /* ===== 预警声音 + 真实K线复盘 + 每日简报 ===== */
 var SOUND_ON=true;
