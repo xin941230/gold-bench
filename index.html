@@ -819,7 +819,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
         <textarea id="aiKbNotes" placeholder="把你的黄金交易心得、常用策略、口诀贴到这里，AI 回答时会一并参考…" rows="3"></textarea>
         <div class="row" style="margin-top:5px"><button onclick="saveKbNotes()">保存笔记</button><span id="aiKbStat" class="muted"></span></div>
       </div>
-      <div class="muted" style="font-size:11px;line-height:1.5">密钥仅存你本机浏览器(localStorage)，不上传第三方。浏览器直连可能被跨域(CORS)拦截；勾选「本地代理」并本地运行 <b style="color:var(--gold2)">node cors-proxy.js</b>（随工作台附带），可彻底绕开跨域，联网回答不再偶发失败。未联网时自动用内置知识库回答。</div>
+      <div class="muted" style="font-size:11px;line-height:1.5">本工作台已<b style="color:var(--gold2)">预置一个 DeepSeek Key</b>（打开即用，可在下方替换或清空）。密钥仅存本机浏览器(localStorage)，不上传第三方；但公开部署的源码会暴露此 Key，风险自负。浏览器直连可能被跨域(CORS)拦截；勾选「本地代理」并本地运行 <b style="color:var(--gold2)">node cors-proxy.js</b>（随工作台附带），可彻底绕开跨域，联网回答不再偶发失败。未联网时自动用内置知识库回答。</div>
     </div>
     <div class="aiT-chat" id="aiTChat"></div>
     <div class="aiT-chips">
@@ -895,7 +895,9 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
 
 <script>
 var PRICE_API = "https://api.gold-api.com/price/XAU";
-var STATE = { price: null, prev: null, ts: null, equity: 400, riskPct: 1.5, aiUseProxy:false, aiProxy:"http://localhost:3000" };
+/* 预置的 DeepSeek Key：打开页面即默认填入并联网（仅作者本机/可信环境使用；公开站点会暴露此 Key，风险自负） */
+var BAKED_AI_KEY = "a4212b13ccec474f84409538c88e6ac3.oSvS5l4NxBAWons7";
+var STATE = { price: null, prev: null, ts: null, equity: 400, riskPct: 1.5, aiUseProxy:false, aiProxy:"http://localhost:3000", aiKey:BAKED_AI_KEY, aiOnline:true };
 
 /* ===== 设置（本金联动全站） ===== */
 function loadSettings(){
@@ -2544,7 +2546,7 @@ function saveAiSettings(){
   document.getElementById("aiStat").textContent=STATE.aiKey?"已保存（AI 复核可用）":"已清空";
 }
 function loadAiSettings(){
-  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"https://api.deepseek.com";STATE.aiKey=s.key||"";STATE.aiModel=s.model||"deepseek-chat";STATE.aiOnline=!!s.online;STATE.aiUseProxy=!!s.useProxy;STATE.aiProxy=s.proxy||"http://localhost:3000";}catch(e){STATE.aiBase="https://api.deepseek.com";STATE.aiModel="deepseek-chat";STATE.aiOnline=false;STATE.aiUseProxy=false;STATE.aiProxy="http://localhost:3000";}
+  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"https://api.deepseek.com";STATE.aiKey=(s.key!==undefined)?s.key:BAKED_AI_KEY;STATE.aiModel=s.model||"deepseek-chat";STATE.aiOnline=(s.online!==undefined)?!!s.online:true;STATE.aiUseProxy=!!s.useProxy;STATE.aiProxy=s.proxy||"http://localhost:3000";}catch(e){STATE.aiBase="https://api.deepseek.com";STATE.aiModel="deepseek-chat";STATE.aiKey=BAKED_AI_KEY;STATE.aiOnline=true;STATE.aiUseProxy=false;STATE.aiProxy="http://localhost:3000";}
   var set=function(id,val){ var e=document.getElementById(id); if(e) e.value=val||""; };
   set("aiBase",STATE.aiBase); set("aiKey",STATE.aiKey);
   set("aiGptBase",STATE.aiBase); set("aiGptKey",STATE.aiKey);
