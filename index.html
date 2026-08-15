@@ -93,33 +93,56 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
 .mt5-card{background:#0d0b09;border:1px solid #2a2520;box-shadow:inset 0 0 0 1px #1a1612}
 .mt5-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:10px}
 .mt5-title{font-size:15px;color:var(--gold2);font-weight:600;letter-spacing:.5px}
-.mt5-ohlc{display:flex;gap:12px;font-size:12px;color:#9a8f76}
-.mt5-ohlc span{background:#181512;padding:4px 8px;border-radius:6px;border:1px solid #2a2520}
-.mt5-ohlc b{color:#ece5d3;font-weight:500;margin-left:4px}
+.mt5-status{font-size:12px;font-weight:600;padding:4px 12px;border-radius:16px;white-space:nowrap;cursor:pointer;user-select:none}
+.mt5-status.ok{background:#13261a;color:#7fd87a;border:1px solid #294d33}
+.mt5-status.warn{background:#2a2410;color:#e8c66a;border:1px solid #4d431f}
+.mt5-status.err{background:#2a1410;color:#ff7a6e;border:1px solid #5a2f28}
+.mt5-status:hover{filter:brightness(1.12)}
 .mt5-quote{display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:8px;margin:12px 0;background:#151210;border:1px solid #2a2520;border-radius:10px;overflow:hidden}
-.mt5-side{padding:14px 10px;text-align:center}
+.mt5-side{padding:14px 10px;text-align:center;position:relative}
 .mt5-side.sell{background:#281713;border-right:1px solid #3a1f1a}
 .mt5-side.buy{background:#132818;border-right:1px solid #1c2e1a}
 .mt5-label{font-size:12px;font-weight:700;letter-spacing:1px}
+.mt5-label .en{font-size:10px;font-weight:400;opacity:.55;margin-left:3px}
 .mt5-side.sell .mt5-label{color:#ff7a6e}
 .mt5-side.buy .mt5-label{color:#7fd87a}
-.mt5-price{font-size:26px;font-weight:700;margin:6px 0}
+.mt5-price{font-size:26px;font-weight:700;margin:6px 0;transition:color .2s}
 .mt5-side.sell .mt5-price{color:#ff7a6e}
 .mt5-side.buy .mt5-price{color:#7fd87a}
+.mt5-price.flash-up{color:#7fd87a!important}
+.mt5-price.flash-dn{color:#ff7a6e!important}
 .mt5-spread{font-size:11px;color:#9a8f76}
 .mt5-center{text-align:center;padding:14px 8px}
-.mt5-big{font-size:34px;font-weight:700;color:var(--gold2)}
+.mt5-big{font-size:34px;font-weight:700;color:var(--gold2);transition:color .2s}
+.mt5-big.flash-up{color:#7fd87a!important}
+.mt5-big.flash-dn{color:#ff7a6e!important}
 .mt5-change{font-size:14px;margin:4px 0}
 .mt5-source{font-size:11px;color:#6b6250}
+.mt5-note{font-size:12.5px;line-height:1.9}
+.mt5-sess{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:0 0 12px;background:#151210;border:1px solid #2a2520;border-radius:10px;padding:10px 12px}
+.mt5-sessItem{display:flex;flex-direction:column;justify-content:center;padding:2px 16px;border-right:1px solid #2a2520}
+.mt5-sessItem:last-of-type{border-right:none}
+.mt5-sessItem span{font-size:11px;color:#9a8f76}
+.mt5-sessItem b{font-size:15px;color:#ece5d3;font-weight:600;margin-top:2px}
+.mt5-rebtn{margin-left:auto;background:#1c1814;border:1px solid #3a3328;color:var(--gold2);border-radius:8px;padding:0 14px;cursor:pointer;font-size:12px;font-weight:600;transition:border-color .2s}
+.mt5-rebtn:hover{border-color:var(--gold)}
 .mt5-wrap{display:grid;grid-template-columns:minmax(0,3fr) minmax(220px,1fr);gap:12px;margin-top:12px}
 .mt5-chart{height:520px;background:#0a0807;border:1px solid #2a2520;border-radius:10px;overflow:hidden;position:relative}
 .mt5-chart iframe{display:block;width:100%;height:100%}
+.mt5-chartmask{position:absolute;inset:0;background:rgba(10,8,7,.88);color:#e8c66a;display:flex;align-items:center;justify-content:center;font-size:13px;text-align:center;padding:20px;line-height:1.8}
 .mt5-pos{background:#151210;border:1px solid #2a2520;border-radius:10px;padding:14px}
 .mt5-pos h4{font-size:14px;color:var(--gold2);margin-bottom:10px}
 .mt5-pos label{display:block;font-size:12px;color:#9a8f76;margin:8px 0 3px}
 .mt5-pos input{width:100%;background:#0d0b09;border:1px solid #2a2520;border-radius:6px;padding:7px 9px;color:#ece5d3;font-size:14px}
 .mt5-posout{margin-top:12px;padding:12px;border-radius:8px;background:#0d0b09;border:1px solid #2a2520;font-size:13px;color:#9a8f76;min-height:70px}
 .mt5-posout .num{color:var(--gold2);font-weight:700}
+@media(max-width:760px){
+  .mt5-quote{grid-template-columns:1fr}
+  .mt5-side.sell,.mt5-side.buy{border-right:none}
+  .mt5-wrap{grid-template-columns:1fr}
+  .mt5-sessItem{border-right:none;padding:4px 10px}
+  .mt5-rebtn{margin-left:0;width:100%;padding:8px 0}
+}
 
 /* ===== 新闻雷达 ===== */
 .newsHead{display:flex;justify-content:space-between;align-items:center;margin:10px 0}
@@ -512,40 +535,47 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
 <section id="mkt">
   <div class="card mt5-card">
     <div class="mt5-top">
-      <div class="mt5-title" id="mt5SymbolTitle">黄金期货 GC=F · 实时走势图</div>
-      <div class="mt5-ohlc" id="mt5Ohlc">
-        <span>开盘<b id="oOpen">--</b></span>
-        <span>最高<b id="oHigh">--</b></span>
-        <span>最低<b id="oLow">--</b></span>
-        <span>振幅<b id="oAmp">--</b></span>
-      </div>
+      <div class="mt5-title" id="mt5SymbolTitle">现货黄金 XAUUSD · 实时走势图</div>
+      <div class="mt5-status ok" id="mt5Status" onclick="mt5ForceReconnect()" title="点击可手动重新连接行情与图表">● 实时连接正常</div>
       <div class="rngBtns" id="mt5Rng">
-        <button onclick="setMt5('GC',this)">期货 GC=F</button>
-        <button class="on" onclick="setMt5('XAUUSD',this)">现货 XAUUSD</button>
-        <button onclick="setMt5('DXY',this)">美元指数</button>
+        <button onclick="setMt5('GC',this)">黄金期货 GC=F</button>
+        <button class="on" onclick="setMt5('XAUUSD',this)">现货黄金 XAUUSD</button>
+        <button onclick="setMt5('DXY',this)">美元指数 DXY</button>
       </div>
     </div>
+
     <div class="mt5-quote">
       <div class="mt5-side sell">
-        <div class="mt5-label">SELL 卖出</div>
+        <div class="mt5-label">卖出价 <span class="en">SELL</span></div>
         <div class="mt5-price" id="sellPrice">--</div>
         <div class="mt5-spread">点差 <b id="spreadVal">0.02</b></div>
       </div>
       <div class="mt5-center">
         <div class="mt5-big" id="mt5Big">--</div>
         <div class="mt5-change" id="mt5Change">--</div>
-        <div class="mt5-source" id="mt5Source">连接实时数据中…</div>
+        <div class="mt5-source" id="mt5Source">正在连接实时行情…</div>
       </div>
       <div class="mt5-side buy">
-        <div class="mt5-label">BUY 买入</div>
+        <div class="mt5-label">买入价 <span class="en">BUY</span></div>
         <div class="mt5-price" id="buyPrice">--</div>
         <div class="mt5-spread">实时报价</div>
       </div>
     </div>
-    <p class="hint mt5-note">怎么读这块报价：<b style="color:var(--gold2)">SELL 卖出价</b>是你做空或平仓的成交价，<b style="color:var(--gold2)">BUY 买入价</b>是你做多的成交价，中间大号数字是实时现价。点差 = BUY − SELL，是你每笔的交易成本，越小越划算。</p>
+
+    <p class="hint mt5-note">怎么读这块报价：<b style="color:var(--gold2)">卖出价</b>是你做空或平仓的成交价，<b style="color:var(--gold2)">买入价</b>是你做多的成交价，中间大号数字是实时现价。<b style="color:var(--gold2)">点差</b> = 买入价 − 卖出价，是你每笔的交易成本，越小越划算。右上角「连接状态」变黄/红说明行情源断了，系统会自动重连，也可直接点它或「重新连接」按钮手动刷新。</p>
+
+    <div class="mt5-sess" id="mt5Sess">
+      <div class="mt5-sessItem"><span>今日最高</span><b id="sessHigh">--</b></div>
+      <div class="mt5-sessItem"><span>今日最低</span><b id="sessLow">--</b></div>
+      <div class="mt5-sessItem"><span>今日涨跌</span><b id="sessChg">--</b></div>
+      <div class="mt5-sessItem"><span>数据来源</span><b id="sessSrc">--</b></div>
+      <button class="mt5-rebtn" onclick="mt5ForceReconnect()">↻ 重新连接</button>
+    </div>
+
     <div class="mt5-wrap">
       <div class="mt5-chart">
         <iframe id="mt5Frame" src="about:blank" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+        <div class="mt5-chartmask" id="mt5ChartMask" style="display:none">图表连接中断，正在重新加载…</div>
       </div>
       <div class="mt5-pos">
         <h4>模拟持仓面板</h4>
@@ -561,7 +591,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
         <div id="mt5PosOut" class="mt5-posout">输入手数后点击计算，按 0.01 手 = 1 盎司/美元波动 $0.01 盈亏估算。</div>
       </div>
     </div>
-    <p class="muted" style="margin-top:10px">📌 K线/成交量来自 TradingView 实时图表；买卖价来自 xaus.com / gold-api 免费现货接口，约 30 秒延迟。切换品种后图表会自动重载。本行情仅供学习，不构成投资建议。</p>
+    <p class="muted" style="margin-top:10px">📌 K线/成交量来自 TradingView 实时图表（每 8 分钟自动重载一次，防止长连断流）；买卖价来自 xaus.com / gold-api 免费现货接口，约 15 秒刷新。切换品种后图表会自动重载。本行情仅供学习，不构成投资建议。</p>
   </div>
 </section>
 
@@ -610,7 +640,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.3 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.4 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -1032,19 +1062,28 @@ function fmtNum(n){
 function fmtPrice(n){ if(n==null) return "-"; return n>=1000?n.toFixed(2):n.toFixed(2); }
 
 /* ===== MT5 实时盘 ===== */
-var MT5={sym:"GC",timer:null,lastPrice:null,prevPrice:null,loaded:false};
+var MT5={sym:"XAUUSD",timer:null,lastPrice:null,prevPrice:null,loaded:false,
+  sessOpen:null,sessHigh:null,sessLow:null,
+  frameOk:false,frameTimer:null,frameRetry:0,
+  failCount:0,retryTimer:null,keepCount:0};
 var MT5MAP={
   XAUUSD:{tv:"FX%3AXAUUSD",name:"现货黄金 XAUUSD",spread:0.02},
   GC:{tv:"COMEX%3AGC1!",name:"黄金期货 GC=F",spread:0.1},
   DXY:{tv:"TVC%3ADXY",name:"美元指数 DXY",spread:0.02}
 };
 function mt5TvUrl(sym){
-  var m=MT5MAP[sym]||MT5MAP.GC;
+  var m=MT5MAP[sym]||MT5MAP.XAUUSD;
   return "https://s.tradingview.com/embed-widget/advanced-chart/?symbol="+m.tv
     +"&interval=1&timezone=Asia%2FShanghai&theme=dark&locale=zh&style=1"
     +"&enable_publishing=false&allow_symbol_change=false&save_image=false"
     +"&withdateranges=false&hide_top_toolbar=false&hide_legend=false&details=true"
     +"&studies=Volume%40tv-basicstudies";
+}
+function mt5SetStatus(state,msg){
+  var el=document.getElementById("mt5Status");
+  el.className="mt5-status "+state;
+  el.textContent=(state==="ok"?"● 实时连接正常":(state==="warn"?"● 重新连接中…":"● 连接中断 · 点击重连"));
+  if(msg) el.title=msg;
 }
 function setMt5(sym,btn){
   MT5.sym=sym;
@@ -1052,64 +1091,144 @@ function setMt5(sym,btn){
   var b=document.querySelectorAll("#mt5Rng button");
   for(var k=0;k<b.length;k++) b[k].className="";
   btn.className="on";
-  document.getElementById("mt5Frame").src=mt5TvUrl(sym);
-  MT5.lastPrice=null; MT5.prevPrice=null;
+  MT5.lastPrice=null; MT5.prevPrice=null; MT5.sessOpen=null; MT5.sessHigh=null; MT5.sessLow=null;
+  document.getElementById("sessHigh").textContent="--";
+  document.getElementById("sessLow").textContent="--";
+  document.getElementById("sessChg").textContent="--";
+  document.getElementById("mt5Big").textContent="--";
+  document.getElementById("sellPrice").textContent="--";
+  document.getElementById("buyPrice").textContent="--";
+  document.getElementById("mt5Change").textContent="--";
+  loadMt5Frame();
   refreshMt5Price();
 }
 function initMt5(){
   if(MT5.loaded) return;
   MT5.loaded=true;
-  document.getElementById("mt5Frame").src=mt5TvUrl(MT5.sym);
+  document.getElementById("mt5SymbolTitle").textContent=MT5MAP[MT5.sym].name+" · 实时走势图";
+  loadMt5Frame();
   refreshMt5Price();
 }
-function stopMt5Ticker(){ if(MT5.timer){clearInterval(MT5.timer);MT5.timer=null;} }
+function loadMt5Frame(){
+  var f=document.getElementById("mt5Frame");
+  var mask=document.getElementById("mt5ChartMask");
+  MT5.frameOk=false; MT5.frameRetry=0;
+  if(mask) mask.style.display="none";
+  f.onload=function(){ MT5.frameOk=true; clearTimeout(MT5.frameTimer); if(mask) mask.style.display="none"; };
+  f.onerror=function(){ mt5FrameRetry(); };
+  f.src=mt5TvUrl(MT5.sym);
+  MT5.frameTimer=setTimeout(function(){ if(!MT5.frameOk) mt5FrameRetry(); },12000);
+}
+function mt5FrameRetry(){
+  if(MT5.frameRetry>=4){
+    mt5SetStatus("err","图表连接中断，已多次重试失败");
+    var m=document.getElementById("mt5ChartMask");
+    if(m){ m.textContent="图表连接中断，请点右上角「连接状态」或「重新连接」按钮重试"; m.style.display="flex"; }
+    return;
+  }
+  MT5.frameRetry++;
+  var f=document.getElementById("mt5Frame");
+  f.src=mt5TvUrl(MT5.sym)+"&_r="+Date.now();
+  MT5.frameTimer=setTimeout(function(){ if(!MT5.frameOk) mt5FrameRetry(); },12000);
+}
+function mt5ForceReconnect(){
+  mt5SetStatus("warn","正在手动重新连接…");
+  loadMt5Frame();
+  MT5.failCount=0;
+  refreshMt5Price();
+}
+function stopMt5Ticker(){
+  if(MT5.timer){clearInterval(MT5.timer);MT5.timer=null;}
+  if(MT5.retryTimer){clearTimeout(MT5.retryTimer);MT5.retryTimer=null;}
+}
 function startMt5Ticker(){
   if(MT5.timer) return;
   MT5.timer=setInterval(function(){
     var sec=document.getElementById("mkt");
-    if(sec&&sec.className==="on") refreshMt5Price();
+    if(!sec||sec.className!=="on") return;
+    MT5.keepCount++;
+    // 每 32 个周期（约 8 分钟）重载一次图表，防止 TradingView 长连断流
+    if(MT5.keepCount%32===0 && MT5.frameOk) loadMt5Frame();
+    refreshMt5Price();
   },15000);
 }
 function refreshMt5Price(){
-  var src=document.getElementById("mt5Source");
-  src.textContent="取价中…";
-  var urls=["https://xaus.com/api/v1/spot","https://api.gold-api.com/price/XAU"];
-  var fastest=null;
-  function fetchOne(url){
-    return fetch(url,{cache:"no-store"})
-      .then(function(r){ return r.json(); })
+  if(MT5.retryTimer){clearTimeout(MT5.retryTimer);MT5.retryTimer=null;}
+  document.getElementById("mt5Source").textContent="取价中…";
+  var sources=[
+    {u:"https://xaus.com/api/v1/spot",src:"xaus.com",field:"spot_usd_oz"},
+    {u:"https://api.gold-api.com/price/XAU",src:"gold-api",field:"price"}
+  ];
+  // 关键修复：原来用 Promise.race，任一源先失败就整体报错（造成「偶尔断连」）。
+  // 改为全部发起、取第一个成功的结果，并对全部失败做自动重试。
+  var reqs=sources.map(function(o){
+    return fetch(o.u,{cache:"no-store"})
+      .then(function(r){return r.json();})
       .then(function(j){
-        var p=null;
-        if(j&&j.spot_usd_oz) p=parseFloat(j.spot_usd_oz);
-        else if(j&&j.price) p=parseFloat(j.price);
-        if(p&&!fastest){ fastest={price:p,source:url.indexOf("xaus")>=0?"xaus.com":"gold-api"}; }
-        return p;
-      }).catch(function(){ return null; });
-  }
-  Promise.race([fetchOne(urls[0]),fetchOne(urls[1])]).then(function(p){
-    if(!p) throw new Error("no price");
-    updateMt5Quote(fastest?fastest.price:p, fastest?fastest.source:"gold-api");
-  }).catch(function(){
-    src.textContent="实时价获取失败（请检查网络）";
+        var p=j?parseFloat(j[o.field]):null;
+        return (p&&isFinite(p))?{price:p,src:o.src}:null;
+      }).catch(function(){return null;});
   });
+  Promise.all(reqs).then(function(res){
+    var ok=res.filter(function(x){return x;});
+    if(ok.length){
+      MT5.failCount=0;
+      mt5SetStatus("ok");
+      updateMt5Quote(ok[0].price, ok[0].src);
+    } else {
+      mt5PriceFail();
+    }
+  });
+}
+function mt5PriceFail(){
+  MT5.failCount++;
+  if(MT5.failCount<=3){
+    mt5SetStatus("warn","行情源暂时无响应，正在自动重试");
+    document.getElementById("mt5Source").textContent="行情源暂时无响应，正在重试（第 "+MT5.failCount+" 次）…";
+    MT5.retryTimer=setTimeout(refreshMt5Price,3000);
+  } else {
+    mt5SetStatus("err","行情源连接中断，已多次重试失败");
+    document.getElementById("mt5Source").textContent="行情源连接中断，已自动重连仍失败，请检查网络或点「重新连接」";
+    loadMt5Frame();
+    MT5.retryTimer=setTimeout(refreshMt5Price,8000);
+  }
 }
 function updateMt5Quote(price,source){
   MT5.prevPrice=MT5.lastPrice||price; MT5.lastPrice=price;
+  if(MT5.sessOpen==null) MT5.sessOpen=price;
+  if(MT5.sessHigh==null||price>MT5.sessHigh) MT5.sessHigh=price;
+  if(MT5.sessLow==null||price<MT5.sessLow) MT5.sessLow=price;
   var spread=MT5MAP[MT5.sym].spread;
   var sell=price, buy=price+spread;
   if(MT5.sym==="DXY"){ sell=price; buy=price+0.02; }
+  var up=price>=MT5.prevPrice;
+  flashEl(document.getElementById("sellPrice"),up);
+  flashEl(document.getElementById("buyPrice"),up);
+  flashEl(document.getElementById("mt5Big"),up);
   document.getElementById("sellPrice").textContent=fmtPrice(sell);
   document.getElementById("buyPrice").textContent=fmtPrice(buy);
   document.getElementById("mt5Big").textContent=fmtPrice(price);
   document.getElementById("spreadVal").textContent=spread.toFixed(2);
-  var chg=price-MT5.prevPrice, pct=MT5.prevPrice?(chg/MT5.prevPrice*100):0;
-  var chgTxt=(chg>=0?"+":"")+chg.toFixed(2)+"（"+(pct>=0?"+":"")+pct.toFixed(2)+"%）";
-  document.getElementById("mt5Change").textContent=chgTxt;
-  document.getElementById("mt5Change").style.color=chg>=0?"#7fd87a":"#ff7a6e";
-  document.getElementById("mt5Source").textContent="来源："+(source==="xaus.com"?"xaus.com":"gold-api.com")+" · 约 30 秒刷新";
+  var chg=price-MT5.sessOpen, pct=MT5.sessOpen?(chg/MT5.sessOpen*100):0;
+  var chgTxt=(chg>=0?"+":"")+chg.toFixed(2)+" ("+(pct>=0?"+":"")+pct.toFixed(2)+"%)";
+  var ce=document.getElementById("mt5Change");
+  ce.textContent=chgTxt; ce.style.color=chg>=0?"#7fd87a":"#ff7a6e";
+  document.getElementById("mt5Source").textContent="数据来源："+source+" · 每 15 秒刷新";
+  document.getElementById("sessHigh").textContent=fmtPrice(MT5.sessHigh);
+  document.getElementById("sessLow").textContent=fmtPrice(MT5.sessLow);
+  var sc=document.getElementById("sessChg");
+  sc.textContent=chgTxt; sc.style.color=chg>=0?"#7fd87a":"#ff7a6e";
+  document.getElementById("sessSrc").textContent=source;
   var oe=document.getElementById("posLongEntry");
   if(!oe.value&&MT5.sym==="XAUUSD") oe.placeholder=price.toFixed(2);
 }
+function flashEl(el,up){
+  if(!el) return;
+  el.classList.remove("flash-up","flash-dn");
+  el.classList.add(up?"flash-up":"flash-dn");
+  setTimeout(function(){ if(el) el.classList.remove("flash-up","flash-dn"); },500);
+}
+
 function calcPosMt5(){
   var lotL=parseFloat(document.getElementById("posLong").value)||0;
   var enL=parseFloat(document.getElementById("posLongEntry").value)||MT5.lastPrice||0;
