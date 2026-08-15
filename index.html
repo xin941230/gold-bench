@@ -812,7 +812,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
         <option value="glm-4-flash">glm-4-flash（免费·轻量）</option>
       </select></div>
       <div class="row"><label>API地址</label><input id="aiGptBase" placeholder="https://open.bigmodel.cn/api/paas/v4" style="flex:1"></div>
-      <div class="row"><label>API Key</label><input id="aiGptKey" type="password" placeholder="sk-..." style="flex:1"></div>
+      <div class="row"><label>API Key</label><input id="aiGptKey" type="password" placeholder="已预置 · 可替换/清空" style="flex:1"></div>
       <div class="row"><label>本地代理</label><input type="checkbox" id="aiGptProxy" onchange="STATE.aiUseProxy=this.checked;saveAiGpt();aiGptBadge()"><input id="aiGptProxyUrl" placeholder="http://localhost:3000" style="flex:1;min-width:0;margin-left:8px" onchange="STATE.aiProxy=this.value.trim();saveAiGpt()"></div>
       <div class="row"><button onclick="testAiConn()">🔌 测试连接</button><button onclick="saveAiGpt()">保存并连接</button><a class="dsOpen" href="https://www.bigmodel.cn/console/overview?icode=RnR%2F%2BmCEyxooOvYk%2FbqmQZmwcr074zMJTpgMb8zZZvg%3D&from=invite" target="_blank" rel="noopener">🌐 打开智谱控制台(邀请)</a><span id="aiGptStat" class="muted"></span></div>
       <div class="kbBlock">
@@ -820,7 +820,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
         <textarea id="aiKbNotes" placeholder="把你的黄金交易心得、常用策略、口诀贴到这里，AI 回答时会一并参考…" rows="3"></textarea>
         <div class="row" style="margin-top:5px"><button onclick="saveKbNotes()">保存笔记</button><span id="aiKbStat" class="muted"></span></div>
       </div>
-      <div class="muted" style="font-size:11px;line-height:1.5">AI 联网使用 <b style="color:var(--gold2)">智谱 BigModel（GLM 模型）</b>。请点上方「🌐 打开智谱控制台(邀请)」注册，到 <b style="color:var(--gold2)">用户中心 → API Keys</b> 生成你自己的 Key 填到下方。密钥仅存本机浏览器(localStorage)，不上传第三方。浏览器直连可能被跨域(CORS)拦截；勾选「本地代理」并本地运行 <b style="color:var(--gold2)">node cors-proxy.js</b>（随工作台附带），可彻底绕开跨域，联网回答不再偶发失败。未联网时自动用内置知识库回答。</div>
+      <div class="muted" style="font-size:11px;line-height:1.5">AI 联网使用 <b style="color:var(--gold2)">智谱 BigModel（GLM 模型）</b>。本工作台已<b style="color:var(--gold2)">预置一个 Key</b>（打开即用，可在下方替换或清空）。密钥仅存本机浏览器(localStorage)，不上传第三方；但公开部署的源码会暴露此 Key，别人可能用它消耗你的额度，风险自负。浏览器直连通常被智谱允许跨域(CORS)，一般无需代理；若个别网络仍失败，勾选「本地代理」并本地运行 <b style="color:var(--gold2)">node cors-proxy.js</b>（随工作台附带）兜底。未联网时自动用内置知识库回答。</div>
     </div>
     <div class="aiT-chat" id="aiTChat"></div>
     <div class="aiT-chips">
@@ -862,7 +862,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
         <label style="font-size:12px">API地址</label><input id="aiBase" placeholder="https://open.bigmodel.cn/api/paas/v4" style="flex:1;min-width:200px">
       </div>
       <div class="row">
-        <label style="font-size:12px">API Key</label><input id="aiKey" type="password" placeholder="sk-..." style="flex:1;min-width:200px">
+        <label style="font-size:12px">API Key</label><input id="aiKey" type="password" placeholder="已预置 · 可替换/清空" style="flex:1;min-width:200px">
         <button class="tbtn" onclick="saveAiSettings()">保存</button>
         <span id="aiStat" class="muted"></span>
       </div>
@@ -896,7 +896,9 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
 
 <script>
 var PRICE_API = "https://api.gold-api.com/price/XAU";
-var STATE = { price: null, prev: null, ts: null, equity: 400, riskPct: 1.5, aiUseProxy:false, aiProxy:"http://localhost:3000", aiKey:"", aiOnline:false };
+/* 预置的智谱 BigModel Key：打开页面即默认填入并联网（任何人打开即用；公开站点源码会暴露此 Key，风险自负） */
+var BAKED_AI_KEY = "a4212b13ccec474f84409538c88e6ac3.oSvS5l4NxBAWons7";
+var STATE = { price: null, prev: null, ts: null, equity: 400, riskPct: 1.5, aiUseProxy:false, aiProxy:"http://localhost:3000", aiKey:BAKED_AI_KEY, aiOnline:true };
 
 /* ===== 设置（本金联动全站） ===== */
 function loadSettings(){
@@ -2545,7 +2547,7 @@ function saveAiSettings(){
   document.getElementById("aiStat").textContent=STATE.aiKey?"已保存（AI 复核可用）":"已清空";
 }
 function loadAiSettings(){
-  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"https://open.bigmodel.cn/api/paas/v4";STATE.aiKey=(s.key!==undefined)?s.key:"";STATE.aiModel=s.model||"glm-4-plus";STATE.aiOnline=(s.online!==undefined)?!!s.online:false;STATE.aiUseProxy=!!s.useProxy;STATE.aiProxy=s.proxy||"http://localhost:3000";}catch(e){STATE.aiBase="https://open.bigmodel.cn/api/paas/v4";STATE.aiModel="glm-4-plus";STATE.aiKey="";STATE.aiOnline=false;STATE.aiUseProxy=false;STATE.aiProxy="http://localhost:3000";}
+  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"https://open.bigmodel.cn/api/paas/v4";STATE.aiKey=(s.key!==undefined&&s.key!=="")?s.key:BAKED_AI_KEY;STATE.aiModel=s.model||"glm-4-plus";STATE.aiOnline=(s.online!==undefined)?!!s.online:true;STATE.aiUseProxy=!!s.useProxy;STATE.aiProxy=s.proxy||"http://localhost:3000";}catch(e){STATE.aiBase="https://open.bigmodel.cn/api/paas/v4";STATE.aiModel="glm-4-plus";STATE.aiKey=BAKED_AI_KEY;STATE.aiOnline=true;STATE.aiUseProxy=false;STATE.aiProxy="http://localhost:3000";}
   var set=function(id,val){ var e=document.getElementById(id); if(e) e.value=val||""; };
   set("aiBase",STATE.aiBase); set("aiKey",STATE.aiKey);
   set("aiGptBase",STATE.aiBase); set("aiGptKey",STATE.aiKey);
