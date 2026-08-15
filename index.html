@@ -147,6 +147,36 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
 .mt5-drawhint{font-size:12px;color:#9a8f76;background:#13110d;border:1px dashed #3a3328;border-radius:8px;padding:8px 12px;margin-bottom:12px;line-height:1.7}
 .mt5-drawhint b{color:var(--gold2)}
 .mt5-drawhint .k{display:inline-block;border:1px solid #4d431f;background:#2a2410;color:#e8c66a;border-radius:5px;padding:1px 7px;font-size:11px;margin:0 2px}
+/* 工作区放大模式（同页内放大，保留顶部操作栏） */
+body.mt5-zoomed{overflow:hidden}
+body.mt5-zoomed header,body.mt5-zoomed nav,body.mt5-zoomed .settings,body.mt5-zoomed footer,body.mt5-zoomed section:not(#mkt){display:none!important}
+body.mt5-zoomed .wrap{max-width:none;padding:0}
+body.mt5-zoomed #mkt{display:block!important;padding:0}
+body.mt5-zoomed .mt5-card{border:none;border-radius:0;background:var(--bg);min-height:100vh;display:flex;flex-direction:column}
+body.mt5-zoomed .mt5-top{padding:12px 16px;background:#14110d;border-bottom:1px solid #2a2520;margin-bottom:0;flex-wrap:wrap}
+body.mt5-zoomed .mt5-note,body.mt5-zoomed .mt5-drawhint,body.mt5-zoomed .mt5-pos,body.mt5-zoomed .mt5-sess{display:none}
+body.mt5-zoomed .mt5-quote{position:absolute;right:16px;top:66px;z-index:25;width:280px;background:rgba(20,17,13,.92);backdrop-filter:blur(4px);border:1px solid #2a2520;border-radius:10px;grid-template-columns:1fr 1fr;margin:0;box-shadow:0 8px 30px rgba(0,0,0,.45)}
+body.mt5-zoomed .mt5-center{display:none}
+body.mt5-zoomed .mt5-wrap{grid-template-columns:1fr;gap:0;flex:1;margin-top:0}
+body.mt5-zoomed .mt5-chart{height:100%;border:none;border-radius:0}
+body.mt5-zoomed .mt5-chart .drawing{cursor:crosshair}
+body.mt5-zoomed #mt5WorkspaceExit{display:inline-block}
+body.mt5-zoomed .mt5-dtools{position:absolute;left:12px;top:66px;z-index:25}
+/* 中文画线浮动工具栏 */
+.mt5-dtools{position:relative;display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px;background:#14110d;border:1px solid #2a2520;border-radius:10px;padding:6px 8px}
+.mt5-dtools .dt-label{font-size:11px;color:#6b6250;margin-right:4px}
+.mt5-dtools .dt-btn{background:#1c1814;border:1px solid #3a3328;color:var(--gold2);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:12px;transition:border-color .2s}
+.mt5-dtools .dt-btn:hover{border-color:var(--gold);background:#241e16}
+.mt5-dtools .dt-btn.on{background:#3a2c10;border-color:var(--gold)}
+.mt5-dtools .dt-sep{width:1px;height:18px;background:#2a2520;margin:0 2px}
+.mt5-dtools .dt-tip{font-size:11px;color:#6b6250;margin-left:auto}
+/* 走势叠加层（AI / 用户画线） */
+.mt5-chart{position:relative}
+#mt5Overlay{position:absolute;inset:0;z-index:10;width:100%;height:100%;pointer-events:none}
+#mt5Overlay.interactive{pointer-events:auto;cursor:crosshair}
+.mt5-ol-line{stroke-linecap:round}
+.mt5-ol-text{font-size:11px;font-family:system-ui,-apple-system,"Microsoft YaHei",sans-serif;fill:#ece5d3}
+.mt5-ol-resize{position:absolute;right:8px;bottom:8px;z-index:20;background:rgba(20,17,13,.85);border:1px solid #2a2520;border-radius:6px;padding:3px 8px;font-size:11px;color:#6b6250;pointer-events:none}
 /* AI 交易员抽屉 */
 #aiTrader{position:fixed;top:0;right:0;height:100vh;width:380px;max-width:92vw;background:#14110d;border-left:1px solid var(--gold);box-shadow:-12px 0 40px rgba(0,0,0,.45);z-index:60;display:none;flex-direction:column}
 #aiTrader.open{display:flex}
@@ -599,12 +629,28 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
           <button onclick="setMt5Interval('60',this)">1时</button>
         </div>
         <button class="mt5-act" onclick="mt5Fullscreen()">⛶ 全屏图表</button>
+        <button class="mt5-act" onclick="toggleWorkspaceZoom()">🔍 放大工作区</button>
         <button class="mt5-act" onclick="openLiveWindow()">🗔 弹出盯盘</button>
         <button class="mt5-act primary" onclick="toggleAiTrader()">🤖 AI职业交易员</button>
         <button class="mt5-act" id="liveExit" onclick="if(document.body.classList.contains('live-mode'))window.close();else location.href=location.pathname;">✕ 退出盯盘</button>
+        <button class="mt5-act" id="mt5WorkspaceExit" onclick="toggleWorkspaceZoom()" style="display:none">✕ 退出放大</button>
       </div>
     </div>
-    <p class="mt5-drawhint">🖌 <b>怎么在图上画线：</b>点图表<b>左侧工具栏最上方的光标/画笔图标</b>，选 <span class="k">斐波那契回调</span><span class="k">江恩扇形</span><span class="k">趋势线</span><span class="k">水平线</span>，然后在图上按住拖拽即可。画的线会在<b>切换品种 / 周期或手动重载图表时清空</b>；想专心盯盘画线，建议点右上「🗔 弹出盯盘」开独立大窗口。点「🤖 AI职业交易员」可一键算出当前支撑/阻力位，照着落笔。</p>
+    <!-- 中文画线工具栏 -->
+    <div class="mt5-dtools" id="mt5Dtools">
+      <span class="dt-label">📐 画线工具</span>
+      <button class="dt-btn on" data-tool="pointer" onclick="selectDrawTool('pointer',this)">🖱 光标</button>
+      <button class="dt-btn" data-tool="horiz" onclick="selectDrawTool('horiz',this)" title="在走势图上画一条水平线">➖ 水平线</button>
+      <button class="dt-btn" data-tool="trend" onclick="selectDrawTool('trend',this)" title="点两点画一条趋势线">📈 趋势线</button>
+      <button class="dt-btn" data-tool="rect" onclick="selectDrawTool('rect',this)" title="框选区间">▭ 矩形框</button>
+      <button class="dt-btn" data-tool="text" onclick="selectDrawTool('text',this)" title="在图上写标注">📝 文字</button>
+      <button class="dt-btn" data-tool="clear" onclick="clearDrawings()" title="清除我画的所有线">🗑 清除</button>
+      <div class="dt-sep"></div>
+      <button class="dt-btn" onclick="projectAiToChart()" title="把 AI 分析的支撑/阻力/斐波那契投射到走势图上">🤖 投射 AI 分析线</button>
+      <span class="dt-tip">水平线/趋势线可直接在图上画；复杂工具请用左侧 TradingView 原生栏</span>
+    </div>
+
+    <p class="mt5-drawhint">🖌 <b>怎么在图上画线：</b>用上方<b>中文工具栏</b>选「水平线 / 趋势线 / 矩形框 / 文字」，然后在走势图上点击或拖拽即可。需要 <span class="k">斐波那契回调</span><span class="k">江恩扇形</span> 等精确工具时，请点图表<b>左侧工具栏</b>对应图标。点「🤖 AI职业交易员」→「投射 AI 分析线」可自动把支撑/阻力/斐波位标到图上。画的线会在<b>切换品种 / 周期 / 重载图表时清空</b>。</p>
 
     <div class="mt5-quote">
       <div class="mt5-side sell">
@@ -635,8 +681,9 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
     </div>
 
     <div class="mt5-wrap">
-      <div class="mt5-chart">
+      <div class="mt5-chart" id="mt5ChartBox">
         <iframe id="mt5Frame" src="about:blank" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+        <svg id="mt5Overlay" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
         <div class="mt5-chartmask" id="mt5ChartMask" style="display:none">图表连接中断，正在重新加载…</div>
       </div>
       <div class="mt5-pos">
@@ -720,7 +767,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.5 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.6 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -1155,7 +1202,7 @@ var MT5MAP={
 function mt5TvUrl(sym){
   var m=MT5MAP[sym]||MT5MAP.XAUUSD;
   return "https://s.tradingview.com/embed-widget/advanced-chart/?symbol="+m.tv
-    +"&interval="+MT5.interval+"&timezone=Asia%2FShanghai&theme=dark&locale=zh&style=1"
+    +"&interval="+MT5.interval+"&timezone=Asia%2FShanghai&theme=dark&locale=zh_CN&style=1"
     +"&enable_publishing=false&allow_symbol_change=false&save_image=false"
     +"&withdateranges=false&hide_top_toolbar=false&hide_side_toolbar=false&hide_legend=false&details=true"
     +"&studies=Volume%40tv-basicstudies";
@@ -1180,6 +1227,7 @@ function setMt5(sym,btn){
   document.getElementById("sellPrice").textContent="--";
   document.getElementById("buyPrice").textContent="--";
   document.getElementById("mt5Change").textContent="--";
+  DRAW.items=[]; DRAW.current=null; AI_PROJECTION=null; renderDrawings();
   loadMt5Frame();
   refreshMt5Price();
 }
@@ -1195,6 +1243,7 @@ function setMt5Interval(iv,btn){
   var b=document.querySelectorAll("#mt5Iv button");
   for(var k=0;k<b.length;k++) b[k].className="";
   btn.className="on";
+  DRAW.items=[]; DRAW.current=null; AI_PROJECTION=null; renderDrawings();
   loadMt5Frame();
 }
 function loadMt5Frame(){
@@ -1414,7 +1463,9 @@ function aiTraderAnalyze(){
   html+='<div class="blk"><h4>斐波那契回调位</h4>'+svg+rows+'</div>';
   html+='<div class="blk"><h4>关键参考</h4>'
       +'<div class="row"><span>最近支撑</span><b class="sup">'+(sup?fmtPrice(sup.p)+' ('+(sup.r*100).toFixed(1)+'%)':'—')+'</b></div>'
-      +'<div class="row"><span>最近阻力</span><b class="res">'+(res?fmtPrice(res.p)+' ('+(res.r*100).toFixed(1)+'%)':'—')+'</b></div></div>';
+      +'<div class="row"><span>最近阻力</span><b class="res">'+(res?fmtPrice(res.p)+' ('+(res.r*100).toFixed(1)+'%)':'—')+'</b></div>'
+      +'<button class="btn" style="margin-top:10px;width:100%" onclick="projectAiToChart()">🎯 投射支撑/阻力/斐波那契到走势图</button>'
+      +'<div class="warn" style="font-size:11px;margin-top:6px">投射线为辅助参考，基于今日高低点估算位置，精确画线请结合 TradingView 原生工具。</div></div>';
   html+='<div class="blk"><h4>多空研判（参考）</h4><div class="bias '+biasCls+'"><b>'+bias+'</b> · '+biasTxt+'</div>'
       + (newsTxt? '<div class="warn">📰 新闻面：'+escHtml(newsTxt)+'</div>':'')
       + '<div class="warn">操作参考：靠近<b class="sup">支撑</b>且出现看涨K线（锤子线 / 看涨吞噬）可轻仓试多，止损放支撑下方；靠近<b class="res">阻力</b>且出现看跌K线可试空。仅供参考，杠杆交易风险极高，务必设止损。</div></div>';
@@ -1453,6 +1504,171 @@ function enterLiveMode(){
   var secs=document.querySelectorAll("section");
   for(var i=0;i<secs.length;i++){ if(secs[i].id!=="mkt") secs[i].className=""; }
   initMt5(); startMt5Ticker();
+}
+
+/* ===== MT5 工作区放大 + 中文画线叠加层 ===== */
+function toggleWorkspaceZoom(){
+  var body=document.body;
+  if(body.classList.contains("mt5-zoomed")){
+    body.classList.remove("mt5-zoomed");
+    document.getElementById("mt5WorkspaceExit").style.display="none";
+  } else {
+    body.classList.add("mt5-zoomed");
+    document.getElementById("mt5WorkspaceExit").style.display="inline-block";
+    initMt5(); startMt5Ticker();
+  }
+  // 重置工具与指针事件
+  var onBtn=document.querySelector('#mt5Dtools .dt-btn.on');
+  selectDrawTool(DRAW.tool, onBtn);
+  setTimeout(resizeOverlay, 100);
+}
+
+// 画线状态
+var DRAW={tool:"pointer",drawing:false,items:[],current:null,ns:"http://www.w3.org/2000/svg"};
+function selectDrawTool(tool,btn){
+  DRAW.tool=tool;
+  var btns=document.querySelectorAll("#mt5Dtools .dt-btn");
+  for(var i=0;i<btns.length;i++) btns[i].classList.remove("on");
+  if(btn) btn.classList.add("on");
+  var ol=document.getElementById("mt5Overlay");
+  if(!ol) return;
+  if(tool==="pointer"){
+    ol.classList.remove("interactive");
+    document.getElementById("mt5Frame").style.pointerEvents="auto";
+  } else {
+    ol.classList.add("interactive");
+    document.getElementById("mt5Frame").style.pointerEvents="none";
+  }
+}
+function getOverlayBox(){ var ol=document.getElementById("mt5Overlay"); return ol?ol.getBoundingClientRect():null; }
+function olPriceRange(){
+  var price=MT5.lastPrice||2500;
+  var hi=MT5.sessHigh||price*1.008, lo=MT5.sessLow||price*0.992;
+  if(hi<=lo){ hi=price*1.008; lo=price*0.992; }
+  var pad=(hi-lo)*0.08;
+  return {min:lo-pad, max:hi+pad, price:price, hi:hi, lo:lo};
+}
+function yToPrice(y, h){ var r=olPriceRange(); return r.max - (y/h)*(r.max-r.min); }
+function priceToY(p, h){ var r=olPriceRange(); return h - ((p-r.min)/(r.max-r.min))*h; }
+function getOlPt(e){
+  var box=getOverlayBox(); if(!box) return null;
+  var cx=e.clientX||e.touches[0].clientX, cy=e.clientY||e.touches[0].clientY;
+  return {x:cx-box.left, y:cy-box.top};
+}
+function startDraw(e){
+  if(DRAW.tool==="pointer" || DRAW.tool==="clear") return;
+  DRAW.drawing=true;
+  var pt=getOlPt(e); if(!pt) return;
+  var h=getOverlayBox().height;
+  var p=yToPrice(pt.y, h);
+  var id="d_"+Date.now();
+  DRAW.current={type:DRAW.tool,id:id,x1:pt.x,y1:pt.y,x2:pt.x,y2:pt.y,p1:p,p2:p};
+}
+function moveDraw(e){
+  if(!DRAW.drawing||!DRAW.current) return;
+  var pt=getOlPt(e); if(!pt) return;
+  var h=getOverlayBox().height;
+  DRAW.current.x2=pt.x; DRAW.current.y2=pt.y; DRAW.current.p2=yToPrice(pt.y, h);
+  if(DRAW.current.type==="horiz"){ DRAW.current.x1=pt.x; DRAW.current.y1=pt.y; DRAW.current.p1=yToPrice(pt.y, h); }
+  renderDrawings();
+}
+function endDraw(){
+  if(!DRAW.drawing||!DRAW.current) return;
+  DRAW.drawing=false;
+  if(DRAW.current.type==="text"){
+    var txt=prompt("请输入标注文字：", "支撑位");
+    if(txt) DRAW.current.text=txt; else { DRAW.current=null; renderDrawings(); return; }
+  }
+  // 忽略误触（点按小于4像素），但水平线允许单点落笔
+  var isHoriz=DRAW.current.type==="horiz";
+  var moved=Math.abs(DRAW.current.x2-DRAW.current.x1)>3 || Math.abs(DRAW.current.y2-DRAW.current.y1)>3;
+  if(isHoriz || moved || DRAW.current.type==="text"){
+    DRAW.items.push(DRAW.current);
+  }
+  DRAW.current=null; renderDrawings();
+}
+function renderDrawings(){
+  var ol=document.getElementById("mt5Overlay"); if(!ol) return;
+  var box=getOverlayBox(); if(!box) return;
+  var W=box.width, H=box.height;
+  ol.setAttribute("viewBox","0 0 "+W+" "+H);
+  var html="";
+  // 1) AI 投射线（底层）
+  if(AI_PROJECTION){
+    var data=AI_PROJECTION;
+    data.fib.forEach(function(f){
+      var y=priceToY(f.p, H);
+      var isSup=data.sup&&Math.abs(f.p-data.sup.p)<1e-6;
+      var isRes=data.res&&Math.abs(f.p-data.res.p)<1e-6;
+      var col=isSup?"#5fb868":(isRes?"#e8624f":"#f7d271");
+      var dash=isSup||isRes?"0":"4 3";
+      html+='<line class="mt5-ol-line" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="'+col+'" stroke-width="'+(isSup||isRes?1.6:1)+'" stroke-dasharray="'+dash+'"/>';
+      html+='<text class="mt5-ol-text" x="6" y="'+(y-5)+'" fill="'+col+'" font-weight="'+(isSup||isRes?"bold":"normal")+'">'+(f.r*100).toFixed(1)+'% '+fmtPrice(f.p)+'</text>';
+    });
+    var py=priceToY(data.price, H);
+    html+='<line class="mt5-ol-line" x1="0" y1="'+py+'" x2="'+W+'" y2="'+py+'" stroke="#f7d271" stroke-width="1.8"/>';
+    html+='<text class="mt5-ol-text" x="6" y="'+(py-7)+'" fill="#f7d271" font-weight="bold">现价 '+fmtPrice(data.price)+'</text>';
+  }
+  // 2) 用户手绘线（顶层）
+  var all=DRAW.items.slice();
+  if(DRAW.current) all.push(DRAW.current);
+  all.forEach(function(d){
+    if(d.type==="horiz"){
+      var hy=priceToY(d.p1, H);
+      html+='<line class="mt5-ol-line" x1="0" y1="'+hy+'" x2="'+W+'" y2="'+hy+'" stroke="#f7d271" stroke-width="1.2" stroke-dasharray="4 3"/>';
+      html+='<text class="mt5-ol-text" x="6" y="'+(hy-5)+'" fill="#f7d271">水平 '+fmtPrice(d.p1)+'</text>';
+    } else if(d.type==="trend"){
+      html+='<line class="mt5-ol-line" x1="'+d.x1+'" y1="'+d.y1+'" x2="'+d.x2+'" y2="'+d.y2+'" stroke="#67c8ff" stroke-width="1.4"/>';
+      html+='<text class="mt5-ol-text" x="'+d.x2+'" y="'+(d.y2-6)+'" fill="#67c8ff">趋势线</text>';
+    } else if(d.type==="rect"){
+      var x=Math.min(d.x1,d.x2), y=Math.min(d.y1,d.y2), w=Math.abs(d.x2-d.x1), he=Math.abs(d.y2-d.y1);
+      html+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+he+'" fill="rgba(247,210,113,.08)" stroke="#f7d271" stroke-width="1" stroke-dasharray="3 2"/>';
+    } else if(d.type==="text"&&d.text){
+      html+='<text class="mt5-ol-text" x="'+d.x1+'" y="'+d.y1+'" font-weight="bold">'+escHtml(d.text)+'</text>';
+    }
+  });
+  ol.innerHTML=html;
+}
+function clearDrawings(){ DRAW.items=[]; DRAW.current=null; AI_PROJECTION=null; renderDrawings(); var ptr=document.querySelector('#mt5Dtools .dt-btn[data-tool="pointer"]'); if(ptr) selectDrawTool('pointer',ptr); }
+function resizeOverlay(){ renderDrawings(); }
+function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+// 绑定叠加层事件（委托，避免重复）
+function bindOverlayEvents(){
+  var ol=document.getElementById("mt5Overlay");
+  var box=document.getElementById("mt5ChartBox");
+  if(!ol||!box) return;
+  ol.addEventListener("mousedown",startDraw);
+  ol.addEventListener("mousemove",moveDraw);
+  window.addEventListener("mouseup",endDraw);
+  ol.addEventListener("touchstart",function(e){ if(DRAW.tool!=="pointer") e.preventDefault(); startDraw(e); },{passive:false});
+  ol.addEventListener("touchmove",function(e){ if(DRAW.tool!=="pointer") e.preventDefault(); moveDraw(e); },{passive:false});
+  window.addEventListener("touchend",endDraw);
+  window.addEventListener("resize",resizeOverlay);
+}
+
+// AI 一键投射分析线到走势图
+var AI_PROJECTION=null;
+function projectAiToChart(){
+  var price=MT5.lastPrice;
+  if(price==null){ alert("实时价还没取到，请稍等。"); return; }
+  var hi=MT5.sessHigh||price*1.005, lo=MT5.sessLow||price*0.995;
+  if(hi<=lo){ hi=price*1.005; lo=price*0.995; }
+  var fib=fibLevels(lo,hi);
+  var sup=null, res=null;
+  for(var i=0;i<fib.length;i++){
+    if(fib[i].p<=price && (sup==null||fib[i].p>sup.p)) sup=fib[i];
+    if(fib[i].p>=price && (res==null||fib[i].p<res.p)) res=fib[i];
+  }
+  AI_PROJECTION={price:price,hi:hi,lo:lo,fib:fib,sup:sup,res:res};
+  renderAiProjection();
+  // 若当前不是放大模式，提示用户可放大盯盘
+  if(!document.body.classList.contains("mt5-zoomed")){
+    toast("✅ AI 分析线已投射到走势图上。建议点「🔍 放大工作区」专心盯盘。");
+  }
+}
+function renderAiProjection(){
+  renderDrawings();
 }
 
 /* ===== 新闻雷达 · 智能语义引擎 v2 ===== */
@@ -1753,6 +1969,7 @@ function renderHome(){
 loadSettings();
 if(/[?&]mode=live\b/.test(location.search)) enterLiveMode();
 loadAiSettings();
+bindOverlayEvents();
 loadAlerts();
 refreshPrice(false);
 renderGalleries();
