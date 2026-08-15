@@ -77,6 +77,17 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .quizOpt.right{background:var(--green-bg);border-color:var(--green);color:var(--green)}
 .quizOpt.wrong{background:var(--red-bg);border-color:var(--red);color:var(--red)}
 footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
+.mktHead{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px}
+.symTag{font-size:12px;padding:3px 10px;border-radius:14px;border:1px solid var(--border);color:var(--muted)}
+.symTag.gold{color:var(--gold2);border-color:var(--gold)}
+.symTag.dxy{color:#7fb3d5;border-color:#2f4a5c}
+.rngBtns{display:flex;gap:6px;margin-left:auto}
+.rngBtns button{background:var(--panel2);border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:4px 10px;cursor:pointer;font-size:12px}
+.rngBtns button.on{color:var(--gold2);border-color:var(--gold)}
+.mktStat{font-size:12.5px;color:var(--muted);margin:2px 0 6px;line-height:1.8}
+.mktStat b{color:var(--gold2)}
+.chartWrap{width:100%;overflow:hidden}
+.mktEmpty{color:var(--muted);font-size:13px;text-align:center;padding:40px 0}
 </style>
 </head>
 <body>
@@ -104,6 +115,7 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
   <button onclick="showTab('fib',this)">斐波纳奇计算器</button>
   <button onclick="showTab('pos',this)">仓位与策略</button>
   <button onclick="showTab('chk',this)">开仓前自检</button>
+  <button onclick="showTab('mkt',this)">实时行情</button>
 </nav>
 
 <!-- 问答台 -->
@@ -311,7 +323,49 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.0 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。金价数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<!-- 实时行情 -->
+<section id="mkt">
+  <div class="card">
+    <h2>实时行情面板 · 黄金期货 &amp; 美元指数</h2>
+    <p class="muted">数据来自 Yahoo Finance 公开接口（<b style="color:var(--text)">GC=F 黄金期货</b> / <b style="color:var(--text)">DX-Y.NYB 美元指数</b>），含价格走势与成交量，免费源约 15-20 分钟延迟。每 60 秒自动刷新，也可手动刷新。</p>
+    <div class="mktHead">
+      <span class="symTag gold">GC=F 黄金期货</span>
+      <span class="symTag dxy">DX-Y.NYB 美元指数</span>
+      <div class="rngBtns" id="rngBtns">
+        <button data-r="1d" data-i="5m" onclick="setMktRange('1d','5m',this)">1天</button>
+        <button data-r="1mo" data-i="1d" class="on" onclick="setMktRange('1mo','1d',this)">1月</button>
+        <button data-r="3mo" data-i="1d" onclick="setMktRange('3mo','1d',this)">3月</button>
+        <button data-r="6mo" data-i="1d" onclick="setMktRange('6mo','1d',this)">6月</button>
+        <button data-r="1y" data-i="1d" onclick="setMktRange('1y','1d',this)">1年</button>
+      </div>
+      <button class="tbtn" onclick="loadMarket(true)">刷新</button>
+    </div>
+    <div class="mktStat" id="mktStat">点击下方区间或刷新开始加载…</div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="color:var(--gold2)">黄金期货走势（GC=F）</h3>
+      <div class="chartWrap" id="chartGold"></div>
+    </div>
+    <div class="card">
+      <h3 style="color:#7fb3d5">美元指数走势（DXY）</h3>
+      <div class="chartWrap" id="chartDxy"></div>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--gold)">黄金期货交易量</h3>
+      <div class="chartWrap" id="volGold"></div>
+    </div>
+    <div class="card">
+      <h3 style="color:#7fb3d5">美元指数交易量</h3>
+      <div class="chartWrap" id="volDxy"></div>
+    </div>
+  </div>
+  <div class="card">
+    <p class="muted">📌 怎么看：<b style="color:var(--text)">黄金涨、美元跌</b>是经典负相关——美元走强通常压制金价。把四张图对照看：金价放量突破前高 + 美元走弱，是多头的强力确认；金价缩量滞涨 + 美元触底反弹，则要警惕回调。成交量放大说明当前价位是多空激战区。</p>
+  </div>
+</section>
+
+<footer>黄金交易心理与策略工作台 v2.1 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 </div>
 
 <script>
@@ -411,6 +465,8 @@ function showTab(id,btn){
   var btns=document.querySelectorAll("nav button");
   for(var j=0;j<btns.length;j++) btns[j].className="";
   btn.className="on";
+  if(id==="mkt"){ if(!MKT.loaded) loadMarket(false); startAutoMarket(); }
+  else { stopAutoMarket(); }
 }
 
 /* ===== K线绘制引擎 ===== */
@@ -713,6 +769,136 @@ function chkUpdate(){
   if(n===boxes.length){el.className="verdict ok";el.textContent="全部通过 · 允许开仓（止损止盈同步填进MT5）";}
   else{el.className="verdict no";el.textContent="已通过 "+n+" / "+boxes.length+" 项 · 禁止开仓";}
 }
+
+/* ===== 实时行情面板（黄金期货 GC=F / 美元指数 DXY） ===== */
+var MKT = { range:"1mo", interval:"1d", loaded:false, timer:null, busy:false };
+function mktProxyList(target){
+  return [
+    "https://api.allorigins.win/raw?url="+encodeURIComponent(target),
+    "https://api.codetabs.com/v1/proxy/?quest="+target,
+    "https://corsproxy.io/?url="+encodeURIComponent(target),
+    "https://thingproxy.freeboard.io/fetch/"+target,
+    "https://api.cors.lol/?url="+encodeURIComponent(target)
+  ];
+}
+function fetchYahoo(sym, range, interval){
+  var target="https://query1.finance.yahoo.com/v8/finance/chart/"+sym+"?range="+range+"&interval="+interval;
+  var urls=mktProxyList(target);
+  function tryOne(i){
+    if(i>=urls.length) return Promise.reject(new Error("all proxies failed"));
+    return fetch(urls[i],{cache:"no-store"})
+      .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.text(); })
+      .then(function(txt){
+        var j=JSON.parse(txt);
+        if(!j.chart||!j.chart.result) throw new Error("bad payload");
+        var r=j.chart.result[0];
+        var ts=r.timestamp||[];
+        var q=(r.indicators.quote&&r.indicators.quote[0])||{};
+        var close=q.close||[], vol=q.volume||[];
+        var out=[];
+        for(var k=0;k<ts.length;k++){
+          var c=close[k];
+          if(c===null||c===undefined) continue;
+          out.push({t:ts[k]*1000, c:c, v:(vol[k]||0)});
+        }
+        return {meta:r.meta, pts:out};
+      })
+      .catch(function(e){ return tryOne(i+1); });
+  }
+  return tryOne(0);
+}
+function fmtNum(n){
+  if(n==null||isNaN(n)) return "-";
+  if(n>=1e9) return (n/1e9).toFixed(2)+"B";
+  if(n>=1e6) return (n/1e6).toFixed(2)+"M";
+  if(n>=1e3) return (n/1e3).toFixed(1)+"K";
+  return ""+Math.round(n);
+}
+function fmtPrice(n){ if(n==null) return "-"; return n>=1000?n.toFixed(1):n.toFixed(2); }
+function mktDate(t){ var d=new Date(t); return (d.getMonth()+1)+"/"+d.getDate(); }
+
+/* 折线/面积图 */
+function lineChartSVG(pts, W, H, color){
+  if(!pts||pts.length<2) return '<div class="mktEmpty">数据不足</div>';
+  var vals=pts.map(function(p){return p.c;});
+  var min=Math.min.apply(null,vals), max=Math.max.apply(null,vals);
+  var pad=(max-min)*0.12||1; min-=pad; max+=pad;
+  var pl=30, pr=8, pt=10, pb=18;
+  function X(i){return pl + i*(W-pl-pr)/(pts.length-1);}
+  function Y(v){return pt + (max-v)/(max-min)*(H-pt-pb);}
+  var line="M"+X(0)+" "+Y(vals[0]), area="M"+X(0)+" "+Y(vals[0]);
+  for(var i=1;i<pts.length;i++){ var x=X(i),y=Y(vals[i]); line+="L"+x+" "+y; area+="L"+x+" "+y; }
+  area+="L"+X(pts.length-1)+" "+(H-pb)+"L"+X(0)+" "+(H-pb)+"Z";
+  var last=pts[pts.length-1], up=last.c>=pts[0].c;
+  var grid="";
+  for(var g=0;g<=2;g++){var gy=pt+g*(H-pt-pb)/2; grid+='<line x1="'+pl+'" y1="'+gy+'" x2="'+(W-pr)+'" y2="'+gy+'" stroke="#3a3223" stroke-width="0.5"/>';}
+  function dlabel(i){return '<text x="'+X(i)+'" y="'+(H-5)+'" font-size="9" fill="#9a8f76" text-anchor="'+((i===0)?"start":(i===pts.length-1)?"end":"middle")+'">'+mktDate(pts[i].t)+'</text>';}
+  var xl=[0, Math.floor(pts.length/2), pts.length-1].map(dlabel).join("");
+  var yl=[max,(max+min)/2,min].map(function(v,gi){var gy=pt+gi*(H-pt-pb)/2;return '<text x="'+(pl-3)+'" y="'+(gy+3)+'" font-size="9" fill="#9a8f76" text-anchor="end">'+fmtPrice(v)+'</text>';}).join("");
+  return '<svg width="100%" viewBox="0 0 '+W+' '+H+'">'
+    + grid
+    + '<path d="'+area+'" fill="'+color+'" fill-opacity="0.12"/>'
+    + '<path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="1.6"/>'
+    + '<circle cx="'+X(pts.length-1)+'" cy="'+Y(last.c)+'" r="3" fill="'+(up?"#e05c4d":"#6dbf67")+'"/>'
+    + yl + xl + '</svg>';
+}
+/* 成交量柱图 */
+function barChartSVG(pts, W, H, color){
+  if(!pts||pts.length<2) return '<div class="mktEmpty">数据不足</div>';
+  var vols=pts.map(function(p){return p.v;});
+  var max=Math.max.apply(null,vols)||1;
+  var pl=30, pr=8, pt=8, pb=14;
+  var slot=(W-pl-pr)/pts.length, bw=Math.min(slot*0.7,14);
+  var svg='<svg width="100%" viewBox="0 0 '+W+' '+H+'">';
+  var avg=max*0.55;
+  for(var i=0;i<pts.length;i++){
+    var h=Math.max(1,(pts[i].v/max)*(H-pt-pb));
+    var x=pl+slot*(i+0.5)-bw/2, y=H-pb-h;
+    svg+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" rx="1" fill="'+color+'" fill-opacity="'+(pts[i].v>=avg?0.9:0.4)+'"/>';
+  }
+  svg+='<text x="'+(pl-3)+'" y="'+(H-3)+'" font-size="9" fill="#9a8f76" text-anchor="end">'+fmtNum(max)+'</text>';
+  return svg+'</svg>';
+}
+function setMktRange(r,i,btn){
+  MKT.range=r; MKT.interval=i;
+  var b=document.querySelectorAll("#rngBtns button");
+  for(var k=0;k<b.length;k++) b[k].className="";
+  btn.className="on";
+  loadMarket(false);
+}
+function loadMarket(manual){
+  if(MKT.busy) return;
+  MKT.busy=true;
+  var stat=document.getElementById("mktStat");
+  if(manual) stat.textContent="刷新中…"; else stat.textContent="加载行情中…";
+  Promise.all([
+    fetchYahoo("GC=F",MKT.range,MKT.interval),
+    fetchYahoo("DX-Y.NYB",MKT.range,MKT.interval)
+  ]).then(function(res){
+    var g=res[0], d=res[1];
+    document.getElementById("chartGold").innerHTML=lineChartSVG(g.pts,560,180,"#e8b33c");
+    document.getElementById("chartDxy").innerHTML=lineChartSVG(d.pts,560,180,"#7fb3d5");
+    document.getElementById("volGold").innerHTML=barChartSVG(g.pts,560,150,"#e8b33c");
+    document.getElementById("volDxy").innerHTML=barChartSVG(d.pts,560,150,"#7fb3d5");
+    var gLast=g.pts[g.pts.length-1], gPrev=g.pts[Math.max(0,g.pts.length-2)];
+    var dLast=d.pts[d.pts.length-1], dPrev=d.pts[Math.max(0,d.pts.length-2)];
+    var gChg=gLast.c-gPrev.c, gPct=gChg/gPrev.c*100;
+    var dChg=dLast.c-dPrev.c, dPct=dChg/dPrev.c*100;
+    stat.innerHTML="<b>黄金期货</b> $"+fmtPrice(gLast.c)+"（"+(gChg>=0?"+":"")+gChg.toFixed(1)+" / "+(gPct>=0?"+":"")+gPct.toFixed(2)+"%）　|　<b>美元指数</b> "+fmtPrice(dLast.c)+"（"+(dChg>=0?"+":"")+dChg.toFixed(2)+" / "+(dPct>=0?"+":"")+dPct.toFixed(2)+"%）　|　更新："+new Date(gLast.t).toLocaleString("zh-CN");
+    MKT.loaded=true; MKT.busy=false;
+  }).catch(function(e){
+    stat.innerHTML="行情加载失败（公共代理可能临时不可用或网络受限）。请稍后点「刷新」重试；也可换网络环境再试。";
+    MKT.busy=false;
+  });
+}
+function startAutoMarket(){
+  if(MKT.timer) return;
+  MKT.timer=setInterval(function(){
+    var sec=document.getElementById("mkt");
+    if(sec&&sec.className==="on") loadMarket(false);
+  },60000);
+}
+function stopAutoMarket(){ if(MKT.timer){clearInterval(MKT.timer);MKT.timer=null;} }
 
 /* ===== 启动 ===== */
 loadSettings();
