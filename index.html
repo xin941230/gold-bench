@@ -174,6 +174,13 @@ body.mt5-zoomed .mt5-dtools{position:absolute;left:12px;top:66px;z-index:25}
 .mt5-chart{position:relative}
 #mt5Overlay{position:absolute;inset:0;z-index:10;width:100%;height:100%;pointer-events:none}
 #mt5Overlay.interactive{pointer-events:auto;cursor:crosshair}
+/* 自绘可交互K线图（替代跨域 TradingView 的缩放/刻度不同步问题） */
+#mt5Canvas{position:absolute;inset:0;z-index:5;width:100%;height:100%;display:none;background:#0a0807}
+.mt5-chart.chart-canvas #mt5Canvas{display:block}
+.mt5-chart.chart-canvas #mt5Frame{display:none}
+.mt5-chart.chart-tv #mt5Canvas{display:none}
+.mt5-chart.chart-tv #mt5Overlay{pointer-events:none}
+.mt5-chart .mt5-zoomhint{position:absolute;left:8px;bottom:6px;z-index:12;font-size:10px;color:#6b6250;background:rgba(20,17,13,.7);border:1px solid #2a2520;border-radius:5px;padding:2px 7px;pointer-events:none}
 .mt5-ol-line{stroke-linecap:round}
 .mt5-ol-text{font-size:11px;font-family:system-ui,-apple-system,"Microsoft YaHei",sans-serif;fill:#ece5d3}
 .mt5-ol-resize{position:absolute;right:8px;bottom:8px;z-index:20;background:rgba(20,17,13,.85);border:1px solid #2a2520;border-radius:6px;padding:3px 8px;font-size:11px;color:#6b6250;pointer-events:none}
@@ -767,8 +774,10 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <button class="dt-btn" data-tool="text" onclick="selectDrawTool('text',this)" title="在图上写标注">📝 文字</button>
       <button class="dt-btn" data-tool="clear" onclick="clearDrawings()" title="清除我画的所有线">🗑 清除</button>
       <div class="dt-sep"></div>
+      <button class="dt-btn" id="mt5ChartToggle" onclick="toggleChartMode()" title="在分析图(可缩放)与 TradingView 实盘图之间切换">📺 实盘图(TV)</button>
+      <button class="dt-btn" onclick="openFibModal()" title="用摆动点列表画斐波那契回调">📐 摆动点斐波</button>
       <button class="dt-btn primary" onclick="toggleAiPanel()" title="打开 AI 职业交易员分析面板">🤖 AI分析</button>
-      <span class="dt-tip">光标 = 和图表交互；选画线工具 = 在走势图上画线；AI分析 = 一键算支撑/阻力/建议</span>
+      <span class="dt-tip">光标 = 和图表交互(滚轮缩放/拖拽)；选画线工具 = 在走势图上画线；AI分析 = 一键算支撑/阻力/建议</span>
     </div>
 
     <p class="mt5-drawhint">🖌 <b>怎么在图上画线：</b>用上方<b>中文工具栏</b>选「水平线 / 趋势线 / 矩形框 / 文字」，然后在走势图上点击或拖拽即可。需要 <span class="k">斐波那契回调</span><span class="k">江恩扇形</span> 等精确工具时，请点图表<b>左侧工具栏</b>对应图标。点「🤖 AI分析」可一键算出当前支撑/阻力并给出操作建议，再点「🎯 投射到走势图」就能把关键位标到图上。画的线会在<b>切换品种 / 周期 / 重载图表时清空</b>。</p>
@@ -802,9 +811,11 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
     </div>
 
     <div class="mt5-wrap">
-      <div class="mt5-chart" id="mt5ChartBox">
+      <div class="mt5-chart chart-canvas" id="mt5ChartBox">
         <iframe id="mt5Frame" src="about:blank" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+        <canvas id="mt5Canvas"></canvas>
         <svg id="mt5Overlay" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
+        <div class="mt5-zoomhint">🖱 滚轮缩放 · 拖拽平移 · 光标悬停看价</div>
         <div class="mt5-chartmask" id="mt5ChartMask" style="display:none">图表连接中断，正在重新加载…</div>
       </div>
       <div class="mt5-pos">
@@ -821,7 +832,23 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
         <div id="mt5PosOut" class="mt5-posout">输入手数后点击计算，按 0.01 手 = 1 盎司/美元波动 $0.01 盈亏估算。</div>
       </div>
     </div>
-    <p class="muted" style="margin-top:10px">📌 K线/成交量来自 TradingView <b style="color:var(--gold2)">实时流式图表</b>（断流会自动重连，不会定时打断你画线）；买卖价来自 xaus.com / gold-api 免费现货接口，约 15 秒刷新。箭头图标可切周期、全屏或弹出独立盯盘窗口。本行情仅供学习，不构成投资建议。</p>
+    <p class="muted" style="margin-top:10px">📌 主图现为<b style="color:var(--gold2)">自绘可缩放K线图</b>（滚轮缩放、拖拽平移，所有分析线会跟着缩放移动）；右上「📺 实盘图(TV)」可切回 TradingView 实时嵌入图。买卖价来自 xaus.com / gold-api 免费现货接口，约 15 秒刷新。本行情仅供学习，不构成投资建议。</p>
+
+    <!-- 摆动点斐波那契模态框 -->
+    <div id="fibModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);align-items:center;justify-content:center">
+      <div style="width:min(560px,92vw);background:#151210;border:1px solid #3a3328;border-radius:12px;padding:18px 20px;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <h3 style="margin:0;color:var(--gold2);font-size:16px">📐 摆动点斐波那契回调</h3>
+          <span style="cursor:pointer;color:#9a8f76;font-size:20px" onclick="closeFibModal()">×</span>
+        </div>
+        <p class="aiT-plan" style="font-size:12.5px;line-height:1.7;margin:0 0 10px">把行情软件里的摆动点（高/低点）按时间顺序粘贴进来，AI 会判断趋势、选一段最明显的上涨/下跌波段，算出 0~100% 斐波那契回调位并画到图上。每行为：<b>时间  价格  高/低</b>（高/低可省略，AI 会自动识别）。可选首行写 <b>ATR=12.5</b>。</p>
+        <textarea id="fibInput" style="width:100%;height:170px;background:#0d0b09;border:1px solid #2a2520;border-radius:8px;color:#ece5d3;font-size:13px;font-family:ui-monospace,Menlo,Consolas,monospace;padding:10px;resize:vertical" placeholder="ATR=12.5&#10;2026-07-20 08:00  2385.50  low&#10;2026-07-24 12:00  2410.80  high&#10;2026-07-28 15:00  2398.20  low&#10;2026-08-02 16:00  2470.20  high&#10;2026-08-07 09:00  2430.20  low"></textarea>
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+          <button class="mt5-act" onclick="closeFibModal()">取消</button>
+          <button class="mt5-act primary" onclick="aiFibFromSwingsModal()">生成斐波那契</button>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -997,7 +1024,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.20 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.21 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -1468,7 +1495,13 @@ function initMt5(){
   if(MT5.loaded) return;
   MT5.loaded=true;
   document.getElementById("mt5SymbolTitle").textContent=MT5MAP[MT5.sym].name+" · 实时走势图";
+  // 默认显示自绘分析图（可缩放、分析线随缩放移动）；实盘图(TV)作为可切换备用视图
+  var box=document.getElementById("mt5ChartBox");
+  if(box){ box.classList.add("chart-canvas"); box.classList.remove("chart-tv"); }
+  CHART.active=true; CHART.tf=AI_STATE.tf||"day";
   loadMt5Frame();
+  chartSetTf(CHART.tf);
+  initChartInteractions();
   refreshMt5Price();
 }
 function setMt5Interval(iv,btn){
@@ -1589,6 +1622,7 @@ function updateMt5Quote(price,source){
   document.getElementById("sessSrc").textContent=source;
   var oe=document.getElementById("posLongEntry");
   if(!oe.value&&MT5.sym==="XAUUSD") oe.placeholder=price.toFixed(2);
+  if(CHART.active && CHART.candles.length) renderChart(); // 实时价线跟随刷新
 }
 function flashEl(el,up){
   if(!el) return;
@@ -1655,6 +1689,7 @@ function selectAiTf(tf,btn){
   var btns=document.querySelectorAll("#aiTTabs .aiT-tab");
   for(var i=0;i<btns.length;i++) btns[i].classList.remove("on");
   if(btn) btn.classList.add("on");
+  if(CHART.active) chartSetTf(tf);   // 同步自绘分析图的周期
   runAiAnalyze(tf);
 }
 function tfName(tf){ return tf==="hour"?"小时线":(tf==="day"?"日线":"周线"); }
@@ -1957,6 +1992,7 @@ function runAiAnalyze(tf, force){
   fetchHistory(MT5.sym, tf).then(function(candles){
     if(candles&&candles.length){
       MT5_HIST[tf]=candles;
+      if(CHART.active && CHART.tf===tf){ CHART.candles=candles; chartResetView(); } // 同步自绘分析图
       renderAi(tf, candles, price);
     } else {
       var fb=buildTfData(tf);
@@ -2039,6 +2075,12 @@ function toggleWorkspaceZoom(){
 var DRAW={tool:"pointer",drawing:false,items:[],current:null,ns:"http://www.w3.org/2000/svg"};
 var AI_STATE={tf:"day",data:null,open:false,levels:null,trend:null,bt:null,candles:null,everOpen:false,signalHostId:null};
 var AI_PROJ_RANGE=null;
+/* ===== 自绘可交互K线图（解决跨域 TradingView 缩放后分析线不同步的问题） =====
+   主图改为我们自己的 Canvas：蜡烛图、滚轮缩放、拖拽平移、实时价线、十字光标都由我们控制，
+   叠加层(SVG)盖在 Canvas 上，坐标随 Canvas 当前可见区间实时更新，所以斐波/江恩/决策/手绘线都会跟着缩放正确移动。 */
+var CHART={active:true, tf:"day", candles:[], viewStart:0, viewCount:140,
+  pmin:0, pmax:0, plotTop:8, plotH:0, crossX:null, crossY:null,
+  dragging:false, lastX:0, padL:60, padR:12, padT:10, padB:22};
 var AI_LIVE_TIMER=null;
 function selectDrawTool(tool,btn){
   DRAW.tool=tool;
@@ -2047,16 +2089,26 @@ function selectDrawTool(tool,btn){
   if(btn) btn.classList.add("on");
   var ol=document.getElementById("mt5Overlay");
   if(!ol) return;
-  if(tool==="pointer"){
-    ol.classList.remove("interactive");
-    document.getElementById("mt5Frame").style.pointerEvents="auto";
-  } else {
-    ol.classList.add("interactive");
-    document.getElementById("mt5Frame").style.pointerEvents="none";
+  var box=document.getElementById("mt5ChartBox");
+  var tvMode = box && box.classList.contains("chart-tv");
+  if(tvMode){ // 实盘图(TV)模式：叠加层不拦截，让 TradingView 可交互
+    ol.classList.remove("interactive"); ol.style.pointerEvents="none";
+    document.getElementById("mt5Frame").style.pointerEvents="auto"; return;
   }
+  // 分析图模式：叠加层接收事件（光标态用于缩放/平移，画线态用于手绘）
+  ol.style.pointerEvents="auto";
+  if(tool==="pointer"){ ol.classList.remove("interactive"); }
+  else { ol.classList.add("interactive"); }
+  document.getElementById("mt5Frame").style.pointerEvents="none";
 }
 function getOverlayBox(){ var ol=document.getElementById("mt5Overlay"); return ol?ol.getBoundingClientRect():null; }
 function olPriceRange(){
+  // 分析图(自绘Canvas)激活时，坐标跟随 Canvas 当前可见区间——这是修复"缩放后线不动"的关键
+  if(CHART.active && CHART.pmax>CHART.pmin){
+    var price=MT5.lastPrice||(CHART.pmin+CHART.pmax)/2;
+    return {min:CHART.pmin, max:CHART.pmax, price:price,
+      hi:Math.max(price,CHART.pmax), lo:Math.min(price,CHART.pmin)};
+  }
   if(AI_PROJ_RANGE){
     var price=MT5.lastPrice||AI_PROJ_RANGE.price;
     return {min:AI_PROJ_RANGE.min, max:AI_PROJ_RANGE.max, price:price, hi:Math.max(price,AI_PROJ_RANGE.max), lo:Math.min(price,AI_PROJ_RANGE.min)};
@@ -2067,8 +2119,8 @@ function olPriceRange(){
   var pad=(hi-lo)*0.08;
   return {min:lo-pad, max:hi+pad, price:price, hi:hi, lo:lo};
 }
-function yToPrice(y, h){ var r=olPriceRange(); return r.max - (y/h)*(r.max-r.min); }
-function priceToY(p, h){ var r=olPriceRange(); return h - ((p-r.min)/(r.max-r.min))*h; }
+function yToPrice(y, h){ var r=olPriceRange(); var top=CHART.active?CHART.plotTop:0; var ph=CHART.active?CHART.plotH:h; return r.max - ((y-top)/ph)*(r.max-r.min); }
+function priceToY(p, h){ var r=olPriceRange(); var top=CHART.active?CHART.plotTop:0; var ph=CHART.active?CHART.plotH:h; return top + (1-((p-r.min)/(r.max-r.min)))*ph; }
 function getOlPt(e){
   var box=getOverlayBox(); if(!box) return null;
   var cx=e.clientX||e.touches[0].clientX, cy=e.clientY||e.touches[0].clientY;
@@ -2105,6 +2157,160 @@ function endDraw(){
     DRAW.items.push(DRAW.current);
   }
   DRAW.current=null; renderDrawings();
+}
+/* ===== 自绘K线图：渲染 / 缩放 / 平移 / 交互 ===== */
+function chartCanvas(){ return document.getElementById("mt5Canvas"); }
+function chartSetTf(tf){
+  CHART.tf=tf;
+  if(MT5_HIST[tf] && MT5_HIST[tf].length){ CHART.candles=MT5_HIST[tf]; chartResetView(); redrawAll(); }
+  else { fetchHistory(MT5.sym, tf).then(function(c){ if(c&&c.length){ MT5_HIST[tf]=c; CHART.candles=c; chartResetView(); redrawAll(); } }); }
+}
+function chartResetView(){
+  var n=CHART.candles.length||0;
+  CHART.viewCount=Math.min(n, Math.max(30, CHART.viewCount||140));
+  CHART.viewStart=Math.max(0, n-CHART.viewCount);
+}
+function chartFitTo(pmin,pmax){
+  var c=CHART.candles; if(!c||!c.length) return;
+  var idxs=[];
+  for(var i=0;i<c.length;i++){ if(c[i].h>=pmin && c[i].l<=pmax) idxs.push(i); }
+  if(!idxs.length) return;
+  var a=Math.max(0, idxs[0]-5), b=Math.min(c.length-1, idxs[idxs.length-1]+5);
+  CHART.viewStart=a; CHART.viewCount=Math.max(25, b-a+1);
+}
+function renderChart(){
+  var cv=chartCanvas(); if(!cv || !CHART.active) return;
+  var box=cv.getBoundingClientRect();
+  if(!box.width || !box.height) return;
+  var dpr=window.devicePixelRatio||1;
+  cv.width=Math.round(box.width*dpr); cv.height=Math.round(box.height*dpr);
+  var ctx=cv.getContext && cv.getContext("2d"); if(!ctx) return;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  var W=box.width, H=box.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#0a0807"; ctx.fillRect(0,0,W,H);
+  if(!CHART.candles.length){
+    ctx.fillStyle="#6b6250"; ctx.font="13px system-ui"; ctx.textBaseline="middle";
+    ctx.fillText("K线加载中…（免费接口，稍候自动刷新）", 16, H/2); return;
+  }
+  var padL=CHART.padL, padR=CHART.padR, padT=CHART.padT, padB=CHART.padB;
+  var plotW=W-padL-padR, plotH=H-padT-padB;
+  CHART.plotTop=padT; CHART.plotH=plotH;
+  var n=CHART.candles.length;
+  var vs=Math.max(0, Math.min(n-1, CHART.viewStart));
+  var vc=Math.max(10, Math.min(n, CHART.viewCount));
+  var ve=Math.min(n, Math.ceil(vs+vc));
+  var pmin=1e18, pmax=-1e18;
+  for(var i=Math.floor(vs);i<ve;i++){ var c=CHART.candles[i]; if(c.h>pmax)pmax=c.h; if(c.l<pmin)pmin=c.l; }
+  if(!(pmax>pmin)){ pmax=pmin+1; }
+  var pad=(pmax-pmin)*0.06; pmin-=pad; pmax+=pad;
+  CHART.pmin=pmin; CHART.pmax=pmax;
+  var xOf=function(idx){ return padL + (idx - vs)/vc * plotW; };
+  var yOf=function(p){ return padT + (1-(p-pmin)/(pmax-pmin))*plotH; };
+  // 网格 + 价格轴（左侧）
+  ctx.font="10px system-ui"; ctx.textBaseline="middle"; ctx.textAlign="left";
+  ctx.strokeStyle="rgba(255,255,255,.05)"; ctx.fillStyle="#8a7f66";
+  var ticks=5;
+  for(var t=0;t<=ticks;t++){
+    var pr=pmax-(pmax-pmin)*t/ticks, yy=yOf(pr);
+    ctx.beginPath(); ctx.moveTo(padL,yy); ctx.lineTo(W-padR,yy); ctx.stroke();
+    ctx.fillText(pr.toFixed(1), 4, Math.max(padT+6, Math.min(H-padB-4, yy)));
+  }
+  // 时间轴（底部）
+  ctx.textBaseline="alphabetic"; ctx.textAlign="left";
+  var step=Math.max(1, Math.floor(vc/6));
+  for(var i2=Math.floor(vs);i2<ve;i2+=step){
+    var c2=CHART.candles[i2], xx=xOf(i2), d=new Date(c2.t);
+    var lbl=(d.getMonth()+1)+"/"+d.getDate()+(CHART.tf==="week"?"":" "+(d.getHours()+"").padStart(2,"0")+":"+(d.getMinutes()+"").padStart(2,"0"));
+    ctx.fillStyle="#8a7f66"; ctx.fillText(lbl, Math.min(W-padR-44, xx), H-6);
+  }
+  // 蜡烛
+  var bw=Math.max(1.2, plotW/vc*0.62);
+  for(var i3=Math.floor(vs);i3<ve;i3++){
+    var c3=CHART.candles[i3], xx3=xOf(i3), up3=c3.c>=c3.o;
+    ctx.strokeStyle=up3?"#e0533f":"#2fa56a"; ctx.fillStyle=up3?"#e0533f":"#2fa56a";
+    ctx.beginPath(); ctx.moveTo(xx3, yOf(c3.h)); ctx.lineTo(xx3, yOf(c3.l)); ctx.stroke();
+    var yo=yOf(c3.o), yc=yOf(c3.c), top=Math.min(yo,yc), bh=Math.max(1,Math.abs(yc-yo));
+    ctx.fillRect(xx3-bw/2, top, bw, bh);
+  }
+  // 实时价线
+  if(MT5.lastPrice!=null && MT5.lastPrice>=pmin && MT5.lastPrice<=pmax){
+    var py=yOf(MT5.lastPrice);
+    ctx.strokeStyle="rgba(247,210,113,.9)"; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(padL,py); ctx.lineTo(W-padR,py); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle="#f7d271"; ctx.fillRect(0, py-8, padL-2, 16);
+    ctx.fillStyle="#1a140a"; ctx.font="bold 10px system-ui"; ctx.textBaseline="middle"; ctx.textAlign="left";
+    ctx.fillText(MT5.lastPrice.toFixed(1), 4, py);
+  }
+  // 十字光标
+  if(CHART.crossX!=null && CHART.crossY!=null){
+    ctx.strokeStyle="rgba(255,255,255,.25)"; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(CHART.crossX,padT); ctx.lineTo(CHART.crossX,H-padB); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(padL,CHART.crossY); ctx.lineTo(W-padR,CHART.crossY); ctx.stroke();
+    ctx.setLineDash([]);
+    var pAt=yToPrice(CHART.crossY, H);
+    ctx.fillStyle="rgba(20,17,13,.9)"; ctx.fillRect(0, CHART.crossY-8, padL-2, 16);
+    ctx.fillStyle="#e8c66a"; ctx.font="bold 10px system-ui"; ctx.textBaseline="middle"; ctx.textAlign="left";
+    ctx.fillText(pAt.toFixed(1), 4, CHART.crossY);
+  }
+}
+function redrawAll(){ renderChart(); if(typeof renderDrawings==="function") renderDrawings(); }
+function chartZoom(e){
+  if(!CHART.active) return;
+  e.preventDefault();
+  var box=getOverlayBox(); if(!box) return;
+  var mx=e.clientX-box.left, padL=CHART.padL, plotW=box.width-padL-CHART.padR;
+  var frac=(mx-padL)/plotW; if(frac<0||frac>1) frac=0.5;
+  var n=CHART.candles.length; if(!n) return;
+  var center=CHART.viewStart + frac*CHART.viewCount;
+  var factor=e.deltaY>0?1.15:0.87;
+  CHART.viewCount=Math.max(12, Math.min(n, CHART.viewCount*factor));
+  CHART.viewStart=center - frac*CHART.viewCount;
+  CHART.viewStart=Math.max(0, Math.min(n-CHART.viewCount, CHART.viewStart));
+  redrawAll();
+}
+function chartPanMove(x){
+  if(!CHART.dragging) return;
+  var box=getOverlayBox(); if(!box) return;
+  var plotW=box.width-CHART.padL-CHART.padR, n=CHART.candles.length; if(!n) return;
+  var dCandles=(CHART.lastX - x)/plotW*CHART.viewCount;
+  CHART.viewStart=Math.max(0, Math.min(n-CHART.viewCount, CHART.viewStart+dCandles));
+  CHART.lastX=x; redrawAll();
+}
+function initChartInteractions(){
+  var ol=document.getElementById("mt5Overlay"); if(!ol || CHART._init) return; CHART._init=true;
+  ol.addEventListener("wheel", function(e){ chartZoom(e); }, {passive:false});
+  ol.addEventListener("mousedown", function(e){
+    if(!CHART.active) return;
+    if(DRAW.tool==="pointer"){ CHART.dragging=true; CHART.lastX=e.clientX; }
+  });
+  window.addEventListener("mousemove", function(e){
+    if(!CHART.active) return;
+    var box=getOverlayBox(); if(!box) return;
+    var x=e.clientX-box.left, y=e.clientY-box.top;
+    CHART.crossX=x; CHART.crossY=y;
+    if(CHART.dragging){ chartPanMove(e.clientX); }
+    else if(DRAW.drawing){ moveDraw(e); }
+    else { renderChart(); }
+  });
+  window.addEventListener("mouseup", function(e){
+    if(CHART.dragging){ CHART.dragging=false; }
+    else if(DRAW.drawing){ endDraw(); }
+  });
+}
+function toggleChartMode(){
+  CHART.active=!CHART.active;
+  var box=document.getElementById("mt5ChartBox");
+  if(CHART.active){
+    box.classList.remove("chart-tv"); box.classList.add("chart-canvas");
+    var tg=document.getElementById("mt5ChartToggle"); if(tg) tg.textContent="📺 实盘图(TV)";
+  } else {
+    box.classList.remove("chart-canvas"); box.classList.add("chart-tv");
+    var tg=document.getElementById("mt5ChartToggle"); if(tg) tg.textContent="📊 分析图(可缩放)";
+    var f=document.getElementById("mt5Frame"); if(f && (!f.src || f.src.indexOf("about:blank")>=0)) f.src=mt5TvUrl(MT5.sym);
+  }
+  selectDrawTool(DRAW.tool||"pointer", null);
+  redrawAll();
 }
 function renderDrawings(){
   var ol=document.getElementById("mt5Overlay"); if(!ol) return;
@@ -2352,6 +2558,7 @@ function aiSystemPrompt(){
     +"④ 实时盘面上下文（会随对话更新）："+ctx+"\n"
     +"⑤ 回答要具体、给可执行建议，但明确说明这是学习参考、非投资建议；黄金波动大，务必轻仓、必设止损、不扛单。\n"
     +"⑥ 若用户要画线/投射/回测等动作，告诉他可在工作台用指令让系统直接画线，你也可以描述做法。\n"
+    +"⑥b 用户若给你一组「摆动点」（时间/价格/高或低），你要按摆动点斐波那契法：先判趋势（低点高点逐步抬高=上升、逐步降低=下降、交错=震荡且置信度<0.5）；再选一段幅度≥ATR(或≥8美元)、方向与趋势一致、且由明确高低点构成的波段，上升连低点→高点、下降连高点→低点；按 0/0.236/0.382/0.5/0.618/0.786/1 算回调位（上升：高点−(高−低)×比例；下降：低点+(高−低)×比例）；只输出 JSON（trend/swing_low/swing_high/levels/confidence/rationale），不超过 50 字 rationale。工作台已内置「📐 摆动点斐波」按钮可一键生成并画线，遇到这类需求可直接调用或引导用户使用。\n"
     +"⑦ 你必须综合上述「黄金知识体系」与「实时盘面上下文」来回答，结合二者给出有依据的判断与可执行的、带风控的交易建议；不要脱离当前行情空谈理论。\n"
     +"⑧ 沟通风格（重要）：用通俗易懂、口语化的大白话，像老师傅带徒弟一样讲；遇到专业术语先一句话解释给新手听；结论先行——先说「该怎么做」，再说「为什么」；少用公式符号，多用生活化比喻；用简体中文回答。";
 }
@@ -2466,7 +2673,8 @@ function aiDrawFib(tf){
     AI_FIB=AI_FIB||{};
     AI_FIB[tf]={tf:tf, lo:lo, hi:hi, lines:lines, label:tfName(tf), color:AI_FIB_COL[tf]};
     aiRecalcProjRange();
-    renderDrawings(); beep(880,0.16);
+    if(CHART.active) chartFitTo(lo, hi); // 把视图框定到斐波那契区间，缩放后线也跟着动
+    redrawAll(); beep(880,0.16);
     var txt='<div class="blk"><h4>📐 '+tfName(tf)+' 斐波那契线已画（区间 '+fmtPrice(lo)+' ~ '+fmtPrice(hi)+'，取自该周期真实高低点'+(src||'')+'）</h4><div class="row">';
     lines.forEach(function(L){ txt+='<span style="margin-right:10px">Fib '+(L.r*100).toFixed(1)+'% <b style="color:#9b7bff">'+fmtPrice(L.p)+'</b></span>'; });
     txt+='</div><div class="warn">回踩 0.382%~0.618%（「黄金口袋」带）不破且出现反转K线，可顺势做多；跌破 0.618% 原趋势大概率失效。说「斐波那契怎么用」看原理。</div></div>';
@@ -2538,6 +2746,85 @@ function clearAiDrawings(){
   renderDrawings();
   aiChat('<div class="warn">🧹 已清除 AI 画的分析线（支撑/阻力、斐波那契、江恩、决策线）。你的手绘线保留。</div>','ai');
 }
+/* ===== 摆动点斐波那契（按用户给定的训练规格实现） ===== */
+var _lastFibJson="";
+function openFibModal(){ var m=document.getElementById("fibModal"); if(m) m.style.display="flex"; var t=document.getElementById("fibInput"); if(t) t.focus(); }
+function closeFibModal(){ var m=document.getElementById("fibModal"); if(m) m.style.display="none"; }
+function copyText(s){ try{ if(navigator.clipboard) navigator.clipboard.writeText(s); else { var ta=document.createElement("textarea"); ta.value=s; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); } toast("已复制 JSON"); }catch(e){ toast("复制失败，请手动选择"); } }
+function aiFibFromSwingsModal(){ var t=document.getElementById("fibInput"); if(t) aiFibFromSwings(t.value||"", true); }
+function aiParseSwings(text){
+  var lines=text.split(/\r?\n/), out=[], atr=null;
+  for(var i=0;i<lines.length;i++){
+    var s=lines[i].trim(); if(!s) continue;
+    var am=s.match(/atr\s*[:=]\s*([\d.]+)/i); if(am){ atr=parseFloat(am[1]); continue; }
+    var tm=s.match(/(\d{4}[-/]\d{1,2}[-/]\d{1,2}(?:[\sT]\d{1,2}:\d{2})?)/);
+    var rest=s; if(tm) rest=s.replace(tm[0],""); // 先去掉日期/时间，避免年份被误当成价格
+    var prm=rest.match(/(\d{3,5}(?:\.\d+)?)/); if(!prm) continue;
+    var type=null, sl=rest.toLowerCase();
+    if(/低|low/.test(sl)) type="low"; else if(/高|high/.test(sl)) type="high";
+    out.push({time:tm?tm[1]:"", price:parseFloat(prm[1]), type:type});
+  }
+  for(var j=0;j<out.length;j++){
+    if(out[j].type) continue;
+    var pv=out[j-1]?out[j-1].price:null, nx=out[j+1]?out[j+1].price:null;
+    if(pv!=null&&nx!=null) out[j].type=(out[j].price<pv&&out[j].price<nx)?"low":(out[j].price>pv&&out[j].price>nx)?"high":"low";
+    else if(pv!=null) out[j].type=out[j].price<pv?"low":"high";
+    else if(nx!=null) out[j].type=out[j].price<nx?"low":"high";
+    else out[j].type="low";
+  }
+  return {swings:out, atr:atr};
+}
+function aiFibFromSwings(text, fromModal){
+  text=(text||"").trim();
+  if(!text){ if(fromModal) openFibModal(); else aiChat('<div class="warn">请把摆动点列表发给我，或点「📐 摆动点斐波」按钮粘贴。每行格式：<b>时间 价格 高/低</b>。</div>','ai'); return; }
+  var parsed=aiParseSwings(text), swings=parsed.swings, atr=parsed.atr;
+  if(swings.length<2){ aiChat('<div class="warn">没能解析出至少 2 个摆动点（需含价格数字）。每行：<b>时间 价格 高/低</b>。</div>','ai'); if(fromModal) closeFibModal(); return; }
+  var lows=swings.filter(function(x){return x.type==="low";});
+  var highs=swings.filter(function(x){return x.type==="high";});
+  var trend="range";
+  if(lows.length>=2&&highs.length>=2){
+    var upB=lows[lows.length-1].price>lows[0].price&&highs[highs.length-1].price>highs[0].price;
+    var dnB=lows[lows.length-1].price<lows[0].price&&highs[highs.length-1].price<highs[0].price;
+    trend=upB?"up":(dnB?"down":"range");
+  }
+  var thr=Math.max(atr||0, 8), best=null;
+  if(trend==="up"){
+    for(var a=0;a<swings.length;a++){ if(swings[a].type!=="low")continue;
+      for(var b=a+1;b<swings.length;b++){ if(swings[b].type!=="high")continue;
+        var amp=swings[b].price-swings[a].price; if(amp>=thr&&(!best||amp>best.amp)) best={lo:swings[a],hi:swings[b],amp:amp}; } }
+  } else if(trend==="down"){
+    for(var c=0;c<swings.length;c++){ if(swings[c].type!=="high")continue;
+      for(var d=c+1;d<swings.length;d++){ if(swings[d].type!=="low")continue;
+        var amp2=swings[c].price-swings[d].price; if(amp2>=thr&&(!best||amp2>best.amp)) best={hi:swings[c],lo:swings[d],amp:amp2}; } }
+  } else {
+    for(var e=0;e<swings.length;e++){ for(var f=e+1;f<swings.length;f++){
+      var amp3=Math.abs(swings[f].price-swings[e].price);
+      if(amp3>=thr&&(!best||amp3>best.amp)){ best={lo:swings[e].price<=swings[f].price?swings[e]:swings[f], hi:swings[e].price>swings[f].price?swings[e]:swings[f], amp:amp3}; } } }
+  }
+  if(!best){ aiChat('<div class="warn">⚠️ 没有幅度 ≥ '+thr.toFixed(1)+' 美元（≥ATR 或 8 美元）的清晰波段，按震荡处理，建议等更明显趋势再画斐波。</div>','ai'); if(fromModal) closeFibModal(); return; }
+  var conf = trend==="range"?0.42:(best.amp>=thr*2?0.9:0.7);
+  var lo=best.lo, hi=best.hi, ratios=[0,0.236,0.382,0.5,0.618,0.786,1], levels={};
+  if(trend==="down"){
+    ratios.forEach(function(r){ levels[String(r)]=+(lo.price+(hi.price-lo.price)*r).toFixed(2); });
+  } else {
+    ratios.forEach(function(r){ levels[String(r)]=+(hi.price-(hi.price-lo.price)*r).toFixed(2); });
+  }
+  var md=function(ts){ if(!ts) return ""; var m=(""+ts).match(/(\d{4})-(\d{2})-(\d{2})/); return m?(m[2]*1)+"/"+(m[3]*1):ts; };
+  var json={ trend:trend, swing_low:{time:lo.time,price:lo.price}, swing_high:{time:hi.time,price:hi.price},
+    levels:levels, confidence:+conf.toFixed(2),
+    rationale:(trend==="up"?("主升波段 "+md(lo.time)+"低→"+md(hi.time)+"高，回调0.382附近，趋势完好。"):trend==="down"?("主跌波段 "+md(hi.time)+"高→"+md(lo.time)+"低，反弹0.382附近，趋势完好。"):"未找到清晰趋势波段，建议观望。") };
+  AI_FIB=AI_FIB||{};
+  AI_FIB.swing={tf:"swing", lo:Math.min(lo.price,hi.price), hi:Math.max(lo.price,hi.price),
+    lines:fibLevels(Math.min(lo.price,hi.price),Math.max(lo.price,hi.price)), label:"摆动点", color:"#ffb347"};
+  if(CHART.active) chartFitTo(Math.min(lo.price,hi.price),Math.max(lo.price,hi.price));
+  redrawAll();
+  if(fromModal) closeFibModal();
+  _lastFibJson=JSON.stringify(json,null,2);
+  aiChat('<div class="blk"><h4>📐 摆动点斐波那契（'+tfName(CHART.tf)+' · 趋势 '+({up:"上升",down:"下降",range:"震荡"})[trend]+' · 置信度 '+(conf*100).toFixed(0)+'%）</h4>'
+    +'<pre style="background:#0d0b09;border:1px solid #2a2520;border-radius:8px;padding:10px;color:#cfe3ff;font-size:12px;overflow:auto;max-height:240px;white-space:pre">'+escHtml(_lastFibJson)+'</pre>'
+    +'<div class="warn">回踩 0.382%~0.618%（黄金口袋带）不破且出现反转K线顺势入场；跌破 0.618% 原趋势大概率失效。已把回调位画到分析图上（橙色）。</div>'
+    +'<button class="mt5-act" onclick="copyText(_lastFibJson)">复制 JSON</button></div>','ai');
+}
 function aiCommand(text){
   var t=(text||"").toLowerCase();
   function has(){ for(var i=0;i<arguments.length;i++) if(t.indexOf(arguments[i])>=0) return true; return false; }
@@ -2554,6 +2841,11 @@ function aiCommand(text){
     return;
   }
   if(has('江恩','gann')){ aiDrawGann(); return; }
+  if(has('摆动点','摆动','swing')){
+    if((text.match(/\d{3,5}(?:\.\d+)?/g)||[]).length>=3) aiFibFromSwings(text, false);
+    else openFibModal();
+    return;
+  }
   if(has('投射','标到图','关键位','投影')){ projectAiToChart(); return; }
   if(has('清','删','去') && has('线','画')){ clearAiDrawings(); return; }
   if(has('分析','走势','盘面','研判','当前','全盘')){ aiChat('<div class="warn">🔄 正在拉取'+tfName(AI_STATE.tf)+'真实K线并回测…</div>','ai'); runAiAnalyze(AI_STATE.tf); return; }
