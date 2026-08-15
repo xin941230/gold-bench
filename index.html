@@ -167,6 +167,40 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
 .snapRow span{color:var(--muted)}
 .snapRow b{color:var(--gold2);font-size:15px}
 .stepList{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:6px}
+/* 价格预警 & Toast */
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,#2a2113,#1c160e);border:1px solid var(--gold);color:var(--text);padding:14px 22px;border-radius:14px;box-shadow:0 12px 44px rgba(0,0,0,.55);font-size:13.5px;z-index:9999;opacity:0;pointer-events:none;transition:.32s;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast b{color:var(--gold2)}
+.alertCard{margin-top:14px}
+.alertRow{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;margin-top:8px;font-size:13px}
+.alertRow .ad{font-weight:700}
+.alertRow .ad.above{color:var(--red)} .alertRow .ad.below{color:var(--green)}
+.alertRow .an{flex:1;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.alertRow .del{cursor:pointer;color:var(--muted);border:none;background:none;font-size:17px;line-height:1;padding:0 4px}
+.alertRow .del:hover{color:var(--red)}
+.alertAdd{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.alertAdd input,.alertAdd select{background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 9px;font-size:13px;width:120px}
+/* 新闻理由 & 置信度 */
+.newsReason{font-size:11px;color:#8a7f68;margin-top:5px;line-height:1.6}
+.newsReason .tag{display:inline-block;padding:1px 6px;border-radius:5px;margin:1px 3px 1px 0;font-size:10.5px}
+.newsReason .tag.b{background:#1c2e1a;color:#7fd87a}
+.newsReason .tag.r{background:#3a1f1a;color:#ff7a6e}
+.confWrap{display:inline-block;width:52px;height:5px;background:#2a2520;border-radius:3px;vertical-align:middle;margin-left:6px;overflow:hidden}
+.confWrap i{display:block;height:100%;background:var(--gold);border-radius:3px}
+/* AI 设置（可选） */
+.aiBox{margin-top:12px;background:var(--panel2);border:1px dashed var(--border);border-radius:12px;padding:13px;font-size:12.5px}
+.aiBox input{background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 9px;font-size:12px;width:100%;margin:5px 0}
+.aiBox .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+/* 模拟复盘 */
+.replayChart{width:100%;height:340px;background:#0d0b08;border:1px solid var(--border);border-radius:12px;cursor:crosshair;touch-action:none;display:block}
+.replayCtrl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.replayCtrl input{background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 9px;font-size:13px;width:130px}
+.replayResult{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:13px;font-size:13px;line-height:1.65;min-height:18px;margin-top:10px}
+.replayResult.ok{border-color:var(--green);color:var(--green)}
+.replayResult.no{border-color:var(--red);color:var(--red)}
+.replayScore{font-size:12px;color:var(--muted);margin-top:8px}
+.replayGuide{font-size:12px;color:var(--muted);line-height:1.7;margin:6px 0 2px}
+
 .step{display:flex;gap:12px;background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:14px}
 .stepNo{flex:none;width:30px;height:30px;border-radius:50%;background:var(--gold);color:#1a1408;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
 .step b{color:var(--gold2)}
@@ -204,6 +238,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   <button onclick="showTab('chk',this)">开仓前自检</button>
   <button onclick="showTab('mkt',this)">MT5实时盘</button>
   <button onclick="showTab('news',this)">新闻雷达</button>
+  <button onclick="showTab('replay',this)">模拟复盘</button>
 </nav>
 <div class="quickbar">
   <span class="qbLabel">今日交易三步：</span>
@@ -252,6 +287,19 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <span class="chip" onclick="askChip('连亏三笔了，想翻本')">连亏想翻本</span>
       <span class="chip" onclick="askChip('非农数据要来了怎么办？')">非农来了怎么办？</span>
     </div>
+  </div>
+
+  <div class="card alertCard">
+    <h2>📣 价格预警 · 不用一直盯着盘</h2>
+    <p class="muted">设定一个目标金价，当实时金价<b style="color:var(--text)">上破或下破</b>它时，工作台会弹窗提醒你（需要允许浏览器通知）。规则保存在本机，刷新不丢。</p>
+    <div class="alertAdd">
+      <select id="alertDir"><option value="above">上破 ≥</option><option value="below">下破 ≤</option></select>
+      <input type="number" id="alertPrice" placeholder="目标金价，如 3400" step="0.1">
+      <input type="text" id="alertNote" placeholder="备注（可空）" style="width:150px">
+      <button class="tbtn" onclick="addAlert()">添加预警</button>
+    </div>
+    <div id="alertList"></div>
+    <p class="hint" style="margin-top:10px">💡 例子：你持有多单，设「下破 ≤ 止损价」当保险；或设「上破 ≥ 前高」提醒你该考虑止盈。预警只提醒、不自动下单。</p>
   </div>
 </section>
 
@@ -521,17 +569,49 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
 <section id="news">
   <div class="card">
     <h2>新闻雷达 · 黄金利多/利空分析</h2>
-    <p class="muted">聚合 FXStreet、Investing.com、Kitco 等公开 RSS 源，通过关键词规则判断每条新闻对黄金的利好、利空或中性。每 5 分钟自动刷新。</p>
-    <p class="hint">⚠️ 情绪判断是<b style="color:var(--gold2)">关键词规则</b>，不是 AI 语义分析，复杂标题可能误判。看「利好/利空」标签后，务必自己读一眼标题再下结论。顶部「市场情绪」只是参考，不是交易指令。</p>
+    <p class="muted">聚合 FXStreet、Investing.com、Kitco 等公开 RSS 源，用<b style="color:var(--gold2)">智能语义引擎 v2</b>（按「利率 / 美元 / 地缘 / ETF流向 / 通胀 / 经济」多主题分别打分，并识别否定词与强度）判断每条新闻对黄金的利好、利空或中性，并给出判断理由。每 5 分钟自动刷新。</p>
+    <p class="hint">⚠️ 默认引擎是<b style="color:var(--gold2)">规则语义分析</b>，已能处理「不会加息」这类否定，但极复杂的长句仍可能误判——看标签后请自己读一眼标题。想更准可开启下方「AI 深度分析」（调用你自己的大模型 key）。顶部「市场情绪」只是参考，不是交易指令。</p>
     <div class="newsHead">
       <div class="newsSent neu" id="newsSent">市场情绪：计算中…</div>
       <button class="tbtn" onclick="loadNews(true)">刷新新闻</button>
     </div>
     <div id="newsList" class="newsList">正在加载新闻…</div>
+    <div class="aiBox">
+      <b style="color:var(--gold2)">🤖 AI 深度分析（可选）</b>
+      <div class="muted" style="margin:4px 0 2px">接入你自己的大模型做真·语义判断。留空则使用内置语义引擎。数据仅存在你本机，不会上传。</div>
+      <div class="row">
+        <label style="font-size:12px">API地址</label><input id="aiBase" placeholder="https://api.openai.com/v1" style="flex:1;min-width:200px">
+      </div>
+      <div class="row">
+        <label style="font-size:12px">API Key</label><input id="aiKey" type="password" placeholder="sk-..." style="flex:1;min-width:200px">
+        <button class="tbtn" onclick="saveAiSettings()">保存</button>
+        <span id="aiStat" class="muted"></span>
+      </div>
+      <div class="muted" style="margin-top:4px">支持 OpenAI 兼容接口（如 DeepSeek / Moonshot / 本地 Ollama）。浏览器直连可能被跨域(CORS)拦截，失败会自动回退内置引擎。</div>
+    </div>
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.2 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<!-- 模拟复盘 -->
+<section id="replay">
+  <div class="card">
+    <h2>模拟复盘 · 不花真钱练找支撑</h2>
+    <p class="muted">实盘找支撑容易慌，这里用历史 K 线让你<b style="color:var(--text)">纯练习</b>：看走势 → 在图上点出你认为金价会反弹的位置（支撑）→ 系统公布实际支撑并打分。多练几段，你对「支撑」的盘感会明显变好。</p>
+    <div class="replayGuide" id="replayGuide">第 <b id="roundNo">1</b> 段：观察下方 K 线，判断价格在哪里获得了支撑（多次跌不下去、反弹）。点图表里你认为的支撑价位。</div>
+    <div class="replayCtrl">
+      <button class="btn" onclick="replayGrade()" style="display:none" id="replayConfirmBtn">确认支撑位并看结果</button>
+      <button class="tbtn" onclick="nextReplay()">换一段行情 ▶</button>
+      <span class="muted" id="replayTol"></span>
+    </div>
+    <svg class="replayChart" id="replayChart" viewBox="0 0 720 320" preserveAspectRatio="none" onclick="replayClick(event)"></svg>
+    <div class="replayResult" id="replayResult">点击上方 K 线图，标出你判断的支撑位。</div>
+    <div class="replayScore" id="replayScore">累计得分：0 / 0 段</div>
+    <p class="hint" style="margin-top:10px">💡 支撑不是一条精确线，而是一个<b style="color:var(--gold2)">价格区</b>：前低附近、密集成交区、斐波那契 0.618 附近都常出现。本练习的「及格线」是离真实支撑不超过 1.5% 的价差。</p>
+  </div>
+</section>
+
+<footer>黄金交易心理与策略工作台 v2.3 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<div class="toast" id="toast"></div>
 </div>
 
 <script>
@@ -616,6 +696,7 @@ function refreshPrice(manual){
     p.textContent="$"+Number(j.price).toFixed(2);
     m.textContent="XAU/USD 实时"+arrow+" · 更新于 "+new Date(j.updatedAt).toLocaleTimeString("zh-CN");
     if(STATE.prev!==null){ var d=j.price-STATE.prev; m.style.color = d>=0?"var(--red)":"var(--green)"; }
+    checkAlerts(Number(j.price));
   }).catch(function(){
     clearTimeout(timer);
     dot.className="dot off";
@@ -637,6 +718,7 @@ function showTab(id,btn){
   else { stopMt5Ticker(); }
   if(id==="news"){ if(!NEWS.loaded) loadNews(false); startNewsTimer(); }
   else { stopNewsTimer(); }
+  if(id==="replay"){ if(!REPLAY.data.length) nextReplay(); }
 }
 
 /* ===== K线绘制引擎 ===== */
@@ -1050,15 +1132,53 @@ function fmtMoney(n){
   return "<span class='num' style='color:"+cls+"'>$"+(n>=0?"":"")+Math.abs(n).toFixed(2)+"</span>";
 }
 
-/* ===== 新闻雷达 ===== */
-var NEWS={loaded:false,timer:null};
+/* ===== 新闻雷达 · 智能语义引擎 v2 ===== */
+var NEWS={loaded:false,timer:null,items:[]};
 var NEWS_FEEDS=[
   {name:"FXStreet",url:"https://www.fxstreet.com/rss/news"},
   {name:"Investing Gold",url:"https://www.investing.com/rss/commodities_Gold.rss"},
   {name:"Kitco",url:"https://www.kitco.com/rss/news.rss"}
 ];
-var NEWS_BULL=["降息","rate cut","fed cut","CPI","inflation","通胀","非农","NFP miss","避险","safe haven","war","冲突","地缘","recession","衰退","央行购金","gold buying","ETF增持","美元走弱","weak dollar","财政赤字","debt","危机","crisis","关税","tariff"];
-var NEWS_BEAR=["加息","rate hike","hawkish","强美元","美元涨","DXY surge","NFP beat","CPI下降","disinflation","经济强劲","risk on","ETF减持","gold selling","利率维持","利率不变","预期降息推迟"];
+// 否定词（出现在信号词前后 ~18 字符内则翻转极性）
+var NEG=["not","n't","no","never","won't","wont","without","fails","fail","less","slow","unlikely","未","不","没","没有","并非","不会","难以","放缓","回落","下降","削减","取消","远离"];
+// 多主题词库：bull=利好黄金 / bear=利空黄金，数值为强度(1~2)
+var ASPECTS=[
+  {label:"利率",bull:[["降息",2],["rate cut",2],["fed cut",2],["宽松",1.5],["鸽派",1.5],["cut rates",2]],bear:[["加息",2],["rate hike",2],["hawkish",1.5],["紧缩",1.5],["鹰派",1.5],["hold rates",1],["维持高利率",1.5],["no cut",1.5]]},
+  {label:"美元",bull:[["美元走弱",2],["weak dollar",2],["美元下跌",2],["soft dollar",1]],bear:[["强美元",2],["美元走强",2],["strong dollar",2],["dxy surge",2],["美元上涨",2],["dollar rise",1.5]]},
+  {label:"地缘",bull:[["避险",2],["safe haven",2],["war",1.5],["冲突",1.5],["地缘",1.5],["crisis",1.5],["危机",1.5],["关税",1],["tariff",1]],bear:[["地缘缓和",1.5],["peace",1],["缓和",1]]},
+  {label:"ETF流向",bull:[["ETF增持",2],["gold buying",1.5],["央行购金",2],["etf inflow",1.5],["资金流入",1]],bear:[["ETF减持",2],["gold selling",2],["etf outflow",1.5],["资金流出",1]]},
+  {label:"通胀",bull:[["通胀",1.5],["cpi上升",1.5],["物价上涨",1.5],["inflation rise",1.5]],bear:[["cpi下降",1.5],["disinflation",1.5],["通胀回落",1.5],["通缩",1],["inflation fall",1.5]]},
+  {label:"经济",bull:[["衰退",1.5],["recession",1.5],["经济疲软",1.5],["失业",1],["nfp miss",1.5],["非农不及预期",1.5]],bear:[["经济强劲",1.5],["strong economy",1.5],["risk on",1],["nfp beat",1.5],["非农强劲",1.5],["软着陆",1]]},
+  {label:"供给",bull:[["矿端中断",1.5],["减产",1.5],["strike",1],["罢工",1]],bear:[["增产",1.5],["产量新高",1],["供给充裕",1]]}
+];
+function nearNeg(t,idx){
+  // 只看信号词「紧前方」约 6 字符内是否有否定词（否定词通常紧挨着它修饰的词）
+  var seg=t.slice(Math.max(0,idx-6), idx).toLowerCase();
+  for(var i=0;i<NEG.length;i++){ if(seg.indexOf(NEG[i].toLowerCase())>=0) return true; }
+  return false;
+}
+function analyzeNews(text){
+  var t=(text||"").toLowerCase();
+  var total=0, reasons=[], maxw=0;
+  function score(pair, sign){
+    var w=pair[0].toLowerCase(), weight=pair[1];
+    var idx=t.indexOf(w);
+    if(idx<0) return;
+    var flip=nearNeg(t,idx);
+    // sign: 利好短语 +1，利空短语 -1；否定词翻转极性
+    var pol = sign>0 ? (flip?-weight:weight) : (flip?weight:-weight);
+    total+=pol;
+    maxw=Math.max(maxw, weight);
+    reasons.push({pol:pol>0?1:-1, txt:pair[0], aspect:""});
+  }
+  ASPECTS.forEach(function(a){
+    a.bull.forEach(function(p){ score(p, 1); });
+    a.bear.forEach(function(p){ score(p, -1); });
+  });
+  var cls=total>0?"bull":(total<0?"bear":"neu");
+  var conf=reasons.length?Math.min(0.95, 0.45+reasons.length*0.12+maxw*0.08):0.3;
+  return {score:total, cls:cls, reasons:reasons, conf:conf};
+}
 function loadNews(manual){
   var box=document.getElementById("newsList");
   if(manual) box.innerHTML="刷新中…";
@@ -1074,8 +1194,8 @@ function loadNews(manual){
     results.forEach(function(r){
       r.items.forEach(function(it){
         it.source=r.feed.name;
-        var score=scoreNews((it.title||"")+" "+(it.description||""));
-        it.score=score; it.cls=score>0?"bull":(score<0?"bear":"neu");
+        var a=analyzeNews((it.title||"")+" "+(it.description||""));
+        it.score=a.score; it.cls=a.cls; it.reasons=a.reasons; it.conf=a.conf; it.ai=null; it.aiLoading=false; it.aiErr=false;
         all.push(it);
       });
     });
@@ -1086,25 +1206,28 @@ function loadNews(manual){
     box.innerHTML="<div class='mktEmpty'>新闻加载失败，请稍后刷新</div>";
   });
 }
-function scoreNews(text){
-  var s=0, t=text.toLowerCase();
-  NEWS_BULL.forEach(function(w){ if(t.indexOf(w.toLowerCase())>=0) s++; });
-  NEWS_BEAR.forEach(function(w){ if(t.indexOf(w.toLowerCase())>=0) s--; });
-  return s;
-}
 function renderNews(list){
+  NEWS.items=list;
   var box=document.getElementById("newsList");
   if(!list.length){ box.innerHTML="<div class='mktEmpty'>暂无新闻</div>"; return; }
-  var bull=0,bear=0;
-  var html="";
-  list.forEach(function(it){
+  var bull=0,bear=0, html="";
+  list.forEach(function(it,idx){
     if(it.cls==="bull") bull++; else if(it.cls==="bear") bear++;
     var date=new Date(it.pubDate).toLocaleString("zh-CN",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
     var badge=it.cls==="bull"?"利好":(it.cls==="bear"?"利空":"中性");
+    var reasons=(it.reasons||[]).map(function(r){ return '<span class="tag '+(r.pol>0?"b":"r")+'">'+(r.pol>0?"+":"−")+escHtml(r.txt)+'</span>'; }).join("");
+    var conf=Math.round((it.conf||0.5)*100);
+    var aiHtml="";
+    if(it.aiLoading) aiHtml='<div class="newsReason">🤖 AI 分析中…</div>';
+    else if(it.ai) aiHtml='<div class="newsReason">🤖 AI：<b style="color:var(--gold2)">'+escHtml(it.ai.label)+'</b> · '+escHtml(it.ai.reason||"")+'</div>';
+    else if(it.aiErr) aiHtml='<div class="newsReason" style="color:#ff7a6e">🤖 AI 调用失败（可能跨域受限），已用内置引擎</div>';
     html+='<div class="newsItem '+it.cls+'"><div class="newsBadge">'+badge+'</div><div class="newsBody">'
       +'<div class="newsTitle"><a href="'+it.link+'" target="_blank" style="color:inherit;text-decoration:none">'+escHtml(it.title)+'</a></div>'
-      +'<div class="newsMeta">'+escHtml(it.source)+' · '+date+'</div>'
-      +'<div class="newsSum">'+escHtml((it.description||"").replace(/<[^>]+>/g," ").slice(0,160))+'…</div>'
+      +'<div class="newsMeta">'+escHtml(it.source)+' · '+date+' · 置信<span class="confWrap"><i style="width:'+conf+'%"></i></span>'+conf+'%</div>'
+      + (reasons?'<div class="newsReason">命中：'+reasons+'</div>':'')
+      + aiHtml
+      +'<div class="newsSum">'+escHtml((it.description||"").replace(/<[^>]+>/g," ").slice(0,150))+'…</div>'
+      +'<button class="tbtn" style="margin-top:6px;font-size:11px;padding:3px 10px" onclick="aiRecheck('+idx+')">🤖 AI 复核这条</button>'
       +'</div></div>';
   });
   box.innerHTML=html;
@@ -1113,9 +1236,176 @@ function renderNews(list){
   sent.className="newsSent "+cls;
   sent.textContent="市场情绪："+txt+"（利好 "+bull+" / 利空 "+bear+" / 中性 "+(list.length-bull-bear)+"）";
 }
+/* 可选：用自己的大模型做真·语义判断（OpenAI 兼容接口） */
+function callAi(text){
+  if(!STATE.aiKey||!STATE.aiBase) return Promise.reject("no key");
+  var url=STATE.aiBase.replace(/\/+$/,"")+"/chat/completions";
+  var body=JSON.stringify({model:"gpt-4o-mini",temperature:0.2,messages:[
+    {role:"system",content:"你是黄金市场分析师。判断下面新闻对黄金价格是利好/利空/中性，并用一句中文说明原因。只输出JSON，如：{\"label\":\"利好\",\"reason\":\"...\"}"},
+    {role:"user",content:text}
+  ]});
+  return fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+STATE.aiKey},body:body})
+    .then(function(r){return r.json();})
+    .then(function(j){
+      var c=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
+      var m=(c||"").match(/\{[\s\S]*\}/);
+      if(!m) throw new Error("no json");
+      return JSON.parse(m[0]);
+    });
+}
+function aiRecheck(idx){
+  var it=NEWS.items&&NEWS.items[idx]; if(!it) return;
+  it.aiLoading=true; it.aiErr=false; renderNews(NEWS.items);
+  callAi((it.title||"")+" "+(it.description||"")).then(function(o){
+    it.ai=o; it.aiLoading=false; renderNews(NEWS.items);
+  }).catch(function(){
+    it.aiLoading=false; it.aiErr=true; renderNews(NEWS.items);
+  });
+}
+function saveAiSettings(){
+  STATE.aiBase=(document.getElementById("aiBase").value||"").trim();
+  STATE.aiKey=(document.getElementById("aiKey").value||"").trim();
+  try{localStorage.setItem("gold_ai",JSON.stringify({base:STATE.aiBase,key:STATE.aiKey}));}catch(e){}
+  document.getElementById("aiStat").textContent=STATE.aiKey?"已保存（AI 复核可用）":"已清空";
+}
+function loadAiSettings(){
+  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"";STATE.aiKey=s.key||"";}catch(e){}
+  if(document.getElementById("aiBase")) document.getElementById("aiBase").value=STATE.aiBase||"";
+  if(document.getElementById("aiKey")) document.getElementById("aiKey").value=STATE.aiKey||"";
+}
 function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function startNewsTimer(){ if(NEWS.timer) return; NEWS.timer=setInterval(function(){ var sec=document.getElementById("news"); if(sec&&sec.className==="on") loadNews(false); },300000); }
 function stopNewsTimer(){ if(NEWS.timer){clearInterval(NEWS.timer);NEWS.timer=null;} }
+
+/* ===== 价格预警 ===== */
+var ALERTS=[];
+function loadAlerts(){ try{ ALERTS=JSON.parse(localStorage.getItem("gold_alerts")||"[]"); }catch(e){ ALERTS=[]; } renderAlerts(); }
+function saveAlerts(){ try{ localStorage.setItem("gold_alerts",JSON.stringify(ALERTS)); }catch(e){} }
+function addAlert(){
+  var dir=document.getElementById("alertDir").value;
+  var price=parseFloat(document.getElementById("alertPrice").value);
+  var note=(document.getElementById("alertNote").value||"").trim();
+  if(isNaN(price)||price<=0){ alert("请填写有效目标金价"); return; }
+  ALERTS.push({id:Date.now(),dir:dir,price:price,note:note,fired:false});
+  saveAlerts(); renderAlerts();
+  document.getElementById("alertPrice").value=""; document.getElementById("alertNote").value="";
+  requestNotif();
+  toast("已添加预警：金价"+(dir==="above"?"上破 ≥ ":"下破 ≤ ")+price+(note?"（"+note+"）":""));
+}
+function delAlert(id){
+  ALERTS=ALERTS.filter(function(a){ return a.id!==id; });
+  saveAlerts(); renderAlerts();
+}
+function renderAlerts(){
+  var box=document.getElementById("alertList"); if(!box) return;
+  if(!ALERTS.length){ box.innerHTML='<div class="muted" style="font-size:12px;margin-top:8px">还没有预警，添加一条试试 👆</div>'; return; }
+  box.innerHTML=ALERTS.map(function(a){
+    return '<div class="alertRow"><span class="ad '+a.dir+'">'+(a.dir==="above"?"↑上破 ≥":"↓下破 ≤")+' '+a.price+'</span>'
+      +'<span class="an">'+(a.note||"")+(a.fired?' · <span style="color:var(--green)">已触发</span>':'')+'</span>'
+      +'<button class="del" onclick="delAlert('+a.id+')" title="删除">✕</button></div>';
+  }).join("");
+}
+function checkAlerts(price){
+  if(price==null||isNaN(price)) return;
+  var hit=false, msgs=[];
+  ALERTS.forEach(function(a){
+    var cond = a.dir==="above" ? price>=a.price : price<=a.price;
+    if(cond && !a.fired){ a.fired=true; hit=true; msgs.push("金价"+(a.dir==="above"?"上破":"下破")+" "+a.price+"（现 "+price.toFixed(2)+"）"+(a.note?" · "+a.note:"")); }
+    else if(!cond && a.fired){ a.fired=false; }
+  });
+  if(hit){ saveAlerts(); renderAlerts(); msgs.forEach(function(m){ toast("📣 价格预警："+m); notify("黄金价格预警", m); }); }
+}
+function requestNotif(){ try{ if('Notification' in window && Notification.permission==="default") Notification.requestPermission(); }catch(e){} }
+function notify(title,body){ try{ if('Notification' in window && Notification.permission==="granted"){ new Notification(title,{body:body}); } }catch(e){} }
+function toast(msg){
+  var t=document.getElementById("toast"); if(!t) return;
+  t.innerHTML=msg; t.className="toast show";
+  clearTimeout(t._tm); t._tm=setTimeout(function(){ t.className="toast"; }, 5200);
+}
+
+/* ===== 模拟复盘 ===== */
+var REPLAY={round:0,data:[],support:0,guess:null,answered:false,score:0,total:0,_min:null,_max:null};
+function genReplay(seed){
+  var s=seed||1, rnd=function(){ s=(s*9301+49297)%233280; return s/233280; };
+  var base=3200+rnd()*400, sup=base-(40+rnd()*60), data=[], p=base, i;
+  for(i=0;i<14;i++){ var o=p; p+=(rnd()-0.62)*30; var c=p; data.push({o:o,c:c,h:Math.max(o,c)+rnd()*14,l:Math.min(o,c)-rnd()*14}); }
+  for(i=0;i<2;i++){
+    var dip=sup+(rnd()*8-4), o1=data[data.length-1].c, c1=sup+(rnd()*6-3);
+    data.push({o:o1,c:c1,h:Math.max(o1,c1)+rnd()*10,l:dip-rnd()*10});
+    var o2=c1, c2=sup+(rnd()*20+10);
+    data.push({o:o2,c:c2,h:Math.max(o2,c2)+rnd()*12,l:sup-rnd()*6});
+  }
+  for(i=0;i<16;i++){ var o3=data[data.length-1].c; p=o3+(rnd()-0.38)*28; var c3=p; var l=Math.min(o3,c3)-rnd()*10; if(l<sup-8)l=sup-8; data.push({o:o3,c:c3,h:Math.max(o3,c3)+rnd()*14,l:l}); }
+  return {data:data, support:sup};
+}
+function renderReplay(){
+  var d=REPLAY.data; if(!d.length) return;
+  var W=720,H=320, padL=34,padR=8,padT=12,padB=18;
+  var min=1e9,max=-1e9; d.forEach(function(c){ if(c.l<min)min=c.l; if(c.h>max)max=c.h; });
+  max=Math.max(max, REPLAY.support+30); min=Math.min(min, REPLAY.support-30);
+  var pr=(max-min)*0.08; min-=pr; max+=pr;
+  REPLAY._min=min; REPLAY._max=max;
+  var slot=(W-padL-padR)/d.length, bw=Math.min(slot*0.6,16);
+  function y(p){ return padT+(max-p)/(max-min)*(H-padT-padB); }
+  var s='<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#0d0b08"/>';
+  for(var g=0;g<=3;g++){ var gy=padT+g*(H-padT-padB)/3; s+='<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="#2a2520" stroke-width="0.5"/>'; }
+  for(var k=0;k<d.length;k++){
+    var cx=padL+slot*(k+0.5), up=d[k].c>=d[k].o, col=up?"#e05c4d":"#6dbf67";
+    var top=y(Math.max(d[k].o,d[k].c)), bot=y(Math.min(d[k].o,d[k].c));
+    if(bot-top<2){top-=1;bot+=1;}
+    s+='<line x1="'+cx+'" y1="'+y(d[k].h)+'" x2="'+cx+'" y2="'+y(d[k].l)+'" stroke="'+col+'" stroke-width="1.3"/>';
+    s+='<rect x="'+(cx-bw/2)+'" y="'+top+'" width="'+bw+'" height="'+(bot-top)+'" fill="'+col+'" rx="1"/>';
+  }
+  if(REPLAY.answered){
+    var sy=y(REPLAY.support);
+    s+='<line x1="'+padL+'" y1="'+sy+'" x2="'+(W-padR)+'" y2="'+sy+'" stroke="#e8b33c" stroke-width="1.4" stroke-dasharray="6,4"/>';
+    s+='<text x="'+(W-padR-4)+'" y="'+(sy-5)+'" text-anchor="end" font-size="11" fill="#e8b33c">实际支撑 '+REPLAY.support.toFixed(1)+'</text>';
+  }
+  if(REPLAY.guess!=null){
+    var gy2=y(REPLAY.guess);
+    s+='<line x1="'+padL+'" y1="'+gy2+'" x2="'+(W-padR)+'" y2="'+gy2+'" stroke="#7fb3d5" stroke-width="1.6"/>';
+    s+='<text x="'+(padL+4)+'" y="'+(gy2-5)+'" font-size="11" fill="#7fb3d5">你的支撑 '+REPLAY.guess.toFixed(1)+'</text>';
+  }
+  [max,(max+min)/2,min].forEach(function(v,gi){ var gy=padT+gi*(H-padT-padB)/3; s+='<text x="'+(padL-3)+'" y="'+(gy+3)+'" font-size="9" fill="#9a8f76" text-anchor="end">'+v.toFixed(0)+'</text>'; });
+  document.getElementById("replayChart").innerHTML=s;
+}
+function replayClick(e){
+  if(REPLAY.answered) return;
+  var svg=document.getElementById("replayChart"); if(!svg||REPLAY._min==null) return;
+  var rect=svg.getBoundingClientRect();
+  var clientY = (e.touches&&e.touches[0])? e.touches[0].clientY : e.clientY;
+  var ry=(clientY-rect.top)/rect.height*320;
+  var min=REPLAY._min, max=REPLAY._max, padT=12, padB=18, H=320;
+  var p = max - (ry-padT)/(H-padT-padB)*(max-min);
+  REPLAY.guess=p; renderReplay();
+  document.getElementById("replayConfirmBtn").style.display="inline-block";
+}
+function replayGrade(){
+  if(REPLAY.guess==null||REPLAY.answered) return;
+  REPLAY.answered=true; REPLAY.total++;
+  var diff=Math.abs(REPLAY.guess-REPLAY.support);
+  var tol=REPLAY.support*0.015, ok=diff<=tol;
+  if(ok) REPLAY.score++;
+  var box=document.getElementById("replayResult");
+  box.className="replayResult "+(ok?"ok":"no");
+  box.innerHTML = ok
+    ? "✅ <b>漂亮！</b>你标的支撑 "+REPLAY.guess.toFixed(1)+" 离真实支撑 "+REPLAY.support.toFixed(1)+" 很近（差 "+diff.toFixed(1)+"，在 1.5% 容差内）。你抓到了多空博弈的关键价位。"
+    : "❌ 偏了 "+diff.toFixed(1)+" 美元。真实支撑在 <b>"+REPLAY.support.toFixed(1)+"</b>（金价两次下探此处都弹起）。你的 "+REPLAY.guess.toFixed(1)+" 稍"+(REPLAY.guess>REPLAY.support?"高":"低")+"。记住：支撑是「跌不下去、反复弹起」的价区，不是最低点。";
+  document.getElementById("replayScore").textContent="累计得分："+REPLAY.score+" / "+REPLAY.total+" 段　（及格容差 1.5%）";
+  document.getElementById("replayConfirmBtn").style.display="none";
+  renderReplay();
+}
+function nextReplay(){
+  REPLAY.round++;
+  var r=genReplay(REPLAY.round*7+13);
+  REPLAY.data=r.data; REPLAY.support=r.support; REPLAY.guess=null; REPLAY.answered=false;
+  document.getElementById("roundNo").textContent=REPLAY.round;
+  var res=document.getElementById("replayResult");
+  res.className="replayResult"; res.textContent="点击上方 K 线图，标出你判断的支撑位，再点「确认」。";
+  document.getElementById("replayConfirmBtn").style.display="none";
+  document.getElementById("replayScore").textContent="累计得分："+REPLAY.score+" / "+REPLAY.total+" 段　（及格容差 1.5%）";
+  renderReplay();
+}
 
 /* ===== 首页 / 新手指引 ===== */
 function goStep(id){
@@ -1138,12 +1428,14 @@ function renderHome(){
 
 /* ===== 启动 ===== */
 loadSettings();
+loadAiSettings();
+loadAlerts();
 refreshPrice(false);
 renderGalleries();
 renderHome();
 setDir("up");
 nextQuiz();
-bubble("你好，我是你的黄金交易教练 👋\n先去顶部填好你的本金（现在 "+STATE.equity+"U），系统会自动算出你每笔最多亏多少。\n\n然后跟着首页的<b>「新手三天路线」</b>走：① 看新闻大势 ② 学K线形态 ③ 开仓前过自检。哪里不懂，随时在「智能问答台」问我。", "bot");
+bubble("你好，我是你的黄金交易教练 👋\n先去顶部填好你的本金（现在 "+STATE.equity+"U），系统会自动算出你每笔最多亏多少。\n\n然后跟着首页的<b>「新手三天路线」</b>走：① 看新闻大势 ② 学K线形态 ③ 开仓前过自检。新加的<b>价格预警</b>可让你不用一直盯盘，<b>模拟复盘</b>能不花真钱练找支撑。哪里不懂，随时在「智能问答台」问我。", "bot");
 </script>
 </body>
 </html>
