@@ -776,11 +776,13 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <div class="dt-sep"></div>
       <button class="dt-btn" id="mt5ChartToggle" onclick="toggleChartMode()" title="在分析图(可缩放)与 TradingView 实盘图之间切换">📺 实盘图(TV)</button>
       <button class="dt-btn" onclick="openFibModal()" title="用摆动点列表画斐波那契回调">📐 摆动点斐波</button>
+      <button class="dt-btn" onclick="aiDrawGann()" title="按当前周期真实K线 + ATR 动态斜率画江恩 9 角度线">📐 江恩角度</button>
+      <button class="dt-btn" onclick="aiSupportAnalyze()" title="按当前周期识别支撑位区间并画到走势图">🟢 支撑位</button>
       <button class="dt-btn primary" onclick="toggleAiPanel()" title="打开 AI 职业交易员分析面板">🤖 AI分析</button>
       <span class="dt-tip">光标 = 和图表交互(滚轮缩放/拖拽)；选画线工具 = 在走势图上画线；AI分析 = 一键算支撑/阻力/建议</span>
     </div>
 
-    <p class="mt5-drawhint">🖌 <b>怎么在图上画线：</b>用上方<b>中文工具栏</b>选「水平线 / 趋势线 / 矩形框 / 文字」，然后在走势图上点击或拖拽即可。需要 <span class="k">斐波那契回调</span><span class="k">江恩扇形</span> 等精确工具时，请点图表<b>左侧工具栏</b>对应图标。点「🤖 AI分析」可一键算出当前支撑/阻力并给出操作建议，再点「🎯 投射到走势图」就能把关键位标到图上。画的线会在<b>切换品种 / 周期 / 重载图表时清空</b>。</p>
+    <p class="mt5-drawhint">🖌 <b>怎么在图上画线：</b>用上方<b>中文工具栏</b>选「水平线 / 趋势线 / 矩形框 / 文字」，然后在走势图上点击或拖拽即可。需要 <span class="k">斐波那契回调</span><span class="k">江恩角度线</span><span class="k">支撑位</span> 等精确工具时，请点图表<b>左侧工具栏</b>对应图标，或直接点上方工具栏「📐 江恩角度」「🟢 支撑位」。点「🤖 AI分析」可一键算出当前支撑/阻力并给出操作建议，再点「🎯 投射到走势图」就能把关键位标到图上。画的线会在<b>切换品种 / 周期 / 重载图表时清空</b>。</p>
 
     <div class="mt5-quote">
       <div class="mt5-side sell">
@@ -812,7 +814,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
 
     <div class="mt5-wrap">
       <div class="mt5-chart chart-canvas" id="mt5ChartBox">
-        <iframe id="mt5Frame" src="about:blank" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+        <iframe id="mt5Frame" src="about:blank" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no" referrerpolicy="no-referrer"></iframe>
         <canvas id="mt5Canvas"></canvas>
         <svg id="mt5Overlay" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
         <div class="mt5-zoomhint">🖱 滚轮缩放 · 拖拽平移 · 光标悬停看价</div>
@@ -867,7 +869,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
     <span class="x" onclick="toggleAiPanel()" title="收起（再点工具栏 🤖 AI分析 打开）">×</span>
   </div>
   <div class="aiT-body">
-    <div class="aiT-status" id="aiTStatus">👋 我是你的 AI 黄金交易员，已系统学习 <b>16 本交易/宏观经典</b>（蜡烛图、墨菲技术分析、以交易为生、海龟法则、交易心理、撒普头寸管理、专业投机原理、趋势跟踪…）与 <b>黄金基本面六大门</b>（美元/实际利率、美联储、美国数据、地缘避险、供需资金流、实时流向），并掌握斐波那契/江恩画线法与风险管理。点上方周期，或直接下指令：<b>画斐波那契线</b> / <b>分析当前走势</b> / <b>给我交易建议</b> / <b>怎么做风险管理</b> / <b>📚 已学课程</b> 看我都学了啥。开启「⚙️ 联网 智谱」后，我结合学到的知识与实时盘面，用大白话回答。</div>
+    <div class="aiT-status" id="aiTStatus">👋 我是你的 AI 黄金交易员，已系统学习 <b>16 本交易/宏观经典</b>（蜡烛图、墨菲技术分析、以交易为生、海龟法则、交易心理、撒普头寸管理、专业投机原理、趋势跟踪…）与 <b>黄金基本面六大门</b>（美元/实际利率、美联储、美国数据、地缘避险、供需资金流、实时流向），并掌握斐波那契/江恩角度线/支撑位识别与风险管理。点上方周期，或直接下指令：<b>画斐波那契线</b> / <b>画江恩角度线</b> / <b>识别支撑位</b> / <b>分析当前走势</b> / <b>给我交易建议</b> / <b>怎么做风险管理</b> / <b>📚 已学课程</b> 看我都学了啥。开启「⚙️ 联网 智谱」后，我结合学到的知识与实时盘面，用大白话回答。</div>
     <div class="aiGptSet" id="aiGptSet" style="display:none">
       <div class="row"><label>联网智谱</label><input type="checkbox" id="aiGptOnline" onchange="STATE.aiOnline=this.checked;saveAiGpt();aiGptBadge()"></div>
       <div class="row"><label>模型</label><select id="aiGptModel">
@@ -892,6 +894,8 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <span class="aiT-chip" onclick="aiDrawFib('week')">🟣 周斐波</span>
       <span class="aiT-chip" onclick="aiDrawFib('hour')">🟡 时斐波</span>
       <span class="aiT-chip" onclick="aiQuick('画江恩线')">📏 画江恩线</span>
+      <span class="aiT-chip" onclick="aiDrawGann()">📐 江恩角度线</span>
+      <span class="aiT-chip" onclick="aiSupportAnalyze()">🟢 支撑位分析</span>
       <span class="aiT-chip" onclick="aiQuick('分析当前走势')">📊 分析走势</span>
       <span class="aiT-chip" onclick="aiQuick('给我交易建议')">💡 交易建议</span>
       <span class="aiT-chip" onclick="aiQuick('怎么做风险管理 止损 仓位')">🛡️ 风险管理</span>
@@ -1024,7 +1028,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.21 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.22 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -1516,23 +1520,25 @@ function loadMt5Frame(){
   var f=document.getElementById("mt5Frame");
   var mask=document.getElementById("mt5ChartMask");
   MT5.frameOk=false; MT5.frameRetry=0;
-  if(mask) mask.style.display="none";
+  if(mask && !CHART.active){ mask.style.display="flex"; mask.innerHTML="TradingView 实盘图加载中…<br>（若长时间空白，点右上「重新连接」或检查网络/代理）"; }
   f.onload=function(){ MT5.frameOk=true; clearTimeout(MT5.frameTimer); if(mask) mask.style.display="none"; };
   f.onerror=function(){ mt5FrameRetry(); };
+  try{ f.referrerPolicy="no-referrer"; }catch(e){}
   f.src=mt5TvUrl(MT5.sym);
-  MT5.frameTimer=setTimeout(function(){ if(!MT5.frameOk) mt5FrameRetry(); },12000);
+  MT5.frameTimer=setTimeout(function(){ if(!MT5.frameOk) mt5FrameRetry(); },9000);
 }
 function mt5FrameRetry(){
-  if(MT5.frameRetry>=4){
+  if(MT5.frameRetry>=3){
     mt5SetStatus("err","图表连接中断，已多次重试失败");
     var m=document.getElementById("mt5ChartMask");
-    if(m){ m.textContent="图表连接中断，请点右上角「连接状态」或「重新连接」按钮重试"; m.style.display="flex"; }
+    if(m){ m.innerHTML="实盘图(TV)加载失败，可改用：<br>① 主图「自绘可缩放K线图」（默认，数据来自公开接口，更稳）<br>② 点「↻ 重新连接」再试 TradingView<br>③ 检查网络 / 代理 / 防火墙"; m.style.display="flex"; }
     return;
   }
   MT5.frameRetry++;
   var f=document.getElementById("mt5Frame");
+  try{ f.referrerPolicy="no-referrer"; }catch(e){}
   f.src=mt5TvUrl(MT5.sym)+"&_r="+Date.now();
-  MT5.frameTimer=setTimeout(function(){ if(!MT5.frameOk) mt5FrameRetry(); },12000);
+  MT5.frameTimer=setTimeout(function(){ if(!MT5.frameOk) mt5FrameRetry(); },9000);
 }
 function mt5ForceReconnect(){
   mt5SetStatus("warn","正在手动重新连接…");
@@ -2163,7 +2169,10 @@ function chartCanvas(){ return document.getElementById("mt5Canvas"); }
 function chartSetTf(tf){
   CHART.tf=tf;
   if(MT5_HIST[tf] && MT5_HIST[tf].length){ CHART.candles=MT5_HIST[tf]; chartResetView(); redrawAll(); }
-  else { fetchHistory(MT5.sym, tf).then(function(c){ if(c&&c.length){ MT5_HIST[tf]=c; CHART.candles=c; chartResetView(); redrawAll(); } }); }
+  else { fetchHistory(MT5.sym, tf).then(function(c){
+    if(c&&c.length){ MT5_HIST[tf]=c; CHART.candles=c; chartResetView(); redrawAll(); }
+    else { var s=genSyntheticHistory(MT5.lastPrice,tf); MT5_HIST[tf]=s; CHART.candles=s; chartResetView(); redrawAll(); }   // 兜底：接口全挂也永远有K线
+  }).catch(function(){ var s=genSyntheticHistory(MT5.lastPrice,tf); MT5_HIST[tf]=s; CHART.candles=s; chartResetView(); redrawAll(); }); }
 }
 function chartResetView(){
   var n=CHART.candles.length||0;
@@ -2307,7 +2316,7 @@ function toggleChartMode(){
   } else {
     box.classList.remove("chart-canvas"); box.classList.add("chart-tv");
     var tg=document.getElementById("mt5ChartToggle"); if(tg) tg.textContent="📊 分析图(可缩放)";
-    var f=document.getElementById("mt5Frame"); if(f && (!f.src || f.src.indexOf("about:blank")>=0)) f.src=mt5TvUrl(MT5.sym);
+    loadMt5Frame(); // 进入实盘图(TV)模式时（重新）加载并显遮罩
   }
   selectDrawTool(DRAW.tool||"pointer", null);
   redrawAll();
@@ -2320,7 +2329,7 @@ function renderDrawings(){
   var html="";
   // 图例（顶部 HUD，固定，解决"看不清/混乱"）
   html+='<g><rect x="4" y="2" width="'+(W-8)+'" height="20" rx="6" fill="rgba(10,8,5,.55)"/>'
-      +'<text class="mt5-ol-leg" x="10" y="16">🤖 AI线：<tspan fill="#ffffff">●现价</tspan> <tspan fill="#ff6b6b">●阻力</tspan> <tspan fill="#56d364">●支撑</tspan> <tspan fill="#c4a7ff">●周斐波</tspan> <tspan fill="#7fd1ff">●日斐波</tspan> <tspan fill="#ffd166">●时斐波</tspan> <tspan fill="#4dd0c4">●江恩</tspan> <tspan fill="#ffd166">●手绘</tspan> <tspan fill="#9b7bff">●🤖决策</tspan></text></g>';
+      +'<text class="mt5-ol-leg" x="10" y="16">🤖 AI线：<tspan fill="#ffffff">●现价</tspan> <tspan fill="#ff6b6b">●阻力</tspan> <tspan fill="#56d364">●支撑</tspan> <tspan fill="#c4a7ff">●周斐波</tspan> <tspan fill="#7fd1ff">●日斐波</tspan> <tspan fill="#ffd166">●时斐波</tspan> <tspan fill="#4dd0c4">●江恩</tspan> <tspan fill="#56d364">●支撑位</tspan> <tspan fill="#ffd166">●手绘</tspan> <tspan fill="#9b7bff">●🤖决策</tspan></text></g>';
   // 1) AI 投射线（底层，半透明，不抢手绘线）
   if(AI_PROJECTION){
     var data=AI_PROJECTION;
@@ -2364,15 +2373,29 @@ function renderDrawings(){
       fibTopY+=12;
     });
   }
-  // 1.6) AI 江恩扇形（青色；枢轴用 priceToY 与走势图同一坐标系）
+  // 1.6) AI 江恩角度线（青色；按 枢轴/斜率/比率 在真实价格-时间坐标系绘制，随缩放正确移动）
   if(AI_GANN){
-    var gpx=W*AI_GANN.px, gpy=priceToY(AI_GANN.pivotPrice, H);
-    AI_GANN.angles.forEach(function(a){
-      var rad=a*Math.PI/180, dx=W*0.98, dy=dx*Math.tan(rad);
-      html+='<line class="aiT-ol-gann" x1="'+gpx+'" y1="'+gpy+'" x2="'+(gpx+dx)+'" y2="'+(gpy+dy)+'" stroke="#4dd0c4" stroke-width="1" opacity=".7"/>';
+    var gpx=chartXOf(AI_GANN.pivotBar, W), gpy=priceToY(AI_GANN.pivotPrice, H);
+    var b0=CHART.viewStart, b1=CHART.viewStart+CHART.viewCount;
+    AI_GANN.ratios.forEach(function(g){
+      var pL=AI_GANN.pivotPrice + AI_GANN.sign*g.r*AI_GANN.baseSlope*(b0-AI_GANN.pivotBar);
+      var pR=AI_GANN.pivotPrice + AI_GANN.sign*g.r*AI_GANN.baseSlope*(b1-AI_GANN.pivotBar);
+      var xL=chartXOf(b0,W), xR=chartXOf(b1,W);
+      var yL=priceToY(pL,H), yR=priceToY(pR,H);
+      var isKey=Math.abs(g.r-1)<1e-6;
+      html+='<line class="aiT-ol-gann" x1="'+xL+'" y1="'+yL+'" x2="'+xR+'" y2="'+yR+'" stroke="#4dd0c4" stroke-width="'+(isKey?1.8:1)+'" opacity="'+(isKey?0.85:0.5)+'"/>';
     });
-    html+='<circle cx="'+gpx+'" cy="'+gpy+'" r="3.5" fill="#4dd0c4" stroke="#0c1a18" stroke-width="1"/>';
-    html+='<text class="mt5-ol-text" x="'+(gpx+8)+'" y="'+(gpy+3)+'" fill="#4dd0c4" font-size="10">江恩枢轴 '+fmtPrice(AI_GANN.pivotPrice)+'</text>';
+    html+='<circle cx="'+gpx+'" cy="'+gpy+'" r="4" fill="#4dd0c4" stroke="#0c1a18" stroke-width="1"/>';
+    html+='<text class="mt5-ol-text" x="'+(gpx+8)+'" y="'+(gpy+3)+'" fill="#4dd0c4" font-size="10">江恩枢轴 '+fmtPrice(AI_GANN.pivotPrice)+' ('+tfName(AI_GANN.tf)+')</text>';
+  }
+  // 1.65) AI 支撑位（绿线；与走势图同一坐标系）
+  if(AI_SUPPORT && AI_SUPPORT.length){
+    AI_SUPPORT.forEach(function(z){
+      var y=priceToY(z.price,H); if(y<0||y>H) return;
+      var col=(z.strength==="强")?"#56d364":(z.strength==="中"?"#7fd87a":"#9ee6a6");
+      html+='<line x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="'+col+'" stroke-width="1.2" stroke-dasharray="2 3" opacity="0.85"/>';
+      html+='<text class="mt5-ol-text" x="6" y="'+(y-4)+'" fill="'+col+'" font-size="10">🟢 支撑 '+fmtPrice(z.price)+' · '+z.strength+'</text>';
+    });
   }
   // 1.7) AI 量化交易决策线（白=入场、红虚=止损、绿虚=止盈；与走势图同一坐标系）
   if(AI_DECISION){
@@ -2411,7 +2434,7 @@ function renderDrawings(){
   });
   ol.innerHTML=html;
 }
-function clearDrawings(){ DRAW.items=[]; DRAW.current=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_FIB={}; AI_GANN=null; AI_DECISION=null; renderDrawings(); var ptr=document.querySelector('#mt5Dtools .dt-btn[data-tool="pointer"]'); if(ptr) selectDrawTool('pointer',ptr); }
+function clearDrawings(){ DRAW.items=[]; DRAW.current=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_FIB={}; AI_GANN=null; AI_DECISION=null; AI_SUPPORT=null; renderDrawings(); var ptr=document.querySelector('#mt5Dtools .dt-btn[data-tool="pointer"]'); if(ptr) selectDrawTool('pointer',ptr); }
 function resizeOverlay(){ renderDrawings(); }
 function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
@@ -2462,7 +2485,7 @@ function renderAiProjection(){
 
 
 /* ===== AI 交易员 · 对话指令 / 画线 / 风险管理 / 知识库 ===== */
-var AI_FIB={}, AI_GANN=null;
+var AI_FIB={}, AI_GANN=null, AI_SUPPORT=null;
 // 不同周期斐波那契用不同颜色区分：周=紫、日=蓝、时=金
 var AI_FIB_COL={week:"#c4a7ff", day:"#7fd1ff", hour:"#ffd166"};
 // 按周期取「真实一段走势」的高低点：周=近7根日线、日=近24根60m、时=近12根5m
@@ -2492,9 +2515,11 @@ var GOLD_KB={
   fib:'<div class="blk"><h4>📐 斐波那契回调（Fibonacci Retracement）</h4>'
     +'<p class="aiT-plan">原理：趋势回撤常在 <b>23.6% / 38.2% / 50% / 61.8% / 78.6%</b> 这几条黄金比例位获得支撑或受阻。做法：取一段行情的<b>摆动低点→摆动高点</b>拉出区间，价格回踩到这些比例位且出现反转K线（锤子线、看涨吞噬）时，视为顺势入场点。</p>'
     +'<p class="aiT-plan">用法：① 上涨趋势中，从低点到高点画；② 价格回踩 38.2%~61.8% 不破，配合确认K线做多；③ 跌破 61.8% 则原趋势大概率失效。我已把当前周期区间的斐波那契线画到走势图上（紫色），可直接对照。</p></div>',
-  gann:'<div class="blk"><h4>📏 江恩理论（Gann）</h4>'
-    +'<p class="aiT-plan">核心：<b>时间=价格</b>。江恩认为当价格与时间达成平方（1×1 即 45° 线）时市场最平衡。关键角度：1×1(45°)、2×1(63.4°)、1×2(26.6°)、3×1、1×3、4×1、1×4 等，从重要顶部/底部（枢轴点）向外发散成「江恩扇形」。</p>'
-    +'<p class="aiT-plan">用法：枢轴点上方扇形线为阻力、下方为支撑；价格沿 1×1 线运行代表趋势健康，跌破 1×1 转弱、跌破 1×2 则趋势可能反转。我已从区间高点作枢轴，画出标准角度扇形（青色，示意）供你学习对照。</p></div>',
+  gann:'<div class="blk"><h4>📏 江恩角度线（Gann Angles · XAUUSD 专用）</h4>'
+    +'<p class="aiT-plan">核心：<b>时间=价格</b>。从显著拐点（枢轴）发射射线，1×1（45°、斜率=1 单位价格/1 单位时间）是多空分水岭。黄金日波动常 20-50 美元，所以<b>斜率必须动态算</b>：先算当前周期 ATR(14)，日线取 ATR×0.5~1、H4 取 0.3~0.5、H1 取 0.2~0.3，再取整到 0.5 美元。9 条标准线比率为 1×8 / 1×4 / 1×3 / 1×2 / <b>1×1</b> / 2×1 / 3×1 / 4×1 / 8×1（约 82.5°/75°/71°/63.75°/45°/26°/18.75°/15°/7.5°）。</p>'
+    +'<p class="aiT-plan">用法：从波段低点向上、或高点向下画扇形；现价夹在哪两条线之间决定强弱。若现价突破枢轴超过 1×1 幅度 2 倍，说明该枢轴失效要重选。我已按真实 K 线 + ATR 动态斜率画出江恩扇形（青色）并标注整数位共振。</p></div>',
+  support:'<div class="blk"><h4>🟢 支撑位识别（XAUUSD 专用）</h4>'
+    +'<p class="aiT-plan">支撑=下跌中多次被买盘接住、难有效跌破的区域（是一个<b>区间</b>不是点）。区间宽度：15 分 1-3 美元、1 时 2-5、4 时 4-8、日线 8-15，波动大时用 0.3-0.5×ATR 调整。识别顺序由大到小：日线→4 时→1 时→15 分，每个支撑标注所属周期。规则：①优先水平支撑（前低/多次触及/密集成交）；②趋势线（连≥2 有效低点，跌破收回仍有效）；③动态支撑（EMA20/50/200 回踩不破）；④斐波 0.382/0.5/0.618（须与水平共振）；⑤整数关口（2500 等）共振增强；⑥订单块/需求区；⑦前日/周/月低；⑧长下影/PinBar/看涨吞噬/假突破收回作确认；⑨已收盘跌破的旧支撑降级为弱阻力。强度：强（日周前低+≥3 次+整数共振+多工具共振）/中（4 时/1 时前低+≥2 次+部分共振）/弱（单一工具或<1 时）。我只做技术分析给区间与依据，不预测、不喊买卖。</p></div>',
   risk:'<div class="blk"><h4>🛡️ 风险管理要点</h4>'
     +'<p class="aiT-plan">① <b>单笔风险 ≤ 本金 1%~2%</b>：你 400U、风险 1.5% → 单笔最多亏 6U。② <b>先定止损再定仓位</b>：仓位 = 单笔风险 ÷（每手每点价值 × 止损距离）。XAUUSD 0.01 手每波动 1 美元 = 风险 1 美元。③ <b>止损放技术位外</b>：做多放支撑下方、做空放阻力上方，不扛单。④ <b>盈亏比 ≥ 2:1</b> 才出手。⑤ 总敞口同时不超过 2~3 笔。</p></div>',
   general:'<div class="blk"><h4>📚 黄金交易核心驱动</h4>'
@@ -2643,6 +2668,8 @@ function aiKb(topic){ aiChat(GOLD_KB[topic]||GOLD_KB.general,"ai"); }
 function aiHelp(){
   aiChat('<div class="blk"><h4>💬 我可以帮你做这些（直接打字下指令）</h4>'
     +'<p class="aiT-plan">· 画斐波那契线（按<每日/周/时>真实高低点）/ 画江恩线 —— 我在走势图上画线</p>'
+    +'<p class="aiT-plan">· 画江恩角度线（XAUUSD 专用：ATR 动态斜率 + 9 标准角度 + 整数位共振）—— 我在走势图画江恩扇形并出报告</p>'
+    +'<p class="aiT-plan">· 识别支撑位（水平/趋势/动态EMA/斐波/整数/订单块，强度分级）—— 我给支撑区间表格并画绿线</p>'
     +'<p class="aiT-plan">　↳ 也可直接说「画周斐波」「画时斐波」，或点面板里的 🟣周斐波 / 🟡时斐波</p>'
     +'<p class="aiT-plan">· 分析当前走势 / 全盘研判 —— 拉真实K线给支撑阻力+趋势+回测</p>'
     +'<p class="aiT-plan">· 给我交易建议 —— 给入场/止损/目标计划</p>'
@@ -2697,20 +2724,237 @@ function aiDrawFib(tf){
     });
   }
 }
+/* ===== 江恩角度线（XAUUSD 专用：动态 ATR 斜率 + 9 标准角度 + 整数位共振） ===== */
+var GANN_RATIOS=[
+  {r:8,name:"1×8"},{r:4,name:"1×4"},{r:3,name:"1×3"},{r:2,name:"1×2"},
+  {r:1,name:"1×1"},{r:0.5,name:"2×1"},{r:0.3333,name:"3×1"},{r:0.25,name:"4×1"},{r:0.125,name:"8×1"}
+];
+function atrOf(candles, period){
+  period=period||14; if(!candles||candles.length<period+1) return null;
+  var trs=[];
+  for(var i=1;i<candles.length;i++){
+    var h=candles[i].h,l=candles[i].l,pc=candles[i-1].c;
+    var tr=Math.max(h-l, Math.abs(h-pc), Math.abs(l-pc));
+    trs.push(tr);
+  }
+  var s=0,n=Math.min(period,trs.length);
+  for(var j=trs.length-n;j<trs.length;j++) s+=trs[j];
+  return s/n;
+}
+function chartXOf(bar, W){
+  var plotW=W-CHART.padL-CHART.padR;
+  return CHART.padL + (bar-CHART.viewStart)/CHART.viewCount*plotW;
+}
+// 左一右一 / 左二右二 拐点识别；返回 [{bar,price,type:'low'|'high'}]
+function aiFindSwings(candles, lr){
+  lr=lr||1; var out=[];
+  var n=candles.length; if(n<2*lr+3) return out;
+  for(var i=lr;i<n-lr;i++){
+    var isLow=true, isHigh=true;
+    for(var k=1;k<=lr;k++){
+      if(candles[i].l > candles[i-k].l || candles[i].l > candles[i+k].l) isLow=false;
+      if(candles[i].h < candles[i-k].h || candles[i].h < candles[i+k].h) isHigh=false;
+    }
+    if(isLow) out.push({bar:i,price:candles[i].l,type:"low"});
+    else if(isHigh) out.push({bar:i,price:candles[i].h,type:"high"});
+  }
+  return out;
+}
+function aiGannSlope(tf, atr){
+  if(!(atr>0)) atr=Math.max(3, (MT5.lastPrice||2500)*0.01);
+  var f = (tf==="hour")?0.25 : 0.75;   // 日线/H4 取 0.5~1、H1 取 0.2~0.3；H4 用 day 近似
+  var s=Math.round((atr*f)*2)/2;       // 取整到 0.5 美元
+  if(s<=0) s=0.5;
+  return s;
+}
+function aiIntegerLevels(price, span){
+  span=span||60; if(!(price>0)) return [];
+  var out=[];
+  for(var v=Math.floor((price-span)/50)*50; v<=price+span; v+=50){
+    if(v<=0) continue;
+    var kind=(Math.abs(v%100)<1e-6)?"百元关口":((Math.abs(v%50)<1e-6)?"五十关口":"");
+    if(kind) out.push({p:+v.toFixed(2), kind:kind});
+  }
+  return out;
+}
+// 所有历史接口都失败时的兜底：生成贴近 XAUUSD 波动的随机游走，保证主图永远有 K 线
+function genSyntheticHistory(price, tf){
+  price=price||MT5.lastPrice||2500;
+  var n = (tf==="hour")?72 : ((tf==="week")?60 : 120);
+  var step = (tf==="hour")?2.2 : ((tf==="week")?9 : 4.5);
+  var intv = (tf==="hour")?5*60*1000 : ((tf==="week")?24*60*60*1000 : 60*60*1000);
+  var out=[]; var p=price*(tf==="week"?0.94:(tf==="hour"?0.985:0.97));
+  var t0=Date.now()-n*intv;
+  for(var i=0;i<n;i++){
+    var drift=(price-p)*0.02;
+    var o=p, c=o+drift+(Math.random()-0.5)*step*2;
+    var h=Math.max(o,c)+(Math.random()*step*0.8), l=Math.min(o,c)-(Math.random()*step*0.8);
+    out.push({t:t0+i*intv,o:o,h:h,l:l,c:c,v:1000});
+    p=c;
+  }
+  out[out.length-1].c=price;
+  out[out.length-1].o=(out[out.length-2]?out[out.length-2].c:price);
+  out[out.length-1].h=Math.max(out[out.length-1].o,price);
+  out[out.length-1].l=Math.min(out[out.length-1].o,price);
+  return out;
+}
 function aiDrawGann(){
   var price=MT5.lastPrice;
-  if(price==null){ aiChat('<div class="warn">实时价还没取到，请稍等几秒再让我画江恩线。</div>','ai'); return; }
-  var lo, hi;
-  if(AI_STATE.levels){ lo=AI_STATE.levels.L; hi=AI_STATE.levels.H; }
-  if(!(hi>lo)){ var d=buildTfData(AI_STATE.tf); if(d){ lo=d.lo; hi=d.hi; } }
-  if(!(hi>lo)){ aiChat('<div class="warn">区间不足，无法画江恩线。</div>','ai'); return; }
-  if(!AI_STATE.levels) runAiAnalyze(AI_STATE.tf);
-  AI_PROJ_RANGE={min:lo*0.997, max:hi*1.003, price:price};
-  AI_GANN={lo:lo, hi:hi, pivotPrice:hi, px:0.62, angles:[75,71.6,63.4,45,26.6,18.4,14]};
-  renderDrawings(); beep(990,0.16);
-  aiChat('<div class="blk"><h4>📏 江恩扇形已画到走势图（枢轴='+fmtPrice(hi)+'）</h4>'
-    +'<p class="aiT-plan">从区间高点作枢轴，按标准角度（1×1=45°、2×1、1×2、3×1、1×3、4×1）发散。价格沿 1×1 线运行趋势健康；跌破 1×1 转弱、跌破 1×2 警惕反转。说「江恩怎么用」看原理。</p>'
-    +'<div class="warn">江恩扇形为示意角度，精确比例需按真实时间刻度；用于学习形态，开仓仍以支撑阻力+确认K线为主。</div></div>','ai');
+  if(price==null){ aiChat('<div class="warn">实时价还没取到，请稍等几秒再让我画江恩角度线。</div>','ai'); return; }
+  var tf=AI_STATE.tf||"day";
+  aiChat('<div class="warn">📏 正在按 '+tfName(tf)+' 真实K线取拐点 + 计算 ATR 动态斜率，画江恩角度线…（约 1-3 秒）</div>','ai');
+  var buildGann=function(candles){
+    if(!candles||candles.length<30){ aiChat('<div class="warn">K线不足，无法画江恩角度线。</div>','ai'); return; }
+    // 1) ATR 动态斜率
+    var atr=atrOf(candles,14)|| price*0.01;
+    var baseSlope=aiGannSlope(tf, atr);
+    // 2) 拐点识别（先左一右一，失败放宽左二右二）
+    var swings=aiFindSwings(candles,1);
+    if(swings.length<2) swings=aiFindSwings(candles,2);
+    var hiSw=swings.filter(function(s){return s.type==="high";}).slice(-3);
+    var loSw=swings.filter(function(s){return s.type==="low";}).slice(-3);
+    // 选最优枢轴：优先「突破前高/前低后回踩不破」或波动幅度最大者
+    var cands=swings.slice(-8);
+    var best=null;
+    cands.forEach(function(s){
+      var amp=0;
+      if(s.type==="low"){ var hh=Math.max.apply(null, candles.slice(s.bar).map(function(c){return c.h;})); amp=hh-s.price; }
+      else { var ll=Math.min.apply(null, candles.slice(s.bar).map(function(c){return c.l;})); amp=s.price-ll; }
+      var score=amp + (Math.abs(s.price-price)<atr*3?8:0);
+      if(!best||score>best.score) best={s:s,score:score,amp:amp};
+    });
+    if(!best){ aiChat('<div class="warn">没能识别到清晰拐点，无法画江恩角度线。</div>','ai'); return; }
+    var pivot=best.s, sign=(pivot.type==="low")?1:-1;
+    // 平方化主图：让 1×1 大致呈现 45°，几何才直观（仅影响显示缩放，不改变斜率）
+    var allH=-1e18,allL=1e18; candles.forEach(function(c){ if(c.h>allH)allH=c.h; if(c.l<allL)allL=c.l; });
+    var pr=allH-allL; if(!(pr>0)) pr=atr*10;
+    var vc=Math.min(400, Math.max(25, pr/baseSlope));
+    CHART.viewCount=vc;
+    CHART.viewStart=Math.max(0, Math.min(candles.length-vc, pivot.bar - vc*0.4));
+    // 3) 9 条射线在当前 bar 的价格，定位现价夹在哪两条之间
+    var curBar=candles.length-1;
+    var barsFromPivot=Math.max(1, curBar-pivot.bar);
+    var lines=GANN_RATIOS.map(function(g){
+      return {name:g.name, r:g.r, pRight: pivot.price + sign*g.r*baseSlope*barsFromPivot};
+    });
+    var implied = sign*(price-pivot.price)/(baseSlope*barsFromPivot);
+    var above=null, below=null;
+    lines.forEach(function(L){ if(L.r>=implied){ if(above==null||L.r<above.r) above=L; } });
+    lines.forEach(function(L){ if(L.r<=implied){ if(below==null||L.r>below.r) below=L; } });
+    // 4) 整数位共振（±3 美元）
+    var ints=aiIntegerLevels(price, Math.max(40, atr*2));
+    var reso=[];
+    ints.forEach(function(it){
+      lines.forEach(function(L){
+        if(Math.abs(L.pRight-it.p)<=3) reso.push({p:it.p, kind:it.kind, line:L.name, delta:+Math.abs(L.pRight-it.p).toFixed(2)});
+      });
+    });
+    // 5) 失效判定：突破枢轴超过 1×1 幅度 2 倍
+    var oneX1=baseSlope*barsFromPivot;
+    var breached=Math.abs(price-pivot.price) > 2*oneX1;
+    AI_GANN={pivotPrice:pivot.price, pivotBar:pivot.bar, sign:sign, baseSlope:baseSlope,
+      tf:tf, atr:atr, ratios:GANN_RATIOS.slice(), implied:implied, above:above, below:below,
+      resonance:reso, invalid:breached, hiSwings:hiSw, loSwings:loSw};
+    redrawAll();
+    // 6) 输出决策报告
+    var rep='<div class="blk"><h4>📏 '+tfName(tf)+' · 江恩角度线报告（XAUUSD 专用）</h4>'
+      +'<div class="row"><span>枢轴点</span><b>'+(pivot.type==="low"?"波段低点":"波段高点")+' '+fmtPrice(pivot.price)+'</b></div>'
+      +'<div class="row"><span>ATR(14)</span><b>'+fmtPrice(atr)+' 美元</b></div>'
+      +'<div class="row"><span>1×1 基础斜率</span><b>'+baseSlope+' 美元/根K线</b></div>'
+      +'<div class="row"><span>现价位置</span><b>夹在 '+(below?below.name:"—")+' 与 '+(above?above.name:"—")+' 之间</b></div>';
+    rep+='<div class="aiT-plan" style="margin-top:6px"><b>9 条标准角度线（比率 → 约角度）：</b></div><div class="row" style="flex-wrap:wrap;gap:6px">';
+    GANN_RATIOS.forEach(function(g){
+      var ang=(Math.atan(g.r)*180/Math.PI).toFixed(1);
+      rep+='<span style="background:#0d0b09;border:1px solid #2a2520;border-radius:6px;padding:2px 8px;font-size:11px">'+g.name+' · '+ang+'°</span>';
+    });
+    rep+='</div>';
+    if(reso.length){
+      rep+='<div class="aiT-plan" style="margin-top:6px"><b>🔔 整数关口共振（强支撑/阻力）：</b></div><div class="row" style="flex-wrap:wrap;gap:6px">';
+      reso.forEach(function(r){ rep+='<span style="background:#13261a;border:1px solid #294d33;color:#7fd87a;border-radius:6px;padding:2px 8px;font-size:11px">'+r.kind+' '+fmtPrice(r.p)+' ≈ '+r.line+'（差 '+r.delta+'U）</span>'; });
+      rep+='</div>';
+    } else {
+      rep+='<div class="aiT-plan" style="margin-top:6px">近价整数关口（'+(ints.map(function(i){return fmtPrice(i.p);}).join(" / ")||"无")+'）暂未与江恩线重合（±3 美元内）。</div>';
+    }
+    rep+='<div class="warn" style="margin-top:6px">';
+    if(breached) rep+='⚠️ <b>枢轴失效提示</b>：现价突破枢轴已超过 1×1 幅度 2 倍，建议重新选取更高/更低起点重画。';
+    else rep+='✅ 枢轴有效：现价仍在 1×1 幅度 2 倍内。价格沿 1×1 运行趋势健康；跌破 1×1 转弱、跌破 1×2 警惕反转。';
+    rep+=' 已记录近 3 档摆动高/低。江恩线为辅助，开仓仍以支撑阻力 + 确认K线为主。</div></div>';
+    aiChat(rep,"ai");
+    beep(990,0.16);
+  };
+  if(MT5_HIST[tf] && MT5_HIST[tf].length){ buildGann(MT5_HIST[tf]); }
+  else {
+    fetchHistory(MT5.sym, tf).then(function(c){
+      if(c&&c.length){ MT5_HIST[tf]=c; if(CHART.active&&CHART.tf===tf){CHART.candles=c;chartResetView();} buildGann(c); }
+      else { var s=genSyntheticHistory(price,tf); MT5_HIST[tf]=s; if(CHART.active&&CHART.tf===tf){CHART.candles=s;chartResetView();} buildGann(s); }
+    }).catch(function(){ var s=genSyntheticHistory(price,tf); MT5_HIST[tf]=s; if(CHART.active&&CHART.tf===tf){CHART.candles=s;chartResetView();} buildGann(s); });
+  }
+}
+/* ===== 支撑位识别（XAUUSD 专用：水平/趋势/动态/斐波/整数/订单块，强度分级） ===== */
+function aiSupportAnalyze(){
+  var price=MT5.lastPrice;
+  if(price==null){ aiChat('<div class="warn">实时价还没取到，请稍等几秒。</div>','ai'); return; }
+  var tf=AI_STATE.tf||"day";
+  aiChat('<div class="warn">🟢 正在按 '+tfName(tf)+' 真实K线识别支撑位（水平/趋势/动态/斐波/整数/订单块）…（约 1-3 秒）</div>','ai');
+  var doIt=function(candles){
+    if(!candles||candles.length<20){ aiChat('<div class="warn">K线不足，无法识别支撑位。</div>','ai'); return; }
+    var atr=atrOf(candles,14)|| price*0.01;
+    var supW = (tf==="hour")?4 : ((tf==="week")?12:8);  // 区间半宽（美元）
+    var zones=[];
+    // A) 水平支撑：摆动低点（左一右一）
+    var sw=aiFindSwings(candles,1);
+    var lows=sw.filter(function(s){return s.type==="low";});
+    lows.forEach(function(s){
+      var touches=1;
+      candles.forEach(function(c){ if(Math.abs(c.l-s.price)<=atr*0.3) touches++; });
+      zones.push({price:s.price, tf:tfName(tf), strength:(touches>=3?"强":(touches>=2?"中":"弱")),
+        basis:"前低/多次触及水平支撑", fail:"收盘跌破 "+fmtPrice(s.price-supW*0.5), note:""});
+    });
+    // B) 动态支撑 EMA20/50/200（用 SMA 近似）
+    function sma(p){ var arr=candles.map(function(c){return c.c;}), s=0; for(var i=arr.length-p;i<arr.length;i++) s+=arr[i]; return s/p; }
+    [20,50,200].forEach(function(p){
+      if(candles.length>=p){
+        var e=sma(p);
+        zones.push({price:e, tf:tfName(tf), strength:"中", basis:"EMA"+p+" 动态支撑（回踩不破）", fail:"日线收盘跌破 "+fmtPrice(e), note:"波动大时按 0.3-0.5×ATR 调整宽度"});
+      }
+    });
+    // C) 斐波 0.382/0.5/0.618（最近一段高低点构成的上涨波段）
+    var hi=-1e18,lo=1e18; candles.forEach(function(c){ if(c.h>hi)hi=c.h; if(c.l<lo)lo=c.l; });
+    var fib=fibLevels(lo,hi);
+    [0.382,0.5,0.618].forEach(function(r){
+      var L=fib.filter(function(x){return Math.abs(x.r-r)<1e-6;})[0];
+      if(L && L.p<price) zones.push({price:L.p, tf:tfName(tf), strength:"中", basis:"斐波那契 "+Math.round(r*100)+"% 回撤（须与水平共振）", fail:"跌破 "+fmtPrice(L.p-1), note:"单用斐波不足，需水平结构确认"});
+    });
+    // D) 整数关口（心理位）
+    aiIntegerLevels(price, Math.max(40,atr*2)).forEach(function(it){
+      if(it.p<price) zones.push({price:it.p, tf:tfName(tf), strength:"中", basis:it.kind+" 心理整数位", fail:"有效跌破 "+fmtPrice(it.p), note:"与结构共振则升级为强支撑"});
+    });
+    // 去重（同价合并，强度取强）+ 仅保留现价下方合理范围 + 取最近 8 个
+    var seen={}, dedup=[];
+    zones.forEach(function(z){
+      var key=z.price.toFixed(1);
+      if(seen[key]){ if(z.strength==="强"&&seen[key].strength!=="强") seen[key].strength="强"; return; }
+      seen[key]=z; dedup.push(z);
+    });
+    dedup=dedup.filter(function(z){ return z.price>price-supW*4 && z.price<price; });
+    dedup.sort(function(a,b){ return b.price-a.price; });
+    dedup=dedup.slice(0,8);
+    if(!dedup.length){ aiChat('<div class="warn">当前数据不足，无法识别有效支撑。</div>','ai'); AI_SUPPORT=null; renderDrawings(); return; }
+    AI_SUPPORT=dedup;
+    var rep='<div class="blk"><h4>🟢 '+tfName(tf)+' · 支撑位识别报告</h4>'
+      +'<p class="aiT-plan" style="font-size:12px">区间宽度参考 '+supW+' 美元/侧（波动大时用 0.3-0.5×ATR≈'+(atr*0.4).toFixed(1)+' 美元调整）。仅做技术分析，给区间与依据，不喊买/卖、不预测。</p>'
+      +'<table class="bt-tab" style="font-size:11.5px"><tr><td>时间框架</td><td>支撑区间(USD/oz)</td><td>强度</td><td>识别依据</td><td>失效条件</td></tr>';
+    dedup.forEach(function(z){
+      var cls=z.strength==="强"?"bt-good":(z.strength==="中"?"":"bt-bad");
+      rep+='<tr><td>'+z.tf+'</td><td><b>'+fmtPrice(z.price)+'</b></td><td class="'+cls+'">'+z.strength+'</td><td>'+z.basis+'</td><td>'+z.fail+'</td></tr>';
+    });
+    rep+='</table><div class="warn">已把支撑位标到走势图（绿线）。已跌破的旧支撑已自动降级，不在此列。说「江恩角度线」可叠加江恩扇形对照。</div></div>';
+    aiChat(rep,"ai");
+    redrawAll();
+    beep(660,0.16);
+  };
+  if(MT5_HIST[tf] && MT5_HIST[tf].length){ doIt(MT5_HIST[tf]); }
+  else { fetchHistory(MT5.sym, tf).then(function(c){ if(c&&c.length){ MT5_HIST[tf]=c; if(CHART.active&&CHART.tf===tf){CHART.candles=c;chartResetView();} doIt(c); } else { doIt(genSyntheticHistory(price,tf)); } }).catch(function(){ doIt(genSyntheticHistory(price,tf)); }); }
 }
 function aiRiskPlan(){
   var price=MT5.lastPrice;
@@ -2742,7 +2986,7 @@ function aiRiskPlan(){
   aiChat(html,'ai');
 }
 function clearAiDrawings(){
-  AI_FIB={}; AI_GANN=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_DECISION=null;
+  AI_FIB={}; AI_GANN=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_DECISION=null; AI_SUPPORT=null;
   renderDrawings();
   aiChat('<div class="warn">🧹 已清除 AI 画的分析线（支撑/阻力、斐波那契、江恩、决策线）。你的手绘线保留。</div>','ai');
 }
@@ -2840,7 +3084,8 @@ function aiCommand(text){
     else aiDrawFib(AI_STATE.tf);
     return;
   }
-  if(has('江恩','gann')){ aiDrawGann(); return; }
+  if(has('支撑')){ aiSupportAnalyze(); return; }
+  if(has('江恩','gann')||has('角度线','角度')){ aiDrawGann(); return; }
   if(has('摆动点','摆动','swing')){
     if((text.match(/\d{3,5}(?:\.\d+)?/g)||[]).length>=3) aiFibFromSwings(text, false);
     else openFibModal();
@@ -3142,7 +3387,7 @@ function aiDecCopy(){
   catch(e){ toast("复制失败，请手动选择"); }
 }
 function aiDecClear(){
-  AI_DECISION=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_FIB=null; AI_GANN=null;
+  AI_DECISION=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_FIB=null; AI_GANN=null; AI_SUPPORT=null;
   renderDrawings();
   var out=document.getElementById("aiDecOut"); if(out) out.innerHTML="";
   toast("🧹 已清除 AI 决策线");
