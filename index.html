@@ -177,7 +177,27 @@ body.mt5-zoomed .mt5-dtools{position:absolute;left:12px;top:66px;z-index:25}
 .mt5-ol-line{stroke-linecap:round}
 .mt5-ol-text{font-size:11px;font-family:system-ui,-apple-system,"Microsoft YaHei",sans-serif;fill:#ece5d3}
 .mt5-ol-resize{position:absolute;right:8px;bottom:8px;z-index:20;background:rgba(20,17,13,.85);border:1px solid #2a2520;border-radius:6px;padding:3px 8px;font-size:11px;color:#6b6250;pointer-events:none}
-/* AI 交易员抽屉 */
+/* AI 分析面板（集成到 MT5 工作区） */
+.aiT-panel{display:none;background:#14110d;border:1px solid #2a2520;border-radius:10px;margin:12px 0;overflow:hidden}
+.aiT-panel.open{display:block}
+.aiT-panel .aiT-head{position:relative;display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid #2a2520;background:#1b160f;flex-wrap:wrap}
+.aiT-panel .aiT-head h3{margin:0;font-size:14px;color:var(--gold2)}
+.aiT-panel .aiT-tabs{display:flex;gap:6px;margin-left:auto;margin-right:32px}
+.aiT-tab{background:#241e16;border:1px solid #3a3328;color:#9a8f76;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer}
+.aiT-tab.on{background:#3a2c10;border-color:var(--gold);color:var(--gold2)}
+.aiT-tab:hover{border-color:var(--gold)}
+.aiT-panel .x{position:absolute;right:12px;top:12px;cursor:pointer;color:var(--muted);font-size:20px;line-height:1}
+.aiT-panel .x:hover{color:var(--red)}
+.aiT-panel .aiT-body{padding:12px 14px}
+.aiT-panel .aiT-body .blk{margin-bottom:10px}
+.aiT-panel .aiT-body .blk h4{font-size:12.5px;color:var(--gold);margin-bottom:6px;border-left:3px solid var(--gold);padding-left:8px}
+.aiT-panel .aiT-out .row{font-size:12px;padding:2px 0}
+.aiT-plan{font-size:12.5px;color:#ece5d3;line-height:1.75;margin:6px 0}
+.aiT-plan b{color:var(--gold2)}
+.aiT-panel .aiT-bar{margin-top:10px}
+.mt5-dtools .dt-btn.primary{background:#3a2c10;border-color:var(--gold);color:var(--gold2)}
+.mt5-dtools .dt-btn.primary:hover{background:#4d3a14}
+#aiTrader{display:none!important}
 #aiTrader{position:fixed;top:0;right:0;height:100vh;width:380px;max-width:92vw;background:#14110d;border-left:1px solid var(--gold);box-shadow:-12px 0 40px rgba(0,0,0,.45);z-index:60;display:none;flex-direction:column}
 #aiTrader.open{display:flex}
 .aiT-head{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid #2a2520;background:#1b160f}
@@ -631,7 +651,6 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
         <button class="mt5-act" onclick="mt5Fullscreen()">⛶ 全屏图表</button>
         <button class="mt5-act" onclick="toggleWorkspaceZoom()">🔍 放大工作区</button>
         <button class="mt5-act" onclick="openLiveWindow()">🗔 弹出盯盘</button>
-        <button class="mt5-act primary" onclick="toggleAiTrader()">🤖 AI职业交易员</button>
         <button class="mt5-act" id="liveExit" onclick="if(document.body.classList.contains('live-mode'))window.close();else location.href=location.pathname;">✕ 退出盯盘</button>
         <button class="mt5-act" id="mt5WorkspaceExit" onclick="toggleWorkspaceZoom()" style="display:none">✕ 退出放大</button>
       </div>
@@ -646,11 +665,11 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <button class="dt-btn" data-tool="text" onclick="selectDrawTool('text',this)" title="在图上写标注">📝 文字</button>
       <button class="dt-btn" data-tool="clear" onclick="clearDrawings()" title="清除我画的所有线">🗑 清除</button>
       <div class="dt-sep"></div>
-      <button class="dt-btn" onclick="projectAiToChart()" title="把 AI 分析的支撑/阻力/斐波那契投射到走势图上">🤖 投射 AI 分析线</button>
-      <span class="dt-tip">水平线/趋势线可直接在图上画；复杂工具请用左侧 TradingView 原生栏</span>
+      <button class="dt-btn primary" onclick="toggleAiPanel()" title="打开 AI 职业交易员分析面板">🤖 AI分析</button>
+      <span class="dt-tip">光标 = 和图表交互；选画线工具 = 在走势图上画线；AI分析 = 一键算支撑/阻力/建议</span>
     </div>
 
-    <p class="mt5-drawhint">🖌 <b>怎么在图上画线：</b>用上方<b>中文工具栏</b>选「水平线 / 趋势线 / 矩形框 / 文字」，然后在走势图上点击或拖拽即可。需要 <span class="k">斐波那契回调</span><span class="k">江恩扇形</span> 等精确工具时，请点图表<b>左侧工具栏</b>对应图标。点「🤖 AI职业交易员」→「投射 AI 分析线」可自动把支撑/阻力/斐波位标到图上。画的线会在<b>切换品种 / 周期 / 重载图表时清空</b>。</p>
+    <p class="mt5-drawhint">🖌 <b>怎么在图上画线：</b>用上方<b>中文工具栏</b>选「水平线 / 趋势线 / 矩形框 / 文字」，然后在走势图上点击或拖拽即可。需要 <span class="k">斐波那契回调</span><span class="k">江恩扇形</span> 等精确工具时，请点图表<b>左侧工具栏</b>对应图标。点「🤖 AI分析」可一键算出当前支撑/阻力并给出操作建议，再点「🎯 投射到走势图」就能把关键位标到图上。画的线会在<b>切换品种 / 周期 / 重载图表时清空</b>。</p>
 
     <div class="mt5-quote">
       <div class="mt5-side sell">
@@ -704,23 +723,24 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<!-- AI 职业交易员抽屉 -->
-<aside id="aiTrader">
+<!-- AI 分析面板（集成在 MT5 工作区内） -->
+<div class="aiT-panel" id="aiTPanel">
   <div class="aiT-head">
     <span class="dot-ai"></span>
     <h3>🤖 AI 职业黄金交易员</h3>
-    <span class="x" onclick="toggleAiTrader()" title="关闭">×</span>
+    <div class="aiT-tabs" id="aiTTabs">
+      <button class="aiT-tab on" onclick="selectAiTf('day',this)">日线</button>
+      <button class="aiT-tab" onclick="selectAiTf('hour',this)">小时线</button>
+      <button class="aiT-tab" onclick="selectAiTf('week',this)">周线</button>
+    </div>
+    <span class="x" onclick="toggleAiPanel()" title="关闭">×</span>
   </div>
   <div class="aiT-body">
-    <div class="aiT-bar">
-      <button onclick="aiTraderAnalyze()">⚡ 一键分析走势</button>
-      <button class="ghost" onclick="aiTraderDeep()">🧠 大模型深度解读</button>
-    </div>
     <div id="aiTOut" class="aiT-out">
-      <div class="warn">点 <b>⚡ 一键分析走势</b>：系统读取当前实时价、今日高低点与斐波那契回调位，标出<b>支撑区 / 阻力区</b>并给出多空参考。若你在「智能问答台」填过自己的大模型 Key，还能点 <b>🧠 大模型深度解读</b> 生成一段自然语言研判。</div>
+      <div class="warn">点上方<b>日线 / 小时线 / 周线</b>切换分析周期。系统读取实时价与对应周期区间，给出支撑/阻力、多空研判与操作建议。点<b>🎯 投射到走势图</b>可把关键位标到走势图上。</div>
     </div>
   </div>
-</aside>
+</div>
 
 <!-- 新闻雷达 -->
 <section id="news">
@@ -767,7 +787,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.6 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.7 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -1401,74 +1421,117 @@ function openLiveWindow(){
   var w=window.open(url,"goldlive","width=1366,height=820,menubar=no,toolbar=no,location=no,status=no,resizable=yes");
   if(!w) alert("浏览器拦截了弹窗。请允许本站点弹窗后重试，或手动把网址后面加上 ?mode=live 再打开。");
 }
-function toggleAiTrader(){
-  var el=document.getElementById("aiTrader");
-  if(el.classList.contains("open")) el.classList.remove("open");
-  else el.classList.add("open");
+function toggleAiPanel(){
+  var p=document.getElementById("aiTPanel");
+  if(!p) return;
+  AI_STATE.open=!AI_STATE.open;
+  if(AI_STATE.open){
+    p.classList.add("open");
+    if(!AI_STATE.data) runAiAnalyze(AI_STATE.tf);
+  } else {
+    p.classList.remove("open");
+  }
 }
+function selectAiTf(tf,btn){
+  AI_STATE.tf=tf;
+  var btns=document.querySelectorAll("#aiTTabs .aiT-tab");
+  for(var i=0;i<btns.length;i++) btns[i].classList.remove("on");
+  if(btn) btn.classList.add("on");
+  runAiAnalyze(tf);
+}
+function tfName(tf){ return tf==="hour"?"小时线":(tf==="day"?"日线":"周线"); }
 function fibLevels(lo,hi){
   var diff=hi-lo, arr=[0,0.236,0.382,0.5,0.618,0.786,1];
   return arr.map(function(r){ return {r:r, p: hi - diff*r}; });
 }
-function aiTraderSvg(price,lo,hi,fib,sup,res){
-  var W=320,H=150,pad=14;
-  function y(p){ return pad + (hi-p)/((hi-lo)||1)*(H-2*pad); }
-  var s='<svg class="aiT-svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">';
-  s+='<rect x="0" y="'+y(hi)+'" width="'+W+'" height="'+(y(lo)-y(hi))+'" fill="#0d0b09"/>';
-  fib.forEach(function(f){
-    var yy=y(f.p);
-    var isSup = sup && Math.abs(f.p-sup.p)<1e-6;
-    var isRes = res && Math.abs(f.p-res.p)<1e-6;
-    var col = isSup?"#5fb868":(isRes?"#e8624f":"#3a3328");
-    s+='<line x1="0" y1="'+yy+'" x2="'+W+'" y2="'+yy+'" stroke="'+col+'" stroke-width="'+(isSup||isRes?1.6:0.7)+'" stroke-dasharray="'+(isSup||isRes?"0":"3 3")+'"/>';
-    s+='<text x="4" y="'+(yy-3)+'" fill="'+(isSup?"#7fd87a":(isRes?"#ff9a8e":"#6b6250"))+'" font-size="9">'+fmtPrice(f.p)+'</text>';
-  });
-  var py=y(price);
-  s+='<line x1="0" y1="'+py+'" x2="'+W+'" y2="'+py+'" stroke="#f7d271" stroke-width="1.6"/>';
-  s+='<circle cx="'+(W-12)+'" cy="'+py+'" r="3.5" fill="#f7d271"/>';
-  s+='<text x="'+(W-150)+'" y="'+(py-6)+'" fill="#f7d271" font-size="10" font-weight="bold">现价 '+fmtPrice(price)+'</text>';
-  s+='</svg>';
-  return s;
-}
-function aiTraderAnalyze(){
-  var out=document.getElementById("aiTOut");
-  var price=MT5.lastPrice, sym=MT5.sym, m=MT5MAP[sym];
-  if(price==null){ out.innerHTML='<div class="warn">实时价还没取到，请稍等几秒再点。</div>'; return; }
-  var hi=MT5.sessHigh||price*1.005, lo=MT5.sessLow||price*0.995;
-  if(hi<=lo){ hi=price*1.005; lo=price*0.995; }
+function buildTfData(tf){
+  var price=MT5.lastPrice;
+  if(price==null) return null;
+  var hi, lo;
+  var dayHi=MT5.sessHigh||price*1.008, dayLo=MT5.sessLow||price*0.992;
+  if(dayHi<=dayLo){ dayHi=price*1.008; dayLo=price*0.992; }
+  if(tf==="hour"){
+    // 小时线：聚焦当前价附近约今日区间的 70%
+    var range=Math.max(dayHi-dayLo, price*0.006);
+    hi=Math.min(dayHi, price+range*0.45);
+    lo=Math.max(dayLo, price-range*0.45);
+  } else if(tf==="day"){
+    // 日线：以今日区间为主，略扩展
+    hi=dayHi*1.002; lo=dayLo*0.998;
+  } else {
+    // 周线：基于今日区间外推约 2.5 倍
+    var range=Math.max(dayHi-dayLo, price*0.012);
+    hi=price+range*1.3; lo=price-range*1.3;
+  }
+  if(hi<=lo){ hi=price*1.01; lo=price*0.99; }
   var fib=fibLevels(lo,hi);
   var sup=null, res=null;
   for(var i=0;i<fib.length;i++){
     if(fib[i].p<=price && (sup==null||fib[i].p>sup.p)) sup=fib[i];
     if(fib[i].p>=price && (res==null||fib[i].p<res.p)) res=fib[i];
   }
-  var mid=(hi+lo)/2, pctIn=(price-lo)/((hi-lo)||1);
+  // 关键支撑/阻力：取再远一级的位
+  var sup2=null;
+  for(var i=fib.length-1;i>=0;i--){ if(fib[i].p<sup.p){ sup2=fib[i]; break; } }
+  var res2=null;
+  for(var i=0;i<fib.length;i++){ if(fib[i].p>res.p){ res2=fib[i]; break; } }
+  var pct=(price-lo)/(hi-lo);
   var bias, biasCls, biasTxt;
-  if(price>fib[3].p){ bias="偏多"; biasCls="up"; biasTxt="价格位于 50% 回调位之上，短线多头占优；回踩不破前低、不破 50% 位，可视为强势。"; }
-  else if(price<fib[3].p){ bias="偏空"; biasCls="dn"; biasTxt="价格位于 50% 回调位之下，短线空头占优；反弹不过前高、不过 50% 位，易再下探。"; }
-  else { bias="震荡"; biasCls="mid"; biasTxt="价格围绕 50% 中轴运行，方向未明，宜观望或在区间内高抛低吸。"; }
-  var newsEl=document.getElementById("newsSent");
-  var newsTxt = newsEl? newsEl.textContent : "";
-  var rows='';
-  fib.forEach(function(f){
-    var cls = f.p<price? 'sup' : (f.p>price? 'res':'');
-    rows+='<div class="row"><span>'+(f.r*100).toFixed(1)+'%</span><b class="'+cls+'">'+fmtPrice(f.p)+'</b></div>';
-  });
-  var svg=aiTraderSvg(price,lo,hi,fib,sup,res);
+  if(pct>0.58){ bias="偏多"; biasCls="up"; biasTxt="价格位于区间中上沿，多头结构占优，回踩支撑不破可顺势看多。"; }
+  else if(pct<0.42){ bias="偏空"; biasCls="dn"; biasTxt="价格位于区间中下沿，空头结构占优，反弹阻力不过可顺势看空。"; }
+  else { bias="震荡"; biasCls="mid"; biasTxt="价格围绕区间中轨运行，方向未明，宜等突破或区间边界信号。"; }
+  return {tf:tf,price:price,hi:hi,lo:lo,fib:fib,sup:sup,res:res,sup2:sup2||sup,res2:res2||res,pct:pct,bias:bias,biasCls:biasCls,biasTxt:biasTxt};
+}
+function runAiAnalyze(tf){
+  var out=document.getElementById("aiTOut");
+  var price=MT5.lastPrice, sym=MT5.sym;
+  if(price==null){ out.innerHTML='<div class="warn">实时价还没取到，请稍等几秒。</div>'; return; }
+  var d=buildTfData(tf);
+  if(!d){ out.innerHTML='<div class="warn">计算区间失败，请确认实时价已获取。</div>'; return; }
+  AI_STATE.data=d;
+  var riskAmt=(STATE.equity||400)*((STATE.riskPct||1.5)/100);
   var html='';
-  html+='<div class="blk"><h4>当前定位（'+(m?m.name:sym)+'）</h4>'
-      +'<div class="row"><span>实时价</span><b>'+fmtPrice(price)+'</b></div>'
-      +'<div class="row"><span>今日区间</span><b>'+fmtPrice(lo)+' ~ '+fmtPrice(hi)+'</b></div>'
-      +'<div class="row"><span>区间位置</span><b>'+pctIn.toFixed(1)+'%</b></div></div>';
-  html+='<div class="blk"><h4>斐波那契回调位</h4>'+svg+rows+'</div>';
-  html+='<div class="blk"><h4>关键参考</h4>'
-      +'<div class="row"><span>最近支撑</span><b class="sup">'+(sup?fmtPrice(sup.p)+' ('+(sup.r*100).toFixed(1)+'%)':'—')+'</b></div>'
-      +'<div class="row"><span>最近阻力</span><b class="res">'+(res?fmtPrice(res.p)+' ('+(res.r*100).toFixed(1)+'%)':'—')+'</b></div>'
-      +'<button class="btn" style="margin-top:10px;width:100%" onclick="projectAiToChart()">🎯 投射支撑/阻力/斐波那契到走势图</button>'
-      +'<div class="warn" style="font-size:11px;margin-top:6px">投射线为辅助参考，基于今日高低点估算位置，精确画线请结合 TradingView 原生工具。</div></div>';
-  html+='<div class="blk"><h4>多空研判（参考）</h4><div class="bias '+biasCls+'"><b>'+bias+'</b> · '+biasTxt+'</div>'
-      + (newsTxt? '<div class="warn">📰 新闻面：'+escHtml(newsTxt)+'</div>':'')
-      + '<div class="warn">操作参考：靠近<b class="sup">支撑</b>且出现看涨K线（锤子线 / 看涨吞噬）可轻仓试多，止损放支撑下方；靠近<b class="res">阻力</b>且出现看跌K线可试空。仅供参考，杠杆交易风险极高，务必设止损。</div></div>';
+  html+='<div class="blk"><h4>'+tfName(tf)+' · 当前定位</h4>'
+      +'<div class="row"><span>品种</span><b>'+(MT5MAP[sym]?MT5MAP[sym].name:sym)+'</b></div>'
+      +'<div class="row"><span>实时价</span><b>'+fmtPrice(d.price)+'</b></div>'
+      +'<div class="row"><span>分析区间</span><b>'+fmtPrice(d.lo)+' ~ '+fmtPrice(d.hi)+'</b></div>'
+      +'<div class="row"><span>区间位置</span><b>'+(d.pct*100).toFixed(1)+'%</b></div>'
+      +'<div class="row"><span>多空研判</span><b class="'+d.biasCls+'">'+d.bias+'</b></div></div>';
+  html+='<div class="blk"><h4>关键支撑 / 阻力</h4>'
+      +'<div class="row"><span>最近阻力</span><b class="res">'+fmtPrice(d.res.p)+'</b></div>'
+      +(d.res2.p!==d.res.p?'<div class="row"><span>关键阻力</span><b class="res">'+fmtPrice(d.res2.p)+'</b></div>':'')
+      +'<div class="row"><span>最近支撑</span><b class="sup">'+fmtPrice(d.sup.p)+'</b></div>'
+      +(d.sup2.p!==d.sup.p?'<div class="row"><span>关键支撑</span><b class="sup">'+fmtPrice(d.sup2.p)+'</b></div>':'')
+      +'</div>';
+  var entry, stop, tp, rr;
+  if(d.bias==="偏多"){
+    entry='等价格回踩 '+fmtPrice(d.sup.p)+' 附近，出现锤子线/看涨吞噬等确认K线后试多';
+    stop='跌破 '+fmtPrice(d.sup2.p)+' 止损（约 '+Math.abs(price-d.sup2.p).toFixed(2)+' 美元）';
+    tp='第一目标 '+fmtPrice(d.res.p)+'，第二目标 '+fmtPrice(d.res2.p)+' 附近';
+    rr=((d.res.p-price)/Math.max(0.3,price-d.sup2.p)).toFixed(1);
+  } else if(d.bias==="偏空"){
+    entry='等价格反弹至 '+fmtPrice(d.res.p)+' 附近，出现射击之星/看跌吞噬等确认K线后试空';
+    stop='升破 '+fmtPrice(d.res2.p)+' 止损（约 '+Math.abs(d.res2.p-price).toFixed(2)+' 美元）';
+    tp='第一目标 '+fmtPrice(d.sup.p)+'，第二目标 '+fmtPrice(d.sup2.p)+' 附近';
+    rr=((price-d.sup.p)/Math.max(0.3,d.res2.p-price)).toFixed(1);
+  } else {
+    entry='方向不明，先观望；等价格突破 '+fmtPrice(d.res.p)+' 再考虑做多，或跌破 '+fmtPrice(d.sup.p)+' 再考虑做空';
+    stop='按突破方向，止损放在假突破的反向边界外 1-2 美元';
+    tp='按突破方向看 '+fmtPrice(d.res.p)+' / '+fmtPrice(d.sup.p)+'，盈亏比需 ≥ 2:1 才开仓';
+    rr='—';
+  }
+  html+='<div class="blk"><h4>研判与操作建议</h4>'
+      +'<div class="bias '+d.biasCls+'"><b>'+d.bias+'</b> · '+d.biasTxt+'</div>'
+      +'<p class="aiT-plan"><b>入场：</b>'+entry+'</p>'
+      +'<p class="aiT-plan"><b>止损：</b>'+stop+'</p>'
+      +'<p class="aiT-plan"><b>目标：</b>'+tp+'</p>'
+      +(rr!=='—'?'<p class="aiT-plan"><b>估算盈亏比：</b>约 '+rr+':1</p>':'')
+      +'<div class="warn">按你当前本金 '+(STATE.equity||400)+'U、单笔风险 '+riskAmt.toFixed(1)+'U 计算，0.01 手最大止损距离为 '+riskAmt.toFixed(1)+' 美元。若技术位止损超过该距离，说明这单不适合你的账户，应放弃。杠杆交易风险极高，务必设止损。</div>'
+      +'</div>';
+  html+='<div class="aiT-bar">'
+      +'<button onclick="projectAiToChart()">🎯 投射到走势图</button>'
+      +'<button class="ghost" onclick="aiTraderDeep()">🧠 大模型深度解读</button>'
+      +'</div>';
   out.innerHTML=html;
 }
 function aiTraderDeep(){
@@ -1477,26 +1540,32 @@ function aiTraderDeep(){
     out.innerHTML='<div class="warn">你还没填大模型 Key。去「智能问答台」底部填好 <b>API Base</b> 和 <b>Key</b> 后，这里就能调用你自己的模型做深度解读。</div>';
     return;
   }
-  if(MT5.lastPrice==null){ out.innerHTML='<div class="warn">实时价还没取到，请稍等。</div>'; return; }
-  var snap='当前品种：'+(MT5MAP[MT5.sym]?MT5MAP[MT5.sym].name:MT5.sym)+'；实时价：'+MT5.lastPrice.toFixed(2)
-    +'；今日高低：'+MT5.sessLow.toFixed(2)+' ~ '+MT5.sessHigh.toFixed(2)
-    +'。请以职业黄金期货交易员视角，给出：1)多空研判 2)关键支撑与阻力 3)操作参考与风险。控制在200字内，客观专业。';
-  out.innerHTML='<div class="warn">🧠 正在调用你的大模型生成深度解读…</div>';
+  if(!AI_STATE.data || AI_STATE.data.price==null){ out.innerHTML='<div class="warn">请先点「日线/小时线/周线」运行一次分析。</div>'; return; }
+  var d=AI_STATE.data;
+  var snap='品种：'+(MT5MAP[MT5.sym]?MT5MAP[MT5.sym].name:MT5.sym)
+    +'；分析周期：'+tfName(d.tf)
+    +'；实时价：'+d.price.toFixed(2)
+    +'；区间：'+d.lo.toFixed(2)+' ~ '+d.hi.toFixed(2)
+    +'；多空研判：'+d.bias
+    +'。请以职业黄金期货交易员视角，用中文给出：1)当前走势定性 2)关键支撑/阻力 3)日内/周内操作计划 4)风险控制提醒。控制在250字内，客观专业。';
+  out.innerHTML='<div class="warn">🧠 正在调用你的大模型生成 '+tfName(d.tf)+' 深度解读…</div>';
   var url=STATE.aiBase.replace(/\/+$/,"")+"/chat/completions";
   var body=JSON.stringify({model:"gpt-4o-mini",temperature:0.3,messages:[
-    {role:"system",content:"你是资深黄金期货交易员。根据给出的实时行情数据，用中文输出：1)多空研判 2)关键支撑阻力 3)操作参考。控制在200字内，客观专业。"},
+    {role:"system",content:"你是资深黄金期货交易员。根据给出的实时行情数据，用中文输出：1)走势定性 2)关键支撑阻力 3)操作计划 4)风控提醒。控制在250字内，客观专业。"},
     {role:"user",content:snap}
   ]});
   fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+STATE.aiKey},body:body})
     .then(function(r){return r.json();})
     .then(function(j){
       var c=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
-      out.innerHTML='<div class="blk"><h4>🧠 大模型研判</h4><div class="warn" style="color:#ece5d3;line-height:1.85">'+escHtml(c||"（模型未返回内容）")+'</div><div class="warn">以上由你自己的大模型生成，仅供参考，不构成投资建议。</div></div>';
+      out.innerHTML='<div class="blk"><h4>🧠 大模型 '+tfName(d.tf)+' 研判</h4><div class="warn" style="color:#ece5d3;line-height:1.85">'+escHtml(c||"（模型未返回内容）")+'</div><div class="warn">以上由你自己的大模型生成，仅供参考，不构成投资建议。</div></div>';
     })
     .catch(function(){
-      out.innerHTML='<div class="warn">🧠 调用失败（可能接口地址 / Key 不正确，或浏览器跨域限制）。可改用「⚡ 一键分析」的规则引擎结果。</div>';
+      out.innerHTML='<div class="warn">🧠 调用失败（可能接口地址 / Key 不正确，或浏览器跨域限制）。可继续使用上方规则引擎结果。</div>';
     });
 }
+/* 兼容旧入口：保留 toggleAiTrader 别名 */
+function toggleAiTrader(){ toggleAiPanel(); }
 function enterLiveMode(){
   document.body.classList.add("live-mode");
   var m=document.getElementById("mkt");
@@ -1525,6 +1594,7 @@ function toggleWorkspaceZoom(){
 
 // 画线状态
 var DRAW={tool:"pointer",drawing:false,items:[],current:null,ns:"http://www.w3.org/2000/svg"};
+var AI_STATE={tf:"day",data:null,open:false};
 function selectDrawTool(tool,btn){
   DRAW.tool=tool;
   var btns=document.querySelectorAll("#mt5Dtools .dt-btn");
@@ -1593,21 +1663,14 @@ function renderDrawings(){
   var W=box.width, H=box.height;
   ol.setAttribute("viewBox","0 0 "+W+" "+H);
   var html="";
-  // 1) AI 投射线（底层）
+  // 1) AI 投射线（底层，最多 5 条，避免画面乱）
   if(AI_PROJECTION){
     var data=AI_PROJECTION;
-    data.fib.forEach(function(f){
-      var y=priceToY(f.p, H);
-      var isSup=data.sup&&Math.abs(f.p-data.sup.p)<1e-6;
-      var isRes=data.res&&Math.abs(f.p-data.res.p)<1e-6;
-      var col=isSup?"#5fb868":(isRes?"#e8624f":"#f7d271");
-      var dash=isSup||isRes?"0":"4 3";
-      html+='<line class="mt5-ol-line" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="'+col+'" stroke-width="'+(isSup||isRes?1.6:1)+'" stroke-dasharray="'+dash+'"/>';
-      html+='<text class="mt5-ol-text" x="6" y="'+(y-5)+'" fill="'+col+'" font-weight="'+(isSup||isRes?"bold":"normal")+'">'+(f.r*100).toFixed(1)+'% '+fmtPrice(f.p)+'</text>';
+    data.lines.forEach(function(L){
+      var y=priceToY(L.p, H);
+      html+='<line class="mt5-ol-line" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="'+L.col+'" stroke-width="'+L.width+'" stroke-dasharray="'+L.dash+'"/>';
+      html+='<text class="mt5-ol-text" x="6" y="'+(y-5)+'" fill="'+L.col+'" font-weight="bold">'+L.label+' '+fmtPrice(L.p)+'</text>';
     });
-    var py=priceToY(data.price, H);
-    html+='<line class="mt5-ol-line" x1="0" y1="'+py+'" x2="'+W+'" y2="'+py+'" stroke="#f7d271" stroke-width="1.8"/>';
-    html+='<text class="mt5-ol-text" x="6" y="'+(py-7)+'" fill="#f7d271" font-weight="bold">现价 '+fmtPrice(data.price)+'</text>';
   }
   // 2) 用户手绘线（顶层）
   var all=DRAW.items.slice();
@@ -1647,24 +1710,24 @@ function bindOverlayEvents(){
   window.addEventListener("resize",resizeOverlay);
 }
 
-// AI 一键投射分析线到走势图
+// AI 一键投射分析线到走势图（只投射最关键的几条线，避免画面乱）
 var AI_PROJECTION=null;
 function projectAiToChart(){
-  var price=MT5.lastPrice;
-  if(price==null){ alert("实时价还没取到，请稍等。"); return; }
-  var hi=MT5.sessHigh||price*1.005, lo=MT5.sessLow||price*0.995;
-  if(hi<=lo){ hi=price*1.005; lo=price*0.995; }
-  var fib=fibLevels(lo,hi);
-  var sup=null, res=null;
-  for(var i=0;i<fib.length;i++){
-    if(fib[i].p<=price && (sup==null||fib[i].p>sup.p)) sup=fib[i];
-    if(fib[i].p>=price && (res==null||fib[i].p<res.p)) res=fib[i];
-  }
-  AI_PROJECTION={price:price,hi:hi,lo:lo,fib:fib,sup:sup,res:res};
-  renderAiProjection();
-  // 若当前不是放大模式，提示用户可放大盯盘
+  var d=AI_STATE.data;
+  if(!d || d.price==null){ alert("请先打开「🤖 AI分析」并选择周期运行分析。"); return; }
+  AI_PROJECTION={
+    price:d.price,
+    lines:[
+      {p:d.price,label:"现价",col:"#f7d271",dash:"0",width:1.6},
+      {p:d.res.p,label:"阻力",col:"#e8624f",dash:"4 3",width:1.3},
+      {p:d.res2.p,label:"强阻",col:"#e8624f",dash:"8 4",width:1.0},
+      {p:d.sup.p,label:"支撑",col:"#5fb868",dash:"4 3",width:1.3},
+      {p:d.sup2.p,label:"强撑",col:"#5fb868",dash:"8 4",width:1.0}
+    ]
+  };
+  renderDrawings();
   if(!document.body.classList.contains("mt5-zoomed")){
-    toast("✅ AI 分析线已投射到走势图上。建议点「🔍 放大工作区」专心盯盘。");
+    toast("✅ AI "+tfName(d.tf)+" 关键位已投射到走势图。建议点「🔍 放大工作区」专心盯盘。");
   }
 }
 function renderAiProjection(){
