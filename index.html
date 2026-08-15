@@ -862,6 +862,8 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
     <div class="aiT-chat" id="aiTChat"></div>
     <div class="aiT-chips">
       <span class="aiT-chip" onclick="aiQuick('画斐波那契线')">📐 画斐波那契</span>
+      <span class="aiT-chip" onclick="aiDrawFib('week')">🟣 周斐波</span>
+      <span class="aiT-chip" onclick="aiDrawFib('hour')">🟡 时斐波</span>
       <span class="aiT-chip" onclick="aiQuick('画江恩线')">📏 画江恩线</span>
       <span class="aiT-chip" onclick="aiQuick('分析当前走势')">📊 分析走势</span>
       <span class="aiT-chip" onclick="aiQuick('给我交易建议')">💡 交易建议</span>
@@ -995,7 +997,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.19 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.20 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -2112,7 +2114,7 @@ function renderDrawings(){
   var html="";
   // 图例（顶部 HUD，固定，解决"看不清/混乱"）
   html+='<g><rect x="4" y="2" width="'+(W-8)+'" height="20" rx="6" fill="rgba(10,8,5,.55)"/>'
-      +'<text class="mt5-ol-leg" x="10" y="16">🤖 AI线：<tspan fill="#ffffff">●现价</tspan> <tspan fill="#ff6b6b">●阻力</tspan> <tspan fill="#56d364">●支撑</tspan> <tspan fill="#c4a7ff">●斐波</tspan> <tspan fill="#4dd0c4">●江恩</tspan> <tspan fill="#ffd166">●手绘</tspan> <tspan fill="#9b7bff">●🤖决策</tspan></text></g>';
+      +'<text class="mt5-ol-leg" x="10" y="16">🤖 AI线：<tspan fill="#ffffff">●现价</tspan> <tspan fill="#ff6b6b">●阻力</tspan> <tspan fill="#56d364">●支撑</tspan> <tspan fill="#c4a7ff">●周斐波</tspan> <tspan fill="#7fd1ff">●日斐波</tspan> <tspan fill="#ffd166">●时斐波</tspan> <tspan fill="#4dd0c4">●江恩</tspan> <tspan fill="#ffd166">●手绘</tspan> <tspan fill="#9b7bff">●🤖决策</tspan></text></g>';
   // 1) AI 投射线（底层，半透明，不抢手绘线）
   if(AI_PROJECTION){
     var data=AI_PROJECTION;
@@ -2123,32 +2125,38 @@ function renderDrawings(){
       html+='<text class="mt5-ol-text" x="6" y="'+(y-5)+'" fill="'+L.col+'" font-weight="bold">'+L.label+' '+fmtPrice(L.p)+'</text>';
     });
   }
-  // 1.5) AI 斐波那契线（紫色；改用 priceToY 与走势图同一坐标系，整段回撤铺满图面）
-  if(AI_FIB){
-    var fLo=AI_FIB.lo, fHi=AI_FIB.hi;
-    // 黄金口袋带（0.382~0.618）淡紫填充，引导视线
-    var _f382=null,_f618=null;
-    AI_FIB.lines.forEach(function(L){ if(Math.abs(L.r-0.382)<1e-6)_f382=L.p; if(Math.abs(L.r-0.618)<1e-6)_f618=L.p; });
-    if(_f382!=null&&_f618!=null){
-      var _ya=priceToY(_f382,H), _yb=priceToY(_f618,H);
-      if(_ya>=0&&_ya<=H&&_yb>=0&&_yb<=H){
-        html+='<rect x="0" y="'+Math.min(_ya,_yb)+'" width="'+W+'" height="'+Math.abs(_ya-_yb)+'" fill="rgba(196,167,255,.10)"/>';
-      }
-    }
+  // 1.5) AI 斐波那契线（按周期着色：周=紫 / 日=蓝 / 时=金；priceToY 与走势图同一坐标系）
+  if(AI_FIB && Object.keys(AI_FIB).length){
     var keyR={0.236:1,0.382:1,0.5:1,0.618:1,0.786:1};
-    AI_FIB.lines.forEach(function(L){
-      var y=priceToY(L.p,H);
-      if(y<0||y>H) return;
-      var isKey=keyR[L.r];
-      var isMid=Math.abs(L.r-0.5)<1e-6;
-      html+='<line class="aiT-ol-fib" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="#c4a7ff" stroke-width="'+(isKey?(isMid?2:1.6):1)+'" opacity="'+(isKey?0.95:0.5)+'"/>';
-      if(isKey){ html+='<text class="mt5-ol-text" x="'+(W-6)+'" y="'+Math.max(28,(y-4))+'" fill="#c4a7ff" font-weight="bold" text-anchor="end">Fib '+(L.r*100).toFixed(1)+'% · '+fmtPrice(L.p)+'</text>'; }
+    var fibTopY=34; // 多周期标签逐行堆叠，避免重叠
+    Object.keys(AI_FIB).forEach(function(k){
+      var F=AI_FIB[k];
+      var col=F.color||"#c4a7ff";
+      var fLo=F.lo, fHi=F.hi;
+      // 黄金口袋带（0.382~0.618）淡填充，引导视线
+      var _f382=null,_f618=null;
+      F.lines.forEach(function(L){ if(Math.abs(L.r-0.382)<1e-6)_f382=L.p; if(Math.abs(L.r-0.618)<1e-6)_f618=L.p; });
+      if(_f382!=null&&_f618!=null){
+        var _ya=priceToY(_f382,H), _yb=priceToY(_f618,H);
+        if(_ya>=0&&_ya<=H&&_yb>=0&&_yb<=H){
+          html+='<rect x="0" y="'+Math.min(_ya,_yb)+'" width="'+W+'" height="'+Math.abs(_ya-_yb)+'" fill="rgba(196,167,255,.10)"/>';
+        }
+      }
+      F.lines.forEach(function(L){
+        var y=priceToY(L.p,H);
+        if(y<0||y>H) return;
+        var isKey=keyR[L.r];
+        var isMid=Math.abs(L.r-0.5)<1e-6;
+        html+='<line class="aiT-ol-fib" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="'+col+'" stroke-width="'+(isKey?(isMid?2:1.6):1)+'" opacity="'+(isKey?0.95:0.5)+'"/>';
+        if(isKey){ html+='<text class="mt5-ol-text" x="'+(W-6)+'" y="'+Math.max(28,(y-4))+'" fill="'+col+'" font-weight="bold" text-anchor="end">'+F.label+' '+(L.r*100).toFixed(1)+'% · '+fmtPrice(L.p)+'</text>'; }
+      });
+      // 左右锚点：0%=高点、100%=低点
+      var y0=priceToY(fHi,H), y100=priceToY(fLo,H);
+      if(y0>=0&&y0<=H){ html+='<circle cx="9" cy="'+y0+'" r="3" fill="'+col+'"/><text class="mt5-ol-text" x="15" y="'+(y0+3)+'" fill="'+col+'" font-size="10">0% '+fmtPrice(fHi)+'</text>'; }
+      if(y100>=0&&y100<=H){ html+='<circle cx="9" cy="'+y100+'" r="3" fill="'+col+'"/><text class="mt5-ol-text" x="15" y="'+(y100+3)+'" fill="'+col+'" font-size="10">100% '+fmtPrice(fLo)+'</text>'; }
+      html+='<text class="mt5-ol-text" x="6" y="'+fibTopY+'" fill="'+col+'" font-size="10" opacity="0.9">📐 '+F.label+'斐波 '+fmtPrice(fLo)+'~'+fmtPrice(fHi)+'</text>';
+      fibTopY+=12;
     });
-    // 左右锚点：0%=高点、100%=低点
-    var y0=priceToY(fHi,H), y100=priceToY(fLo,H);
-    if(y0>=0&&y0<=H){ html+='<circle cx="9" cy="'+y0+'" r="3" fill="#c4a7ff"/><text class="mt5-ol-text" x="15" y="'+(y0+3)+'" fill="#c4a7ff" font-size="10">0% '+fmtPrice(fHi)+'</text>'; }
-    if(y100>=0&&y100<=H){ html+='<circle cx="9" cy="'+y100+'" r="3" fill="#c4a7ff"/><text class="mt5-ol-text" x="15" y="'+(y100+3)+'" fill="#c4a7ff" font-size="10">100% '+fmtPrice(fLo)+'</text>'; }
-    html+='<text class="mt5-ol-text" x="6" y="34" fill="#c4a7ff" font-size="10" opacity="0.85">📐 斐波那契区间 '+fmtPrice(fLo)+'~'+fmtPrice(fHi)+'</text>';
   }
   // 1.6) AI 江恩扇形（青色；枢轴用 priceToY 与走势图同一坐标系）
   if(AI_GANN){
@@ -2197,7 +2205,7 @@ function renderDrawings(){
   });
   ol.innerHTML=html;
 }
-function clearDrawings(){ DRAW.items=[]; DRAW.current=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_FIB=null; AI_GANN=null; AI_DECISION=null; renderDrawings(); var ptr=document.querySelector('#mt5Dtools .dt-btn[data-tool="pointer"]'); if(ptr) selectDrawTool('pointer',ptr); }
+function clearDrawings(){ DRAW.items=[]; DRAW.current=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_FIB={}; AI_GANN=null; AI_DECISION=null; renderDrawings(); var ptr=document.querySelector('#mt5Dtools .dt-btn[data-tool="pointer"]'); if(ptr) selectDrawTool('pointer',ptr); }
 function resizeOverlay(){ renderDrawings(); }
 function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
@@ -2248,7 +2256,30 @@ function renderAiProjection(){
 
 
 /* ===== AI 交易员 · 对话指令 / 画线 / 风险管理 / 知识库 ===== */
-var AI_FIB=null, AI_GANN=null;
+var AI_FIB={}, AI_GANN=null;
+// 不同周期斐波那契用不同颜色区分：周=紫、日=蓝、时=金
+var AI_FIB_COL={week:"#c4a7ff", day:"#7fd1ff", hour:"#ffd166"};
+// 按周期取「真实一段走势」的高低点：周=近7根日线、日=近24根60m、时=近12根5m
+function aiTfRange(candles, tf){
+  var n = tf==="week" ? 7 : (tf==="hour" ? 12 : 24);
+  var slice = candles.slice(Math.max(0, candles.length-n));
+  var lo=1e18, hi=-1e18;
+  for(var i=0;i<slice.length;i++){ if(slice[i].h>hi) hi=slice[i].h; if(slice[i].l<lo) lo=slice[i].l; }
+  if(!isFinite(lo)||!isFinite(hi)||!(hi>lo)){
+    lo=1e18; hi=-1e18;
+    for(var j=0;j<candles.length;j++){ if(candles[j].h>hi) hi=candles[j].h; if(candles[j].l<lo) lo=candles[j].l; }
+  }
+  return {lo:lo, hi:hi, n:slice.length};
+}
+// 重算叠加层坐标范围，使其同时容纳所有斐波周期 + 决策线 + 现价
+function aiRecalcProjRange(){
+  var lo=1e18, hi=-1e18, has=false;
+  if(AI_FIB){ Object.keys(AI_FIB).forEach(function(k){ var f=AI_FIB[k]; if(f.lo<lo)lo=f.lo; if(f.hi>hi)hi=f.hi; has=true; }); }
+  if(AI_DECISION){ ["entry","stop_loss","take_profit"].forEach(function(kk){ var p=AI_DECISION[kk]; if(typeof p==="number"&&isFinite(p)){ if(p<lo)lo=p; if(p>hi)hi=p; has=true; } }); }
+  var price=MT5.lastPrice;
+  if(price!=null){ if(price<lo)lo=price; if(price>hi)hi=price; has=true; }
+  if(has && hi>lo){ var pad=(hi-lo)*0.06; AI_PROJ_RANGE={min:lo-pad, max:hi+pad, price:price||(lo+hi)/2}; }
+}
 var AI_DECISION=null;
 /* 内置黄金期货知识库（整理自公开资料：斐波那契、江恩、风险管理） */
 var GOLD_KB={
@@ -2404,7 +2435,8 @@ function aiSendCmd(){
 function aiKb(topic){ aiChat(GOLD_KB[topic]||GOLD_KB.general,"ai"); }
 function aiHelp(){
   aiChat('<div class="blk"><h4>💬 我可以帮你做这些（直接打字下指令）</h4>'
-    +'<p class="aiT-plan">· 画斐波那契线 / 画江恩线 —— 我在走势图上画线</p>'
+    +'<p class="aiT-plan">· 画斐波那契线（按<每日/周/时>真实高低点）/ 画江恩线 —— 我在走势图上画线</p>'
+    +'<p class="aiT-plan">　↳ 也可直接说「画周斐波」「画时斐波」，或点面板里的 🟣周斐波 / 🟡时斐波</p>'
     +'<p class="aiT-plan">· 分析当前走势 / 全盘研判 —— 拉真实K线给支撑阻力+趋势+回测</p>'
     +'<p class="aiT-plan">· 给我交易建议 —— 给入场/止损/目标计划</p>'
     +'<p class="aiT-plan">· 怎么做风险管理 / 设止损 / 控仓 —— 算止损位与仓位</p>'
@@ -2422,23 +2454,40 @@ function aiGiveAdvice(){
   if(!AI_STATE.levels){ aiChat('<div class="warn">先拉取K线并回测，稍等…</div>','ai'); runAiAnalyze(AI_STATE.tf); }
   else { aiPlanToChat(); aiRiskPlan(); }
 }
-function aiDrawFib(){
+function aiDrawFib(tf){
+  tf = tf || AI_STATE.tf || "day";
+  if(!/^(week|day|hour)$/.test(tf)) tf="day";
   var price=MT5.lastPrice;
   if(price==null){ aiChat('<div class="warn">实时价还没取到，请稍等几秒再让我画斐波那契。</div>','ai'); return; }
-  var lo, hi;
-  if(AI_STATE.levels){ lo=AI_STATE.levels.L; hi=AI_STATE.levels.H; }
-  if(!(hi>lo)){ var d=buildTfData(AI_STATE.tf); if(d){ lo=d.lo; hi=d.hi; } }
-  if(!(hi>lo)){ aiChat('<div class="warn">区间不足，无法画斐波那契。</div>','ai'); return; }
-  if(!AI_STATE.levels) runAiAnalyze(AI_STATE.tf); // 顺手补全分析上下文（不阻塞画线）
-  var lines=fibLevels(lo,hi);
-  // 把叠加层坐标范围适配到斐波区间：整段回撤清晰铺满图面，且与走势图同一坐标系
-  AI_PROJ_RANGE={min:lo*0.997, max:hi*1.003, price:price};
-  AI_FIB={lo:lo, hi:hi, lines:lines};
-  renderDrawings(); beep(880,0.16);
-  var txt='<div class="blk"><h4>📐 斐波那契线已画到走势图（区间 '+fmtPrice(lo)+' ~ '+fmtPrice(hi)+'）</h4><div class="row">';
-  lines.forEach(function(L){ txt+='<span style="margin-right:10px">Fib '+(L.r*100).toFixed(1)+'% <b style="color:#9b7bff">'+fmtPrice(L.p)+'</b></span>'; });
-  txt+='</div><div class="warn">回踩 0.382%~0.618%（紫色「黄金口袋」带）不破且出现反转K线，可顺势做多；跌破 0.618% 原趋势大概率失效。说「斐波那契怎么用」看原理。</div></div>';
-  aiChat(txt,"ai");
+  aiChat('<div class="warn">📐 正在按 '+tfName(tf)+' 真实走势取高低点，画'+tfName(tf)+'斐波那契…（免费接口，约 1-3 秒）</div>','ai');
+  var doDraw=function(lo,hi,src){
+    if(!(hi>lo)){ aiChat('<div class="warn">区间不足，无法画'+tfName(tf)+'斐波那契。</div>','ai'); return; }
+    var lines=fibLevels(lo,hi);
+    AI_FIB=AI_FIB||{};
+    AI_FIB[tf]={tf:tf, lo:lo, hi:hi, lines:lines, label:tfName(tf), color:AI_FIB_COL[tf]};
+    aiRecalcProjRange();
+    renderDrawings(); beep(880,0.16);
+    var txt='<div class="blk"><h4>📐 '+tfName(tf)+' 斐波那契线已画（区间 '+fmtPrice(lo)+' ~ '+fmtPrice(hi)+'，取自该周期真实高低点'+(src||'')+'）</h4><div class="row">';
+    lines.forEach(function(L){ txt+='<span style="margin-right:10px">Fib '+(L.r*100).toFixed(1)+'% <b style="color:#9b7bff">'+fmtPrice(L.p)+'</b></span>'; });
+    txt+='</div><div class="warn">回踩 0.382%~0.618%（「黄金口袋」带）不破且出现反转K线，可顺势做多；跌破 0.618% 原趋势大概率失效。说「斐波那契怎么用」看原理。</div></div>';
+    aiChat(txt,"ai");
+  };
+  if(MT5_HIST[tf] && MT5_HIST[tf].length){
+    var r=aiTfRange(MT5_HIST[tf], tf); doDraw(r.lo, r.hi, "（已缓存K线）");
+  } else {
+    fetchHistory(MT5.sym, tf).then(function(candles){
+      if(candles&&candles.length){ MT5_HIST[tf]=candles; var r=aiTfRange(candles, tf); doDraw(r.lo, r.hi); }
+      else {
+        var fb=buildTfData(tf);
+        if(fb){ doDraw(fb.lo, fb.hi, "（接口限流，日内高低估算）"); }
+        else aiChat('<div class="warn">'+tfName(tf)+'历史K线接口暂时取不到，请稍后点「🔄 重新拉取K线」或重试。</div>','ai');
+      }
+    }).catch(function(){
+      var fb=buildTfData(tf);
+      if(fb) doDraw(fb.lo, fb.hi, "（兜底：日内高低估算）");
+      else aiChat('<div class="warn">'+tfName(tf)+'数据获取失败。</div>','ai');
+    });
+  }
 }
 function aiDrawGann(){
   var price=MT5.lastPrice;
@@ -2485,7 +2534,7 @@ function aiRiskPlan(){
   aiChat(html,'ai');
 }
 function clearAiDrawings(){
-  AI_FIB=null; AI_GANN=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_DECISION=null;
+  AI_FIB={}; AI_GANN=null; AI_PROJECTION=null; AI_PROJ_RANGE=null; AI_DECISION=null;
   renderDrawings();
   aiChat('<div class="warn">🧹 已清除 AI 画的分析线（支撑/阻力、斐波那契、江恩、决策线）。你的手绘线保留。</div>','ai');
 }
@@ -2497,7 +2546,13 @@ function aiCommand(text){
   if(know && has('江恩','gann')){ aiKb('gann'); return; }
   if(know && has('风险','仓位','控仓','止损','风控')){ aiKb('risk'); return; }
   if(has('风险','止损','仓位','控仓','风控')){ aiRiskPlan(); return; }
-  if(has('斐波','fib')){ aiDrawFib(); return; }
+  if(has('斐波','fib')){
+    if(has('周','week')) aiDrawFib('week');
+    else if(has('小时','时','hour')) aiDrawFib('hour');
+    else if(has('日','day')) aiDrawFib('day');
+    else aiDrawFib(AI_STATE.tf);
+    return;
+  }
   if(has('江恩','gann')){ aiDrawGann(); return; }
   if(has('投射','标到图','关键位','投影')){ projectAiToChart(); return; }
   if(has('清','删','去') && has('线','画')){ clearAiDrawings(); return; }
