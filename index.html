@@ -390,6 +390,8 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
 .aiGptSet .row label{width:54px;color:var(--muted);font-size:11px;flex:none}
 .aiGptSet select,.aiGptSet input[type=text],.aiGptSet input[type=password]{flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--text);border-radius:6px;padding:5px 7px;font-size:12px}
 .aiGptSet input[type=checkbox]{width:16px;height:16px}
+.aiGptSet a.dsOpen{margin-left:auto;color:var(--gold2);text-decoration:none;font-size:11px;border:1px solid var(--gold);border-radius:6px;padding:4px 8px;white-space:nowrap}
+.aiGptSet a.dsOpen:hover{background:rgba(247,210,113,.12)}
 .aiThinking{color:var(--gold2);opacity:.85}
 .aiGptBody{white-space:normal;line-height:1.6;font-size:13px}
 .aiGptBody b{color:var(--gold2)}
@@ -796,24 +798,21 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <button class="aiT-tab" onclick="selectAiTf('hour',this)">小时线</button>
       <button class="aiT-tab" onclick="selectAiTf('week',this)">周线</button>
     </div>
-    <button class="aiGear" onclick="toggleAiGptSet()" title="ChatGPT 联网设置">⚙️</button>
+    <button class="aiGear" onclick="toggleAiGptSet()" title="DeepSeek 联网设置">⚙️</button>
     <span class="aiGptBadge" id="aiGptOn">🔌 离线</span>
     <span class="x" onclick="toggleAiPanel()" title="收起（再点工具栏 🤖 AI分析 打开）">×</span>
   </div>
   <div class="aiT-body">
-    <div class="aiT-status" id="aiTStatus">👋 我是你的 AI 黄金交易员，已学习<b>斐波那契</b>、<b>江恩</b>画线法与<b>风险管理</b>体系。点上方周期，或直接在下面对我下指令：<b>画斐波那契线</b> / <b>画江恩线</b> / <b>分析当前走势</b> / <b>给我交易建议</b> / <b>怎么做风险管理</b> / <b>把关键位投射到走势图</b>。开启「⚙️ 联网 ChatGPT」后，你直接问我问题，我会结合学到的知识与实时盘面用 ChatGPT 回答。</div>
+    <div class="aiT-status" id="aiTStatus">👋 我是你的 AI 黄金交易员，已学习<b>斐波那契</b>、<b>江恩</b>画线法与<b>风险管理</b>体系。点上方周期，或直接在下面对我下指令：<b>画斐波那契线</b> / <b>画江恩线</b> / <b>分析当前走势</b> / <b>给我交易建议</b> / <b>怎么做风险管理</b> / <b>把关键位投射到走势图</b>。开启「⚙️ 联网 DeepSeek」后，你直接问我问题，我会结合学到的知识（斐波那契/江恩/风险管理）与实时盘面，用 DeepSeek 回答。</div>
     <div class="aiGptSet" id="aiGptSet" style="display:none">
-      <div class="row"><label>联网GPT</label><input type="checkbox" id="aiGptOnline" onchange="STATE.aiOnline=this.checked;saveAiGpt();aiGptBadge()"></div>
+      <div class="row"><label>联网DeepSeek</label><input type="checkbox" id="aiGptOnline" onchange="STATE.aiOnline=this.checked;saveAiGpt();aiGptBadge()"></div>
       <div class="row"><label>模型</label><select id="aiGptModel">
-        <option value="gpt-4o-mini">gpt-4o-mini（快/省）</option>
-        <option value="gpt-4o">gpt-4o（强）</option>
-        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-        <option value="deepseek-chat">DeepSeek（兼容）</option>
-        <option value="moonshot-v1-8k">Moonshot（兼容）</option>
+        <option value="deepseek-chat">deepseek-chat（默认·快/省）</option>
+        <option value="deepseek-reasoner">deepseek-reasoner（R1·强推理）</option>
       </select></div>
-      <div class="row"><label>API地址</label><input id="aiGptBase" placeholder="https://api.openai.com/v1" style="flex:1"></div>
+      <div class="row"><label>API地址</label><input id="aiGptBase" placeholder="https://api.deepseek.com" style="flex:1"></div>
       <div class="row"><label>API Key</label><input id="aiGptKey" type="password" placeholder="sk-..." style="flex:1"></div>
-      <div class="row"><button onclick="testAiGpt()">🔌 测试连接</button><button onclick="saveAiGpt()">保存并连接</button><span id="aiGptStat" class="muted"></span></div>
+      <div class="row"><button onclick="testAiConn()">🔌 测试连接</button><button onclick="saveAiGpt()">保存并连接</button><a class="dsOpen" href="https://chat.deepseek.com/" target="_blank" rel="noopener">🌐 打开 DeepSeek 网页</a><span id="aiGptStat" class="muted"></span></div>
       <div class="kbBlock">
         <div style="color:var(--muted);font-size:11px;margin:2px 0 4px">📝 我的知识笔记（会一起教给 AI，让它更懂你的风格）</div>
         <textarea id="aiKbNotes" placeholder="把你的黄金交易心得、常用策略、口诀贴到这里，AI 回答时会一并参考…" rows="3"></textarea>
@@ -858,7 +857,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <b style="color:var(--gold2)">🤖 AI 深度分析（可选）</b>
       <div class="muted" style="margin:4px 0 2px">接入你自己的大模型做真·语义判断。留空则使用内置语义引擎。数据仅存在你本机，不会上传。</div>
       <div class="row">
-        <label style="font-size:12px">API地址</label><input id="aiBase" placeholder="https://api.openai.com/v1" style="flex:1;min-width:200px">
+        <label style="font-size:12px">API地址</label><input id="aiBase" placeholder="https://api.deepseek.com" style="flex:1;min-width:200px">
       </div>
       <div class="row">
         <label style="font-size:12px">API Key</label><input id="aiKey" type="password" placeholder="sk-..." style="flex:1;min-width:200px">
@@ -889,7 +888,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.12 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.13 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -1883,7 +1882,7 @@ function aiTraderDeep(){
     +'。请以职业黄金期货交易员视角，用中文给出：1)当前全盘走势定性 2)支撑阻力与操作计划 3)风险控制提醒。控制在250字内，客观专业。';
   out.innerHTML='<div class="warn">🧠 正在调用你的大模型生成 '+tfName(d.tf)+' 深度解读…</div>';
   var url=STATE.aiBase.replace(/\/+$/,"")+"/chat/completions";
-  var body=JSON.stringify({model:"gpt-4o-mini",temperature:0.3,messages:[
+  var body=JSON.stringify({model:"deepseek-chat",temperature:0.3,messages:[
     {role:"system",content:"你是资深黄金期货交易员。根据给出的实时行情与回测数据，用中文输出：1)走势定性 2)关键支撑阻力与操作计划 3)风控提醒。控制在250字内，客观专业。"},
     {role:"user",content:snap}
   ]});
@@ -2124,7 +2123,7 @@ var GOLD_KB={
   general:'<div class="blk"><h4>📚 黄金交易核心驱动</h4>'
     +'<p class="aiT-plan">黄金由 <b>美元</b>（美元弱→金强）、<b>实际利率</b>（利率降/通胀升→金强）、<b>避险情绪</b>（地缘、危机→金强）、<b>ETF与央行购金</b>流向共同驱动。看盘重点：美盘时段（北京时间 20:30 后）波动最大；关注美国 CPI、非农、美联储讲话。技术面配合支撑阻力与斐波/江恩，胜率更高。</p></div>'
 };
-/* ===== ChatGPT 联网（后台接入 OpenAI 兼容接口，结合本地黄金知识库回答） ===== */
+/* ===== DeepSeek 联网（后台接入 DeepSeek / OpenAI 兼容接口，结合本地黄金知识库 + 实时盘面回答） ===== */
 var AI_HIST=[];
 function stripTags(h){ return (h||"").replace(/<[^>]+>/g,"").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\s+/g," ").trim(); }
 var USER_KB_NOTES="";
@@ -2148,18 +2147,19 @@ function aiSystemPrompt(){
     +"你的职责：① 用通俗中文解释市场动态与交易策略，帮他理解并把握机会；② 在预测走势的同时始终把风险放第一位，给出止损位、仓位、盈亏比；③ 你已掌握以下黄金交易知识体系（用得上就引用）：\n"+GOLD_KB_PROMPT+"\n"
     +"④ 实时盘面上下文（会随对话更新）："+ctx+"\n"
     +"⑤ 回答要具体、给可执行建议，但明确说明这是学习参考、非投资建议；黄金波动大，务必轻仓、必设止损、不扛单。\n"
-    +"⑥ 若用户要画线/投射/回测等动作，告诉他可在工作台用指令让系统直接画线，你也可以描述做法。";
+    +"⑥ 若用户要画线/投射/回测等动作，告诉他可在工作台用指令让系统直接画线，你也可以描述做法。\n"
+    +"⑦ 你必须综合上述「黄金知识体系」与「实时盘面上下文」来回答，结合二者给出有依据的判断与可执行的、带风控的交易建议；不要脱离当前行情空谈理论。用简体中文回答。";
 }
-function chatGpt(question){
+function chatDeepseek(question){
   openAiIfNeeded();
-  var base=(STATE.aiBase||"https://api.openai.com/v1").replace(/\/+$/,"");
+  var base=(STATE.aiBase||"https://api.deepseek.com").replace(/\/+$/,"");
   var key=(STATE.aiKey||"").trim();
   if(!key){ aiChat('<div class="warn">未配置 API Key，已用本地知识库回答。</div>','ai'); aiCommand(question); return; }
   var sys=aiSystemPrompt();
   var messages=[{role:"system",content:sys}];
   AI_HIST.slice(-10).forEach(function(m){ if(m&&m.role&&m.content) messages.push(m); });
   messages.push({role:"user",content:question});
-  var mid=aiChat('<span class="aiThinking">🤖 正在调用 ChatGPT 思考…</span>','ai');
+  var mid=aiChat('<span class="aiThinking">🤖 正在调用 DeepSeek 思考…</span>','ai');
   var box=document.getElementById("aiTChat");
   var bubble=box?document.getElementById(mid):null;
   function setText(t){ if(bubble){ bubble.innerHTML='<div class="who">🤖 AI 交易员</div>'+t; if(box) box.scrollTop=box.scrollHeight; } }
@@ -2167,7 +2167,7 @@ function chatGpt(question){
   fetch(base+"/chat/completions",{
     method:"POST",
     headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
-    body:JSON.stringify({model:STATE.aiModel||"gpt-4o-mini", messages:messages, temperature:0.45, stream:true})
+    body:JSON.stringify({model:STATE.aiModel||"deepseek-chat", messages:messages, temperature:0.45, stream:true})
   }).then(function(resp){
     if(!resp.ok){ return resp.text().then(function(t){ throw new Error("HTTP "+resp.status+" "+(t||"").slice(0,160)); }); }
     var reader=resp.body.getReader();
@@ -2191,7 +2191,7 @@ function chatGpt(question){
     }
     return pump();
   }).then(function(){
-    if(!acc){ setText('<div class="warn">ChatGPT 返回为空，已切换本地回答。</div>'); aiCommand(question); return; }
+    if(!acc){ setText('<div class="warn">DeepSeek 返回为空，已切换本地回答。</div>'); aiCommand(question); return; }
     AI_HIST.push({role:"user",content:question});
     AI_HIST.push({role:"assistant",content:acc});
     if(AI_HIST.length>20) AI_HIST=AI_HIST.slice(-20);
@@ -2220,7 +2220,7 @@ function aiSendCmd(){
   aiChat(escHtml(v),"me");
   var LOCAL_ACT=['画斐波','画江恩','斐波那契线','江恩线','投射','关键位','投影','清','清除','删','分析当前','分析走势','全盘研判','当前走势','交易建议','给交易','风险管理','设止损','控仓','仓位','每日简报','每日多空','帮助','help','你能','功能','复盘','回测'];
   function isLocal(t){ for(var k=0;k<LOCAL_ACT.length;k++){ if(t.indexOf(LOCAL_ACT[k])>=0) return true; } return false; }
-  if(STATE.aiOnline && STATE.aiKey && !isLocal(v.toLowerCase())){ chatGpt(v); return; }
+  if(STATE.aiOnline && STATE.aiKey && !isLocal(v.toLowerCase())){ chatDeepseek(v); return; }
   aiCommand(v);
 }
 function aiKb(topic){ aiChat(GOLD_KB[topic]||GOLD_KB.general,"ai"); }
@@ -2499,11 +2499,11 @@ function renderNews(list){
   sent.className="newsSent "+cls;
   sent.textContent="市场情绪："+txt+"（利好 "+bull+" / 利空 "+bear+" / 中性 "+(list.length-bull-bear)+"）";
 }
-/* 可选：用自己的大模型做真·语义判断（OpenAI 兼容接口） */
+/* 可选：用自己的大模型做真·语义判断（DeepSeek 兼容接口） */
 function callAi(text){
   if(!STATE.aiKey||!STATE.aiBase) return Promise.reject("no key");
   var url=STATE.aiBase.replace(/\/+$/,"")+"/chat/completions";
-  var body=JSON.stringify({model:"gpt-4o-mini",temperature:0.2,messages:[
+  var body=JSON.stringify({model:"deepseek-chat",temperature:0.2,messages:[
     {role:"system",content:"你是黄金市场分析师。判断下面新闻对黄金价格是利好/利空/中性，并用一句中文说明原因。只输出JSON，如：{\"label\":\"利好\",\"reason\":\"...\"}"},
     {role:"user",content:text}
   ]});
@@ -2526,9 +2526,9 @@ function aiRecheck(idx){
   });
 }
 function saveAiSettings(){
-  STATE.aiBase=(document.getElementById("aiBase").value||"").trim()||"https://api.openai.com/v1";
+  STATE.aiBase=(document.getElementById("aiBase").value||"").trim()||"https://api.deepseek.com";
   STATE.aiKey=(document.getElementById("aiKey").value||"").trim();
-  var mm=document.getElementById("aiGptModel"); if(mm) STATE.aiModel=mm.value||"gpt-4o-mini";
+  var mm=document.getElementById("aiGptModel"); if(mm) STATE.aiModel=mm.value||"deepseek-chat";
   var om=document.getElementById("aiGptOnline"); if(om) STATE.aiOnline=om.checked;
   try{localStorage.setItem("gold_ai",JSON.stringify({base:STATE.aiBase,key:STATE.aiKey,model:STATE.aiModel,online:STATE.aiOnline}));}catch(e){}
   var gb=document.getElementById("aiGptBase"); if(gb) gb.value=STATE.aiBase;
@@ -2537,12 +2537,12 @@ function saveAiSettings(){
   document.getElementById("aiStat").textContent=STATE.aiKey?"已保存（AI 复核可用）":"已清空";
 }
 function loadAiSettings(){
-  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"https://api.openai.com/v1";STATE.aiKey=s.key||"";STATE.aiModel=s.model||"gpt-4o-mini";STATE.aiOnline=!!s.online;}catch(e){STATE.aiBase="https://api.openai.com/v1";STATE.aiModel="gpt-4o-mini";STATE.aiOnline=false;}
+  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"https://api.deepseek.com";STATE.aiKey=s.key||"";STATE.aiModel=s.model||"deepseek-chat";STATE.aiOnline=!!s.online;}catch(e){STATE.aiBase="https://api.deepseek.com";STATE.aiModel="deepseek-chat";STATE.aiOnline=false;}
   var set=function(id,val){ var e=document.getElementById(id); if(e) e.value=val||""; };
   set("aiBase",STATE.aiBase); set("aiKey",STATE.aiKey);
   set("aiGptBase",STATE.aiBase); set("aiGptKey",STATE.aiKey);
   var om=document.getElementById("aiGptOnline"); if(om) om.checked=STATE.aiOnline;
-  var mm=document.getElementById("aiGptModel"); if(mm) mm.value=STATE.aiModel||"gpt-4o-mini";
+  var mm=document.getElementById("aiGptModel"); if(mm) mm.value=STATE.aiModel||"deepseek-chat";
   var kn=document.getElementById("aiKbNotes"); if(kn){ try{ USER_KB_NOTES=localStorage.getItem("gold_kb_notes")||""; }catch(e){ USER_KB_NOTES=""; } kn.value=USER_KB_NOTES; }
   rebuildKbPrompt();
   aiGptBadge();
@@ -2550,13 +2550,13 @@ function loadAiSettings(){
 function toggleAiGptSet(){ var e=document.getElementById("aiGptSet"); if(e) e.style.display=(e.style.display==="none"?"block":"none"); }
 function aiGptBadge(){
   var e=document.getElementById("aiGptOn"); if(!e) return;
-  if(STATE.aiOnline && STATE.aiKey){ e.textContent="🔌 ChatGPT 在线"; e.className="aiGptBadge on"; }
+  if(STATE.aiOnline && STATE.aiKey){ e.textContent="🔌 DeepSeek 在线"; e.className="aiGptBadge on"; }
   else { e.textContent="🔌 离线"; e.className="aiGptBadge"; }
 }
 function saveAiGpt(){
-  STATE.aiBase=(document.getElementById("aiGptBase").value||"").trim()||"https://api.openai.com/v1";
+  STATE.aiBase=(document.getElementById("aiGptBase").value||"").trim()||"https://api.deepseek.com";
   STATE.aiKey=(document.getElementById("aiGptKey").value||"").trim();
-  STATE.aiModel=document.getElementById("aiGptModel").value||"gpt-4o-mini";
+  STATE.aiModel=document.getElementById("aiGptModel").value||"deepseek-chat";
   STATE.aiOnline=document.getElementById("aiGptOnline").checked;
   try{ localStorage.setItem("gold_ai", JSON.stringify({base:STATE.aiBase,key:STATE.aiKey,model:STATE.aiModel,online:STATE.aiOnline})); }catch(e){}
   var nb=document.getElementById("aiBase"); if(nb) nb.value=STATE.aiBase;
@@ -2564,17 +2564,17 @@ function saveAiGpt(){
   var ns=document.getElementById("aiStat"); if(ns) ns.textContent="已保存"+(STATE.aiKey?"（AI 复核可用）":"");
   var gs=document.getElementById("aiGptStat"); if(gs) gs.textContent="已保存"+(STATE.aiKey?" · "+(STATE.aiOnline?"联网已开":"联网未开"):" · 已清空");
   aiGptBadge();
-  toast(STATE.aiOnline&&STATE.aiKey?"🔌 ChatGPT 已联网，直接问我问题吧":"已保存（联网未开启或缺失 Key，将用本地知识库）");
+  toast(STATE.aiOnline&&STATE.aiKey?"🔌 DeepSeek 已联网，直接问我问题吧":"已保存（联网未开启或缺失 Key，将用本地知识库）");
 }
-function testAiGpt(){
-  var base=(STATE.aiBase||"https://api.openai.com/v1").replace(/\/+$/,"");
+function testAiConn(){
+  var base=(STATE.aiBase||"https://api.deepseek.com").replace(/\/+$/,"");
   var key=(STATE.aiKey||"").trim();
   var gs=document.getElementById("aiGptStat");
   if(!key){ if(gs) gs.textContent="请先填写 API Key"; return; }
   if(gs) gs.textContent="连接测试中…";
-  fetch(base+"/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify({model:STATE.aiModel||"gpt-4o-mini",messages:[{role:"user",content:"ping"}],temperature:0,stream:false,max_tokens:5})})
+  fetch(base+"/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify({model:STATE.aiModel||"deepseek-chat",messages:[{role:"user",content:"ping"}],temperature:0,stream:false,max_tokens:5})})
     .then(function(r){ return r.text().then(function(t){ if(!r.ok) throw new Error("HTTP "+r.status+" "+(t||"").slice(0,120)); return t; }); })
-    .then(function(){ if(gs) gs.textContent="✅ 连接成功（"+(STATE.aiModel||"gpt-4o-mini")+"）"; toast("✅ ChatGPT 连接成功，可以问我问题了"); })
+    .then(function(){ if(gs) gs.textContent="✅ 连接成功（"+(STATE.aiModel||"deepseek-chat")+"）"; toast("✅ DeepSeek 连接成功，可以问我问题了"); })
     .catch(function(e){ if(gs) gs.textContent="❌ 失败："+(e.message||"").slice(0,90); toast("❌ 连接失败："+(e.message||"").slice(0,90)); });
 }
 function saveKbNotes(){
