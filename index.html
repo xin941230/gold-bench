@@ -376,6 +376,18 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
 .hint{font-size:11.8px;color:var(--muted);line-height:1.6;margin-top:10px;padding:9px 13px;background:var(--panel2);border-left:3px solid var(--gold);border-radius:6px}
 .mt5-note{font-size:11.5px;color:var(--muted);line-height:1.6}
 @media(max-width:760px){.homeHero{grid-template-columns:1fr}.quickbar{font-size:11px}.snapRow b{font-size:13px}}
+.aiT-head{flex-wrap:wrap;gap:4px}
+.aiGear{background:none;border:none;cursor:pointer;font-size:15px;margin-left:6px;color:var(--text);line-height:1}
+.aiGptBadge{font-size:10px;padding:2px 6px;border-radius:10px;background:rgba(255,255,255,.08);color:#9aa;margin-left:4px;white-space:nowrap}
+.aiGptBadge.on{background:rgba(95,184,104,.20);color:#5fb868}
+.aiGptSet{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.10);border-radius:10px;padding:10px;margin:8px 0;font-size:12px}
+.aiGptSet .row{display:flex;align-items:center;gap:8px;margin:6px 0}
+.aiGptSet .row label{width:54px;color:var(--muted);font-size:11px;flex:none}
+.aiGptSet select,.aiGptSet input[type=text],.aiGptSet input[type=password]{flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--text);border-radius:6px;padding:5px 7px;font-size:12px}
+.aiGptSet input[type=checkbox]{width:16px;height:16px}
+.aiThinking{color:var(--gold2);opacity:.85}
+.aiGptBody{white-space:normal;line-height:1.6;font-size:13px}
+.aiGptBody b{color:var(--gold2)}
 </style>
 </head>
 <body>
@@ -779,10 +791,26 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <button class="aiT-tab" onclick="selectAiTf('hour',this)">小时线</button>
       <button class="aiT-tab" onclick="selectAiTf('week',this)">周线</button>
     </div>
+    <button class="aiGear" onclick="toggleAiGptSet()" title="ChatGPT 联网设置">⚙️</button>
+    <span class="aiGptBadge" id="aiGptOn">🔌 离线</span>
     <span class="x" onclick="toggleAiPanel()" title="收起（再点工具栏 🤖 AI分析 打开）">×</span>
   </div>
   <div class="aiT-body">
-    <div class="aiT-status" id="aiTStatus">👋 我是你的 AI 黄金交易员，已学习<b>斐波那契</b>、<b>江恩</b>画线法与<b>风险管理</b>体系。点上方周期，或直接在下面对我下指令：<b>画斐波那契线</b> / <b>画江恩线</b> / <b>分析当前走势</b> / <b>给我交易建议</b> / <b>怎么做风险管理</b> / <b>把关键位投射到走势图</b>。</div>
+    <div class="aiT-status" id="aiTStatus">👋 我是你的 AI 黄金交易员，已学习<b>斐波那契</b>、<b>江恩</b>画线法与<b>风险管理</b>体系。点上方周期，或直接在下面对我下指令：<b>画斐波那契线</b> / <b>画江恩线</b> / <b>分析当前走势</b> / <b>给我交易建议</b> / <b>怎么做风险管理</b> / <b>把关键位投射到走势图</b>。开启「⚙️ 联网 ChatGPT」后，你直接问我问题，我会结合学到的知识与实时盘面用 ChatGPT 回答。</div>
+    <div class="aiGptSet" id="aiGptSet" style="display:none">
+      <div class="row"><label>联网GPT</label><input type="checkbox" id="aiGptOnline" onchange="STATE.aiOnline=this.checked;saveAiGpt();aiGptBadge()"></div>
+      <div class="row"><label>模型</label><select id="aiGptModel">
+        <option value="gpt-4o-mini">gpt-4o-mini（快/省）</option>
+        <option value="gpt-4o">gpt-4o（强）</option>
+        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+        <option value="deepseek-chat">DeepSeek（兼容）</option>
+        <option value="moonshot-v1-8k">Moonshot（兼容）</option>
+      </select></div>
+      <div class="row"><label>API地址</label><input id="aiGptBase" placeholder="https://api.openai.com/v1" style="flex:1"></div>
+      <div class="row"><label>API Key</label><input id="aiGptKey" type="password" placeholder="sk-..." style="flex:1"></div>
+      <div class="row"><button onclick="saveAiGpt()">保存并连接</button><span id="aiGptStat" class="muted"></span></div>
+      <div class="muted" style="font-size:11px;line-height:1.5">密钥仅存你本机浏览器(localStorage)，不上传第三方。浏览器直连可能被跨域(CORS)拦截；若失败可改用 DeepSeek / Moonshot 等兼容接口或自建代理。未联网时自动用内置知识库回答。</div>
+    </div>
     <div class="aiT-chat" id="aiTChat"></div>
     <div class="aiT-chips">
       <span class="aiT-chip" onclick="aiQuick('画斐波那契线')">📐 画斐波那契</span>
@@ -850,7 +878,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.10 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.11 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -2082,6 +2110,81 @@ var GOLD_KB={
   general:'<div class="blk"><h4>📚 黄金交易核心驱动</h4>'
     +'<p class="aiT-plan">黄金由 <b>美元</b>（美元弱→金强）、<b>实际利率</b>（利率降/通胀升→金强）、<b>避险情绪</b>（地缘、危机→金强）、<b>ETF与央行购金</b>流向共同驱动。看盘重点：美盘时段（北京时间 20:30 后）波动最大；关注美国 CPI、非农、美联储讲话。技术面配合支撑阻力与斐波/江恩，胜率更高。</p></div>'
 };
+/* ===== ChatGPT 联网（后台接入 OpenAI 兼容接口，结合本地黄金知识库回答） ===== */
+var AI_HIST=[];
+function stripTags(h){ return (h||"").replace(/<[^>]+>/g,"").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\s+/g," ").trim(); }
+var GOLD_KB_PROMPT=(function(){ try{ return Object.keys(GOLD_KB).map(function(k){ return stripTags(GOLD_KB[k]); }).join("\n"); }catch(e){ return "黄金交易基础知识：斐波那契回调、江恩角度/扇形、风险管理与仓位控制。"; } })();
+function aiMd(s){
+  var t=escHtml(s||"");
+  t=t.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\*(.+?)\*/g,"<i>$1</i>");
+  t=t.replace(/\n/g,"<br>");
+  return t;
+}
+function aiSystemPrompt(){
+  var lv=AI_STATE.levels, tr=AI_STATE.trend, price=MT5.lastPrice;
+  var ctx="";
+  if(price!=null){ ctx+="\n- 当前 XAUUSD 实时价："+fmtPrice(price)+" 美元/盎司（约 "+(price*7.2).toFixed(0)+" 人民币/克，仅供参考）。"; }
+  if(lv){ ctx+="\n- 当前分析：支撑 "+(fmtPrice(lv.sup||lv.S1))+"，阻力 "+(fmtPrice(lv.res||lv.R1))+"，枢轴PP "+(fmtPrice(lv.PP))+"，区间高 "+(fmtPrice(lv.H))+" 低 "+(fmtPrice(lv.L))+"。"; }
+  if(tr){ ctx+="\n- 趋势研判："+tr.bias+(tr.pos!=null?("（价格处区间 "+(tr.pos*100).toFixed(0)+"% 位置）"):"")+"。"; }
+  ctx+="\n- 用户本金 "+(STATE.equity||400)+"U，单笔风险目标 "+(STATE.riskPct||1.5)+"%，习惯 0.01 手轻仓。";
+  return "你是「黄金期货职业交易员」AI 助手，服务于一位用 MT5 做 XAUUSD（现货黄金/沪金）的新手，本金约 400 美元，每笔 0.01 手。\n"
+    +"你的职责：① 用通俗中文解释市场动态与交易策略，帮他理解并把握机会；② 在预测走势的同时始终把风险放第一位，给出止损位、仓位、盈亏比；③ 你已掌握以下黄金交易知识体系（用得上就引用）：\n"+GOLD_KB_PROMPT+"\n"
+    +"④ 实时盘面上下文（会随对话更新）："+ctx+"\n"
+    +"⑤ 回答要具体、给可执行建议，但明确说明这是学习参考、非投资建议；黄金波动大，务必轻仓、必设止损、不扛单。\n"
+    +"⑥ 若用户要画线/投射/回测等动作，告诉他可在工作台用指令让系统直接画线，你也可以描述做法。";
+}
+function chatGpt(question){
+  openAiIfNeeded();
+  var base=(STATE.aiBase||"https://api.openai.com/v1").replace(/\/+$/,"");
+  var key=(STATE.aiKey||"").trim();
+  if(!key){ aiChat('<div class="warn">未配置 API Key，已用本地知识库回答。</div>','ai'); aiCommand(question); return; }
+  var sys=aiSystemPrompt();
+  var messages=[{role:"system",content:sys}];
+  AI_HIST.slice(-10).forEach(function(m){ if(m&&m.role&&m.content) messages.push(m); });
+  messages.push({role:"user",content:question});
+  var mid=aiChat('<span class="aiThinking">🤖 正在调用 ChatGPT 思考…</span>','ai');
+  var box=document.getElementById("aiTChat");
+  var bubble=box?document.getElementById(mid):null;
+  function setText(t){ if(bubble){ bubble.innerHTML='<div class="who">🤖 AI 交易员</div>'+t; if(box) box.scrollTop=box.scrollHeight; } }
+  var acc="";
+  fetch(base+"/chat/completions",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:STATE.aiModel||"gpt-4o-mini", messages:messages, temperature:0.45, stream:true})
+  }).then(function(resp){
+    if(!resp.ok){ return resp.text().then(function(t){ throw new Error("HTTP "+resp.status+" "+(t||"").slice(0,160)); }); }
+    var reader=resp.body.getReader();
+    var dec=new TextDecoder();
+    var buf="";
+    function pump(){
+      return reader.read().then(function(r){
+        if(r.done) return;
+        buf+=dec.decode(r.value,{stream:true});
+        var segs=buf.split("\n");
+        buf=segs.pop();
+        for(var i=0;i<segs.length;i++){
+          var ln=segs[i].trim();
+          if(ln.indexOf("data:")!==0) continue;
+          var data=ln.slice(5).trim();
+          if(data==="[DONE]") continue;
+          try{ var j=JSON.parse(data); var d=(j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content)||""; if(d){ acc+=d; setText('<div class="aiGptBody">'+aiMd(acc)+'</div>'); } }catch(e){}
+        }
+        return pump();
+      });
+    }
+    return pump();
+  }).then(function(){
+    if(!acc){ setText('<div class="warn">ChatGPT 返回为空，已切换本地回答。</div>'); aiCommand(question); return; }
+    AI_HIST.push({role:"user",content:question});
+    AI_HIST.push({role:"assistant",content:acc});
+    if(AI_HIST.length>20) AI_HIST=AI_HIST.slice(-20);
+    setText('<div class="aiGptBody">'+aiMd(acc)+'</div>');
+  }).catch(function(err){
+    var msg=(err&&err.message)?err.message:"网络/跨域";
+    setText('<div class="warn">⚠️ 联网调用失败（'+msg.slice(0,140)+'）。已用本地知识库回答：</div>');
+    aiCommand(question);
+  });
+}
 function aiChat(html, who){
   var box=document.getElementById("aiTChat"); if(!box) return null;
   var mid="aiMsg_"+Date.now()+"_"+Math.floor(Math.random()*1000);
@@ -2097,7 +2200,11 @@ function aiQuick(t){ var i=document.getElementById("aiTCmd"); if(i) i.value=t; a
 function aiSendCmd(){
   var i=document.getElementById("aiTCmd"); if(!i) return;
   var v=i.value.trim(); if(!v) return; i.value="";
-  aiChat(escHtml(v),"me"); aiCommand(v);
+  aiChat(escHtml(v),"me");
+  var LOCAL_ACT=['画斐波','画江恩','斐波那契线','江恩线','投射','关键位','投影','清','清除','删','分析当前','分析走势','全盘研判','当前走势','交易建议','给交易','风险管理','设止损','控仓','仓位','每日简报','每日多空','帮助','help','你能','功能','复盘','回测'];
+  function isLocal(t){ for(var k=0;k<LOCAL_ACT.length;k++){ if(t.indexOf(LOCAL_ACT[k])>=0) return true; } return false; }
+  if(STATE.aiOnline && STATE.aiKey && !isLocal(v.toLowerCase())){ chatGpt(v); return; }
+  aiCommand(v);
 }
 function aiKb(topic){ aiChat(GOLD_KB[topic]||GOLD_KB.general,"ai"); }
 function aiHelp(){
@@ -2402,15 +2509,43 @@ function aiRecheck(idx){
   });
 }
 function saveAiSettings(){
-  STATE.aiBase=(document.getElementById("aiBase").value||"").trim();
+  STATE.aiBase=(document.getElementById("aiBase").value||"").trim()||"https://api.openai.com/v1";
   STATE.aiKey=(document.getElementById("aiKey").value||"").trim();
-  try{localStorage.setItem("gold_ai",JSON.stringify({base:STATE.aiBase,key:STATE.aiKey}));}catch(e){}
+  var mm=document.getElementById("aiGptModel"); if(mm) STATE.aiModel=mm.value||"gpt-4o-mini";
+  var om=document.getElementById("aiGptOnline"); if(om) STATE.aiOnline=om.checked;
+  try{localStorage.setItem("gold_ai",JSON.stringify({base:STATE.aiBase,key:STATE.aiKey,model:STATE.aiModel,online:STATE.aiOnline}));}catch(e){}
+  var gb=document.getElementById("aiGptBase"); if(gb) gb.value=STATE.aiBase;
+  var gk=document.getElementById("aiGptKey"); if(gk) gk.value=STATE.aiKey;
+  aiGptBadge();
   document.getElementById("aiStat").textContent=STATE.aiKey?"已保存（AI 复核可用）":"已清空";
 }
 function loadAiSettings(){
-  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"";STATE.aiKey=s.key||"";}catch(e){}
-  if(document.getElementById("aiBase")) document.getElementById("aiBase").value=STATE.aiBase||"";
-  if(document.getElementById("aiKey")) document.getElementById("aiKey").value=STATE.aiKey||"";
+  try{var s=JSON.parse(localStorage.getItem("gold_ai")||"{}");STATE.aiBase=s.base||"https://api.openai.com/v1";STATE.aiKey=s.key||"";STATE.aiModel=s.model||"gpt-4o-mini";STATE.aiOnline=!!s.online;}catch(e){STATE.aiBase="https://api.openai.com/v1";STATE.aiModel="gpt-4o-mini";STATE.aiOnline=false;}
+  var set=function(id,val){ var e=document.getElementById(id); if(e) e.value=val||""; };
+  set("aiBase",STATE.aiBase); set("aiKey",STATE.aiKey);
+  set("aiGptBase",STATE.aiBase); set("aiGptKey",STATE.aiKey);
+  var om=document.getElementById("aiGptOnline"); if(om) om.checked=STATE.aiOnline;
+  var mm=document.getElementById("aiGptModel"); if(mm) mm.value=STATE.aiModel||"gpt-4o-mini";
+  aiGptBadge();
+}
+function toggleAiGptSet(){ var e=document.getElementById("aiGptSet"); if(e) e.style.display=(e.style.display==="none"?"block":"none"); }
+function aiGptBadge(){
+  var e=document.getElementById("aiGptOn"); if(!e) return;
+  if(STATE.aiOnline && STATE.aiKey){ e.textContent="🔌 ChatGPT 在线"; e.className="aiGptBadge on"; }
+  else { e.textContent="🔌 离线"; e.className="aiGptBadge"; }
+}
+function saveAiGpt(){
+  STATE.aiBase=(document.getElementById("aiGptBase").value||"").trim()||"https://api.openai.com/v1";
+  STATE.aiKey=(document.getElementById("aiGptKey").value||"").trim();
+  STATE.aiModel=document.getElementById("aiGptModel").value||"gpt-4o-mini";
+  STATE.aiOnline=document.getElementById("aiGptOnline").checked;
+  try{ localStorage.setItem("gold_ai", JSON.stringify({base:STATE.aiBase,key:STATE.aiKey,model:STATE.aiModel,online:STATE.aiOnline})); }catch(e){}
+  var nb=document.getElementById("aiBase"); if(nb) nb.value=STATE.aiBase;
+  var nk=document.getElementById("aiKey"); if(nk) nk.value=STATE.aiKey;
+  var ns=document.getElementById("aiStat"); if(ns) ns.textContent="已保存"+(STATE.aiKey?"（AI 复核可用）":"");
+  var gs=document.getElementById("aiGptStat"); if(gs) gs.textContent="已保存"+(STATE.aiKey?" · "+(STATE.aiOnline?"联网已开":"联网未开"):" · 已清空");
+  aiGptBadge();
+  toast(STATE.aiOnline&&STATE.aiKey?"🔌 ChatGPT 已联网，直接问我问题吧":"已保存（联网未开启或缺失 Key，将用本地知识库）");
 }
 function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function startNewsTimer(){ if(NEWS.timer) return; NEWS.timer=setInterval(function(){ var sec=document.getElementById("news"); if(sec&&sec.className==="on") loadNews(false); },300000); }
