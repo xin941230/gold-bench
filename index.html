@@ -267,8 +267,13 @@ body.mt5-zoomed .mt5-dtools{position:absolute;left:12px;top:66px;z-index:25}
 .aiT-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 10px 9px;background:#1b160f}
 .aiT-chip{background:#241e16;border:1px solid #3a3328;color:#b9ab8a;border-radius:20px;padding:4px 10px;font-size:11px;cursor:pointer}
 .aiT-chip:hover{border-color:var(--gold);color:var(--gold2)}
-.aiT-ol-fib{stroke:#9b7bff;stroke-width:1.1;stroke-dasharray:4 3}
-.aiT-ol-gann{stroke:#5fd0c8;stroke-width:1.1}
+..aiT-ol-fib{stroke:#c4a7ff;stroke-width:1.1;stroke-dasharray:3 3}
+.aiT-ol-gann{stroke:#4dd0c4;stroke-width:0.9;opacity:.55;stroke-linecap:round}
+.mt5-ol-leg{font-size:10px;font-family:system-ui,-apple-system,"Microsoft YaHei",sans-serif;fill:#e8e0cc}
+.mt5-ol-cur{stroke:#ffffff;stroke-width:2;stroke-linecap:round}
+.aiGptSet textarea{width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--text);border-radius:6px;padding:6px 7px;font-size:12px;resize:vertical;font-family:inherit;line-height:1.5}
+.aiGptSet .kbBlock{margin-top:8px;border-top:1px dashed rgba(255,255,255,.14);padding-top:6px}
+.aiGptSet .kbBlock button{background:#3a2c10;border:1px solid var(--gold);color:var(--gold2);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:12px}
 /* 盯盘弹出模式 */
 body.live-mode .wrap{max-width:none;padding:0}
 body.live-mode header,body.live-mode nav,body.live-mode .settings,body.live-mode footer,body.live-mode section:not(#mkt){display:none!important}
@@ -808,7 +813,12 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       </select></div>
       <div class="row"><label>API地址</label><input id="aiGptBase" placeholder="https://api.openai.com/v1" style="flex:1"></div>
       <div class="row"><label>API Key</label><input id="aiGptKey" type="password" placeholder="sk-..." style="flex:1"></div>
-      <div class="row"><button onclick="saveAiGpt()">保存并连接</button><span id="aiGptStat" class="muted"></span></div>
+      <div class="row"><button onclick="testAiGpt()">🔌 测试连接</button><button onclick="saveAiGpt()">保存并连接</button><span id="aiGptStat" class="muted"></span></div>
+      <div class="kbBlock">
+        <div style="color:var(--muted);font-size:11px;margin:2px 0 4px">📝 我的知识笔记（会一起教给 AI，让它更懂你的风格）</div>
+        <textarea id="aiKbNotes" placeholder="把你的黄金交易心得、常用策略、口诀贴到这里，AI 回答时会一并参考…" rows="3"></textarea>
+        <div class="row" style="margin-top:5px"><button onclick="saveKbNotes()">保存笔记</button><span id="aiKbStat" class="muted"></span></div>
+      </div>
       <div class="muted" style="font-size:11px;line-height:1.5">密钥仅存你本机浏览器(localStorage)，不上传第三方。浏览器直连可能被跨域(CORS)拦截；若失败可改用 DeepSeek / Moonshot 等兼容接口或自建代理。未联网时自动用内置知识库回答。</div>
     </div>
     <div class="aiT-chat" id="aiTChat"></div>
@@ -822,6 +832,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
       <span class="aiT-chip" onclick="aiQuick('斐波那契怎么用')">📚 斐波那契知识</span>
       <span class="aiT-chip" onclick="aiQuick('清除AI画线')">🧹 清AI画线</span>
       <span class="aiT-chip" onclick="aiDailyBrief()">📰 每日简报</span>
+      <span class="aiT-chip" onclick="showKbNotes()">📝 我的笔记</span>
       <span class="aiT-chip" onclick="SOUND_ON=!SOUND_ON;toast(SOUND_ON?'🔔 预警声音：开':'🔇 预警声音：关')">🔔 声音开关</span>
     </div>
     <div class="aiT-input">
@@ -878,7 +889,7 @@ input:focus,button:focus{box-shadow:0 0 0 2px rgba(233,185,73,.35)}
   </div>
 </section>
 
-<footer>黄金交易心理与策略工作台 v2.11 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
+<footer>黄金交易心理与策略工作台 v2.12 · 更新于 2026-08-15 · 本工作台仅供学习研究，不构成投资建议。行情数据来自公开免费接口，可能有延迟；杠杆交易风险极高，请只用亏得起的钱交易。</footer>
 <div class="toast" id="toast"></div>
 </div>
 
@@ -1991,39 +2002,42 @@ function renderDrawings(){
   var W=box.width, H=box.height;
   ol.setAttribute("viewBox","0 0 "+W+" "+H);
   var html="";
-  // 1) AI 投射线（底层）
+  // 图例（顶部 HUD，固定，解决"看不清/混乱"）
+  html+='<g><rect x="4" y="2" width="'+(W-8)+'" height="20" rx="6" fill="rgba(10,8,5,.55)"/>'
+      +'<text class="mt5-ol-leg" x="10" y="16">🤖 AI线：<tspan fill="#ffffff">●现价</tspan> <tspan fill="#ff6b6b">●阻力</tspan> <tspan fill="#56d364">●支撑</tspan> <tspan fill="#c4a7ff">●斐波</tspan> <tspan fill="#4dd0c4">●江恩</tspan> <tspan fill="#ffd166">●手绘</tspan></text></g>';
+  // 1) AI 投射线（底层，半透明，不抢手绘线）
   if(AI_PROJECTION){
     var data=AI_PROJECTION;
     data.lines.forEach(function(L){
       var y=priceToY(L.p, H);
-      html+='<line class="mt5-ol-line" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="'+L.col+'" stroke-width="'+L.width+'" stroke-dasharray="'+L.dash+'"/>';
+      var op=(L.label==="现价")?0.95:0.62;
+      html+='<line class="mt5-ol-line" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="'+L.col+'" stroke-width="'+L.width+'" stroke-dasharray="'+L.dash+'" opacity="'+op+'"/>';
       html+='<text class="mt5-ol-text" x="6" y="'+(y-5)+'" fill="'+L.col+'" font-weight="bold">'+L.label+' '+fmtPrice(L.p)+'</text>';
     });
   }
-  // 1.5) AI 斐波那契线（紫色，区间摆动高低点）
+  // 1.5) AI 斐波那契线（紫色，仅标关键比例，右侧标注避免与左侧投射重叠）
   if(AI_FIB){
     var fmin=AI_FIB.min, fmax=AI_FIB.max;
+    var keyR={0.236:1,0.382:1,0.5:1,0.618:1,0.786:1};
     AI_FIB.lines.forEach(function(L){
       var y=H-((L.p-fmin)/(fmax-fmin))*H;
       if(y<0||y>H) return;
-      html+='<line class="aiT-ol-fib" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'"/>';
-      html+='<text class="mt5-ol-text" x="6" y="'+(y-4)+'" fill="#9b7bff" font-weight="bold">Fib '+(L.r*100).toFixed(1)+'% '+fmtPrice(L.p)+'</text>';
+      var isMid=Math.abs(L.r-0.5)<1e-6;
+      html+='<line class="aiT-ol-fib" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" opacity="'+(isMid?0.9:0.6)+'"/>';
+      if(keyR[L.r]) html+='<text class="mt5-ol-text" x="'+(W-6)+'" y="'+Math.max(28,(y-4))+'" fill="#c4a7ff" font-weight="bold" text-anchor="end">Fib '+(L.r*100).toFixed(1)+'% '+fmtPrice(L.p)+'</text>';
     });
-    html+='<text class="mt5-ol-text" x="'+(W-150)+'" y="14" fill="#9b7bff" font-size="11">📐 斐波那契(示意)</text>';
+    html+='<text class="mt5-ol-text" x="6" y="34" fill="#c4a7ff" font-size="10" opacity="0.85">📐 斐波那契(示意)</text>';
   }
-  // 1.6) AI 江恩扇形（青色，枢轴点按标准角度）
+  // 1.6) AI 江恩扇形（青色，仅向下向右射线=经典扇形，避免四方向杂乱）
   if(AI_GANN){
     var gmin=AI_GANN.min, gmax=AI_GANN.max;
     var gpx=W*AI_GANN.px, gpy=H-((AI_GANN.pivotPrice-gmin)/(gmax-gmin))*H;
     AI_GANN.angles.forEach(function(a){
-      var rad=a*Math.PI/180, dx=W, dy=dx*Math.tan(rad);
+      var rad=a*Math.PI/180, dx=W*0.98, dy=dx*Math.tan(rad);
       html+='<line class="aiT-ol-gann" x1="'+gpx+'" y1="'+gpy+'" x2="'+(gpx+dx)+'" y2="'+(gpy+dy)+'"/>';
-      html+='<line class="aiT-ol-gann" x1="'+gpx+'" y1="'+gpy+'" x2="'+(gpx-dx)+'" y2="'+(gpy+dy)+'"/>';
-      html+='<line class="aiT-ol-gann" x1="'+gpx+'" y1="'+gpy+'" x2="'+(gpx+dx)+'" y2="'+(gpy-dy)+'"/>';
-      html+='<line class="aiT-ol-gann" x1="'+gpx+'" y1="'+gpy+'" x2="'+(gpx-dx)+'" y2="'+(gpy-dy)+'"/>';
     });
-    html+='<circle cx="'+gpx+'" cy="'+gpy+'" r="3" fill="#5fd0c8"/>';
-    html+='<text class="mt5-ol-text" x="6" y="'+(gpy-6)+'" fill="#5fd0c8" font-size="11">江恩枢轴 '+fmtPrice(AI_GANN.pivotPrice)+'</text>';
+    html+='<circle cx="'+gpx+'" cy="'+gpy+'" r="3.5" fill="#4dd0c4" stroke="#0c1a18" stroke-width="1"/>';
+    html+='<text class="mt5-ol-text" x="'+(gpx+8)+'" y="'+(gpy+3)+'" fill="#4dd0c4" font-size="10">江恩枢轴 '+fmtPrice(AI_GANN.pivotPrice)+'</text>';
   }
   // 2) 用户手绘线（顶层）
   var all=DRAW.items.slice();
@@ -2074,11 +2088,11 @@ function projectAiToChart(){
     lv={res:d.res.p,res2:d.res2.p,sup:d.sup.p,sup2:d.sup2.p};
   }
   var lines=[
-    {p:price,label:"现价",col:"#f7d271",dash:"0",width:1.8},
-    {p:lv.res,label:"阻力",col:"#e8624f",dash:"4 3",width:1.4},
-    {p:lv.res2,label:"强阻",col:"#e8624f",dash:"8 4",width:1.0},
-    {p:lv.sup,label:"支撑",col:"#5fb868",dash:"4 3",width:1.4},
-    {p:lv.sup2,label:"强撑",col:"#5fb868",dash:"8 4",width:1.0}
+    {p:price,label:"现价",col:"#ffffff",dash:"0",width:2},
+    {p:lv.res,label:"阻力",col:"#ff6b6b",dash:"5 3",width:1.4},
+    {p:lv.res2,label:"强阻",col:"#ff9a8f",dash:"9 4",width:1.0},
+    {p:lv.sup,label:"支撑",col:"#56d364",dash:"5 3",width:1.4},
+    {p:lv.sup2,label:"强撑",col:"#9ee6a6",dash:"9 4",width:1.0}
   ];
   var ps=lines.map(function(x){return x.p;});
   var mn=Math.min.apply(null,ps), mx=Math.max.apply(null,ps);
@@ -2113,7 +2127,10 @@ var GOLD_KB={
 /* ===== ChatGPT 联网（后台接入 OpenAI 兼容接口，结合本地黄金知识库回答） ===== */
 var AI_HIST=[];
 function stripTags(h){ return (h||"").replace(/<[^>]+>/g,"").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\s+/g," ").trim(); }
-var GOLD_KB_PROMPT=(function(){ try{ return Object.keys(GOLD_KB).map(function(k){ return stripTags(GOLD_KB[k]); }).join("\n"); }catch(e){ return "黄金交易基础知识：斐波那契回调、江恩角度/扇形、风险管理与仓位控制。"; } })();
+var USER_KB_NOTES="";
+var GOLD_KB_PROMPT="";
+function rebuildKbPrompt(){ try{ GOLD_KB_PROMPT=Object.keys(GOLD_KB).map(function(k){ return stripTags(GOLD_KB[k]); }).join("\n")+(USER_KB_NOTES?("\n\n【用户补充笔记】\n"+USER_KB_NOTES):""); }catch(e){ GOLD_KB_PROMPT="黄金交易基础知识：斐波那契回调、江恩角度/扇形、风险管理与仓位控制。"; } }
+rebuildKbPrompt();
 function aiMd(s){
   var t=escHtml(s||"");
   t=t.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\*(.+?)\*/g,"<i>$1</i>");
@@ -2526,6 +2543,8 @@ function loadAiSettings(){
   set("aiGptBase",STATE.aiBase); set("aiGptKey",STATE.aiKey);
   var om=document.getElementById("aiGptOnline"); if(om) om.checked=STATE.aiOnline;
   var mm=document.getElementById("aiGptModel"); if(mm) mm.value=STATE.aiModel||"gpt-4o-mini";
+  var kn=document.getElementById("aiKbNotes"); if(kn){ try{ USER_KB_NOTES=localStorage.getItem("gold_kb_notes")||""; }catch(e){ USER_KB_NOTES=""; } kn.value=USER_KB_NOTES; }
+  rebuildKbPrompt();
   aiGptBadge();
 }
 function toggleAiGptSet(){ var e=document.getElementById("aiGptSet"); if(e) e.style.display=(e.style.display==="none"?"block":"none"); }
@@ -2546,6 +2565,29 @@ function saveAiGpt(){
   var gs=document.getElementById("aiGptStat"); if(gs) gs.textContent="已保存"+(STATE.aiKey?" · "+(STATE.aiOnline?"联网已开":"联网未开"):" · 已清空");
   aiGptBadge();
   toast(STATE.aiOnline&&STATE.aiKey?"🔌 ChatGPT 已联网，直接问我问题吧":"已保存（联网未开启或缺失 Key，将用本地知识库）");
+}
+function testAiGpt(){
+  var base=(STATE.aiBase||"https://api.openai.com/v1").replace(/\/+$/,"");
+  var key=(STATE.aiKey||"").trim();
+  var gs=document.getElementById("aiGptStat");
+  if(!key){ if(gs) gs.textContent="请先填写 API Key"; return; }
+  if(gs) gs.textContent="连接测试中…";
+  fetch(base+"/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify({model:STATE.aiModel||"gpt-4o-mini",messages:[{role:"user",content:"ping"}],temperature:0,stream:false,max_tokens:5})})
+    .then(function(r){ return r.text().then(function(t){ if(!r.ok) throw new Error("HTTP "+r.status+" "+(t||"").slice(0,120)); return t; }); })
+    .then(function(){ if(gs) gs.textContent="✅ 连接成功（"+(STATE.aiModel||"gpt-4o-mini")+"）"; toast("✅ ChatGPT 连接成功，可以问我问题了"); })
+    .catch(function(e){ if(gs) gs.textContent="❌ 失败："+(e.message||"").slice(0,90); toast("❌ 连接失败："+(e.message||"").slice(0,90)); });
+}
+function saveKbNotes(){
+  var ta=document.getElementById("aiKbNotes");
+  USER_KB_NOTES=ta?ta.value:"";
+  try{ localStorage.setItem("gold_kb_notes", USER_KB_NOTES); }catch(e){}
+  rebuildKbPrompt();
+  var ks=document.getElementById("aiKbStat"); if(ks) ks.textContent=USER_KB_NOTES?("已保存 "+USER_KB_NOTES.length+" 字"):"已清空";
+  toast(USER_KB_NOTES?"📝 我的笔记已加入 AI 知识库":"已清空我的笔记");
+}
+function showKbNotes(){
+  if(!USER_KB_NOTES){ aiChat('<div class="warn">你还没添加笔记。点 ⚙️ 在「我的知识笔记」里粘贴你的心得，AI 回答时会一并参考。</div>','ai'); return; }
+  aiChat('<div class="blk"><h4>📝 我的知识笔记（'+USER_KB_NOTES.length+' 字，已加入 AI 知识库）</h4><div class="aiT-plan">'+escHtml(USER_KB_NOTES).replace(/\n/g,"<br>")+'</div></div>','ai');
 }
 function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function startNewsTimer(){ if(NEWS.timer) return; NEWS.timer=setInterval(function(){ var sec=document.getElementById("news"); if(sec&&sec.className==="on") loadNews(false); },300000); }
