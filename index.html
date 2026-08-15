@@ -88,6 +88,56 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
 .mktStat b{color:var(--gold2)}
 .chartWrap{width:100%;overflow:hidden}
 .mktEmpty{color:var(--muted);font-size:13px;text-align:center;padding:40px 0}
+
+/* ===== MT5 实时盘 ===== */
+.mt5-card{background:#0d0b09;border:1px solid #2a2520;box-shadow:inset 0 0 0 1px #1a1612}
+.mt5-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.mt5-title{font-size:15px;color:var(--gold2);font-weight:600;letter-spacing:.5px}
+.mt5-ohlc{display:flex;gap:12px;font-size:12px;color:#9a8f76}
+.mt5-ohlc span{background:#181512;padding:4px 8px;border-radius:6px;border:1px solid #2a2520}
+.mt5-ohlc b{color:#ece5d3;font-weight:500;margin-left:4px}
+.mt5-quote{display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:8px;margin:12px 0;background:#151210;border:1px solid #2a2520;border-radius:10px;overflow:hidden}
+.mt5-side{padding:14px 10px;text-align:center}
+.mt5-side.sell{background:#281713;border-right:1px solid #3a1f1a}
+.mt5-side.buy{background:#132818;border-right:1px solid #1c2e1a}
+.mt5-label{font-size:12px;font-weight:700;letter-spacing:1px}
+.mt5-side.sell .mt5-label{color:#ff7a6e}
+.mt5-side.buy .mt5-label{color:#7fd87a}
+.mt5-price{font-size:26px;font-weight:700;margin:6px 0}
+.mt5-side.sell .mt5-price{color:#ff7a6e}
+.mt5-side.buy .mt5-price{color:#7fd87a}
+.mt5-spread{font-size:11px;color:#9a8f76}
+.mt5-center{text-align:center;padding:14px 8px}
+.mt5-big{font-size:34px;font-weight:700;color:var(--gold2)}
+.mt5-change{font-size:14px;margin:4px 0}
+.mt5-source{font-size:11px;color:#6b6250}
+.mt5-wrap{display:grid;grid-template-columns:minmax(0,3fr) minmax(220px,1fr);gap:12px;margin-top:12px}
+.mt5-chart{height:520px;background:#0a0807;border:1px solid #2a2520;border-radius:10px;overflow:hidden;position:relative}
+.mt5-chart iframe{display:block;width:100%;height:100%}
+.mt5-pos{background:#151210;border:1px solid #2a2520;border-radius:10px;padding:14px}
+.mt5-pos h4{font-size:14px;color:var(--gold2);margin-bottom:10px}
+.mt5-pos label{display:block;font-size:12px;color:#9a8f76;margin:8px 0 3px}
+.mt5-pos input{width:100%;background:#0d0b09;border:1px solid #2a2520;border-radius:6px;padding:7px 9px;color:#ece5d3;font-size:14px}
+.mt5-posout{margin-top:12px;padding:12px;border-radius:8px;background:#0d0b09;border:1px solid #2a2520;font-size:13px;color:#9a8f76;min-height:70px}
+.mt5-posout .num{color:var(--gold2);font-weight:700}
+
+/* ===== 新闻雷达 ===== */
+.newsHead{display:flex;justify-content:space-between;align-items:center;margin:10px 0}
+.newsSent{font-size:14px;font-weight:600;padding:8px 14px;border-radius:20px;background:#181512;border:1px solid #2a2520}
+.newsSent.bull{background:#1c2e1a;color:#7fd87a;border-color:#2f4a2c}
+.newsSent.bear{background:#3a1f1a;color:#ff7a6e;border-color:#5a2f28}
+.newsSent.neu{background:#181512;color:#9a8f76;border-color:#2a2520}
+.newsList{display:flex;flex-direction:column;gap:10px}
+.newsItem{display:flex;gap:10px;align-items:flex-start;padding:12px;background:#181512;border:1px solid #2a2520;border-radius:10px}
+.newsBadge{min-width:52px;text-align:center;padding:4px 0;border-radius:6px;font-size:11px;font-weight:700}
+.newsItem.bull .newsBadge{background:#1c2e1a;color:#7fd87a}
+.newsItem.bear .newsBadge{background:#3a1f1a;color:#ff7a6e}
+.newsItem.neu .newsBadge{background:#2a2520;color:#9a8f76}
+.newsBody{flex:1}
+.newsTitle{font-size:13.5px;color:#ece5d3;font-weight:600;line-height:1.45;margin-bottom:4px}
+.newsMeta{font-size:11px;color:#6b6250}
+.newsSum{font-size:12px;color:#9a8f76;margin-top:5px;line-height:1.5}
+@media(max-width:900px){.mt5-wrap{grid-template-columns:1fr}.mt5-chart{height:420px}.mt5-quote{grid-template-columns:1fr}.mt5-center{border-top:1px solid #2a2520;border-bottom:1px solid #2a2520}}
 </style>
 </head>
 <body>
@@ -115,7 +165,8 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
   <button onclick="showTab('fib',this)">斐波纳奇计算器</button>
   <button onclick="showTab('pos',this)">仓位与策略</button>
   <button onclick="showTab('chk',this)">开仓前自检</button>
-  <button onclick="showTab('mkt',this)">实时行情</button>
+  <button onclick="showTab('mkt',this)">MT5实时盘</button>
+  <button onclick="showTab('news',this)">新闻雷达</button>
 </nav>
 
 <!-- 问答台 -->
@@ -323,45 +374,72 @@ footer{margin:18px 0 8px;font-size:11px;color:var(--muted);text-align:center}
   </div>
 </section>
 
-<!-- 实时行情 -->
+<!-- MT5 实时盘 -->
 <section id="mkt">
-  <div class="card">
-    <h2>实时行情面板 · 黄金期货 &amp; 美元指数</h2>
-    <p class="muted">数据来自 Yahoo Finance 公开接口（<b style="color:var(--text)">GC=F 黄金期货</b> / <b style="color:var(--text)">DX-Y.NYB 美元指数</b>），含价格走势与成交量，免费源约 15-20 分钟延迟。每 60 秒自动刷新，也可手动刷新。</p>
-    <div class="mktHead">
-      <span class="symTag gold">GC=F 黄金期货</span>
-      <span class="symTag dxy">DX-Y.NYB 美元指数</span>
-      <div class="rngBtns" id="rngBtns">
-        <button data-r="1d" data-i="5m" onclick="setMktRange('1d','5m',this)">1天</button>
-        <button data-r="1mo" data-i="1d" class="on" onclick="setMktRange('1mo','1d',this)">1月</button>
-        <button data-r="3mo" data-i="1d" onclick="setMktRange('3mo','1d',this)">3月</button>
-        <button data-r="6mo" data-i="1d" onclick="setMktRange('6mo','1d',this)">6月</button>
-        <button data-r="1y" data-i="1d" onclick="setMktRange('1y','1d',this)">1年</button>
+  <div class="card mt5-card">
+    <div class="mt5-top">
+      <div class="mt5-title" id="mt5SymbolTitle">黄金期货 GC=F · 实时走势图</div>
+      <div class="mt5-ohlc" id="mt5Ohlc">
+        <span>开盘<b id="oOpen">--</b></span>
+        <span>最高<b id="oHigh">--</b></span>
+        <span>最低<b id="oLow">--</b></span>
+        <span>振幅<b id="oAmp">--</b></span>
       </div>
-      <button class="tbtn" onclick="loadMarket(true)">刷新</button>
+      <div class="rngBtns" id="mt5Rng">
+        <button onclick="setMt5('GC',this)">期货 GC=F</button>
+        <button class="on" onclick="setMt5('XAUUSD',this)">现货 XAUUSD</button>
+        <button onclick="setMt5('DXY',this)">美元指数</button>
+      </div>
     </div>
-    <div class="mktStat" id="mktStat">点击下方区间或刷新开始加载…</div>
+    <div class="mt5-quote">
+      <div class="mt5-side sell">
+        <div class="mt5-label">SELL 卖出</div>
+        <div class="mt5-price" id="sellPrice">--</div>
+        <div class="mt5-spread">点差 <b id="spreadVal">0.02</b></div>
+      </div>
+      <div class="mt5-center">
+        <div class="mt5-big" id="mt5Big">--</div>
+        <div class="mt5-change" id="mt5Change">--</div>
+        <div class="mt5-source" id="mt5Source">连接实时数据中…</div>
+      </div>
+      <div class="mt5-side buy">
+        <div class="mt5-label">BUY 买入</div>
+        <div class="mt5-price" id="buyPrice">--</div>
+        <div class="mt5-spread">实时报价</div>
+      </div>
+    </div>
+    <div class="mt5-wrap">
+      <div class="mt5-chart">
+        <iframe id="mt5Frame" src="about:blank" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+      </div>
+      <div class="mt5-pos">
+        <h4>模拟持仓面板</h4>
+        <label>多单手数</label>
+        <input type="number" id="posLong" value="0.01" step="0.01" min="0">
+        <label>多单入场价</label>
+        <input type="number" id="posLongEntry" placeholder="自动用现价">
+        <label>空单手数</label>
+        <input type="number" id="posShort" value="0" step="0.01" min="0">
+        <label>空单入场价</label>
+        <input type="number" id="posShortEntry" placeholder="自动用现价">
+        <button class="btn" onclick="calcPosMt5()">计算盈亏</button>
+        <div id="mt5PosOut" class="mt5-posout">输入手数后点击计算，按 0.01 手 = 1 盎司/美元波动 $0.01 盈亏估算。</div>
+      </div>
+    </div>
+    <p class="muted" style="margin-top:10px">📌 K线/成交量来自 TradingView 实时图表；买卖价来自 xaus.com / gold-api 免费现货接口，约 30 秒延迟。切换品种后图表会自动重载。本行情仅供学习，不构成投资建议。</p>
   </div>
-  <div class="grid2">
-    <div class="card">
-      <h3 style="color:var(--gold2)">黄金期货走势（GC=F）</h3>
-      <div class="chartWrap" id="chartGold"></div>
-    </div>
-    <div class="card">
-      <h3 style="color:#7fb3d5">美元指数走势（DXY）</h3>
-      <div class="chartWrap" id="chartDxy"></div>
-    </div>
-    <div class="card">
-      <h3 style="color:var(--gold)">黄金期货交易量</h3>
-      <div class="chartWrap" id="volGold"></div>
-    </div>
-    <div class="card">
-      <h3 style="color:#7fb3d5">美元指数交易量</h3>
-      <div class="chartWrap" id="volDxy"></div>
-    </div>
-  </div>
+</section>
+
+<!-- 新闻雷达 -->
+<section id="news">
   <div class="card">
-    <p class="muted">📌 怎么看：<b style="color:var(--text)">黄金涨、美元跌</b>是经典负相关——美元走强通常压制金价。把四张图对照看：金价放量突破前高 + 美元走弱，是多头的强力确认；金价缩量滞涨 + 美元触底反弹，则要警惕回调。成交量放大说明当前价位是多空激战区。</p>
+    <h2>新闻雷达 · 黄金利多/利空分析</h2>
+    <p class="muted">聚合 FXStreet、Investing.com、Kitco 等公开 RSS 源，通过关键词规则判断每条新闻对黄金的利好、利空或中性。每 5 分钟自动刷新。</p>
+    <div class="newsHead">
+      <div class="newsSent neu" id="newsSent">市场情绪：计算中…</div>
+      <button class="tbtn" onclick="loadNews(true)">刷新新闻</button>
+    </div>
+    <div id="newsList" class="newsList">正在加载新闻…</div>
   </div>
 </section>
 
@@ -465,8 +543,10 @@ function showTab(id,btn){
   var btns=document.querySelectorAll("nav button");
   for(var j=0;j<btns.length;j++) btns[j].className="";
   btn.className="on";
-  if(id==="mkt"){ if(!MKT.loaded) loadMarket(false); startAutoMarket(); }
-  else { stopAutoMarket(); }
+  if(id==="mkt"){ initMt5(); startMt5Ticker(); }
+  else { stopMt5Ticker(); }
+  if(id==="news"){ if(!NEWS.loaded) loadNews(false); startNewsTimer(); }
+  else { stopNewsTimer(); }
 }
 
 /* ===== K线绘制引擎 ===== */
@@ -770,43 +850,6 @@ function chkUpdate(){
   else{el.className="verdict no";el.textContent="已通过 "+n+" / "+boxes.length+" 项 · 禁止开仓";}
 }
 
-/* ===== 实时行情面板（黄金期货 GC=F / 美元指数 DXY） ===== */
-var MKT = { range:"1mo", interval:"1d", loaded:false, timer:null, busy:false };
-function mktProxyList(target){
-  return [
-    "https://api.allorigins.win/raw?url="+encodeURIComponent(target),
-    "https://api.codetabs.com/v1/proxy/?quest="+target,
-    "https://corsproxy.io/?url="+encodeURIComponent(target),
-    "https://thingproxy.freeboard.io/fetch/"+target,
-    "https://api.cors.lol/?url="+encodeURIComponent(target)
-  ];
-}
-function fetchYahoo(sym, range, interval){
-  var target="https://query1.finance.yahoo.com/v8/finance/chart/"+sym+"?range="+range+"&interval="+interval;
-  var urls=mktProxyList(target);
-  function tryOne(i){
-    if(i>=urls.length) return Promise.reject(new Error("all proxies failed"));
-    return fetch(urls[i],{cache:"no-store"})
-      .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.text(); })
-      .then(function(txt){
-        var j=JSON.parse(txt);
-        if(!j.chart||!j.chart.result) throw new Error("bad payload");
-        var r=j.chart.result[0];
-        var ts=r.timestamp||[];
-        var q=(r.indicators.quote&&r.indicators.quote[0])||{};
-        var close=q.close||[], vol=q.volume||[];
-        var out=[];
-        for(var k=0;k<ts.length;k++){
-          var c=close[k];
-          if(c===null||c===undefined) continue;
-          out.push({t:ts[k]*1000, c:c, v:(vol[k]||0)});
-        }
-        return {meta:r.meta, pts:out};
-      })
-      .catch(function(e){ return tryOne(i+1); });
-  }
-  return tryOne(0);
-}
 function fmtNum(n){
   if(n==null||isNaN(n)) return "-";
   if(n>=1e9) return (n/1e9).toFixed(2)+"B";
@@ -814,91 +857,175 @@ function fmtNum(n){
   if(n>=1e3) return (n/1e3).toFixed(1)+"K";
   return ""+Math.round(n);
 }
-function fmtPrice(n){ if(n==null) return "-"; return n>=1000?n.toFixed(1):n.toFixed(2); }
-function mktDate(t){ var d=new Date(t); return (d.getMonth()+1)+"/"+d.getDate(); }
+function fmtPrice(n){ if(n==null) return "-"; return n>=1000?n.toFixed(2):n.toFixed(2); }
 
-/* 折线/面积图 */
-function lineChartSVG(pts, W, H, color){
-  if(!pts||pts.length<2) return '<div class="mktEmpty">数据不足</div>';
-  var vals=pts.map(function(p){return p.c;});
-  var min=Math.min.apply(null,vals), max=Math.max.apply(null,vals);
-  var pad=(max-min)*0.12||1; min-=pad; max+=pad;
-  var pl=30, pr=8, pt=10, pb=18;
-  function X(i){return pl + i*(W-pl-pr)/(pts.length-1);}
-  function Y(v){return pt + (max-v)/(max-min)*(H-pt-pb);}
-  var line="M"+X(0)+" "+Y(vals[0]), area="M"+X(0)+" "+Y(vals[0]);
-  for(var i=1;i<pts.length;i++){ var x=X(i),y=Y(vals[i]); line+="L"+x+" "+y; area+="L"+x+" "+y; }
-  area+="L"+X(pts.length-1)+" "+(H-pb)+"L"+X(0)+" "+(H-pb)+"Z";
-  var last=pts[pts.length-1], up=last.c>=pts[0].c;
-  var grid="";
-  for(var g=0;g<=2;g++){var gy=pt+g*(H-pt-pb)/2; grid+='<line x1="'+pl+'" y1="'+gy+'" x2="'+(W-pr)+'" y2="'+gy+'" stroke="#3a3223" stroke-width="0.5"/>';}
-  function dlabel(i){return '<text x="'+X(i)+'" y="'+(H-5)+'" font-size="9" fill="#9a8f76" text-anchor="'+((i===0)?"start":(i===pts.length-1)?"end":"middle")+'">'+mktDate(pts[i].t)+'</text>';}
-  var xl=[0, Math.floor(pts.length/2), pts.length-1].map(dlabel).join("");
-  var yl=[max,(max+min)/2,min].map(function(v,gi){var gy=pt+gi*(H-pt-pb)/2;return '<text x="'+(pl-3)+'" y="'+(gy+3)+'" font-size="9" fill="#9a8f76" text-anchor="end">'+fmtPrice(v)+'</text>';}).join("");
-  return '<svg width="100%" viewBox="0 0 '+W+' '+H+'">'
-    + grid
-    + '<path d="'+area+'" fill="'+color+'" fill-opacity="0.12"/>'
-    + '<path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="1.6"/>'
-    + '<circle cx="'+X(pts.length-1)+'" cy="'+Y(last.c)+'" r="3" fill="'+(up?"#e05c4d":"#6dbf67")+'"/>'
-    + yl + xl + '</svg>';
+/* ===== MT5 实时盘 ===== */
+var MT5={sym:"GC",timer:null,lastPrice:null,prevPrice:null,loaded:false};
+var MT5MAP={
+  XAUUSD:{tv:"FX%3AXAUUSD",name:"现货黄金 XAUUSD",spread:0.02},
+  GC:{tv:"COMEX%3AGC1!",name:"黄金期货 GC=F",spread:0.1},
+  DXY:{tv:"TVC%3ADXY",name:"美元指数 DXY",spread:0.02}
+};
+function mt5TvUrl(sym){
+  var m=MT5MAP[sym]||MT5MAP.GC;
+  return "https://s.tradingview.com/embed-widget/advanced-chart/?symbol="+m.tv
+    +"&interval=1&timezone=Asia%2FShanghai&theme=dark&locale=zh&style=1"
+    +"&enable_publishing=false&allow_symbol_change=false&save_image=false"
+    +"&withdateranges=false&hide_top_toolbar=false&hide_legend=false&details=true"
+    +"&studies=Volume%40tv-basicstudies";
 }
-/* 成交量柱图 */
-function barChartSVG(pts, W, H, color){
-  if(!pts||pts.length<2) return '<div class="mktEmpty">数据不足</div>';
-  var vols=pts.map(function(p){return p.v;});
-  var max=Math.max.apply(null,vols)||1;
-  var pl=30, pr=8, pt=8, pb=14;
-  var slot=(W-pl-pr)/pts.length, bw=Math.min(slot*0.7,14);
-  var svg='<svg width="100%" viewBox="0 0 '+W+' '+H+'">';
-  var avg=max*0.55;
-  for(var i=0;i<pts.length;i++){
-    var h=Math.max(1,(pts[i].v/max)*(H-pt-pb));
-    var x=pl+slot*(i+0.5)-bw/2, y=H-pb-h;
-    svg+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" rx="1" fill="'+color+'" fill-opacity="'+(pts[i].v>=avg?0.9:0.4)+'"/>';
-  }
-  svg+='<text x="'+(pl-3)+'" y="'+(H-3)+'" font-size="9" fill="#9a8f76" text-anchor="end">'+fmtNum(max)+'</text>';
-  return svg+'</svg>';
-}
-function setMktRange(r,i,btn){
-  MKT.range=r; MKT.interval=i;
-  var b=document.querySelectorAll("#rngBtns button");
+function setMt5(sym,btn){
+  MT5.sym=sym;
+  document.getElementById("mt5SymbolTitle").textContent=MT5MAP[sym].name+" · 实时走势图";
+  var b=document.querySelectorAll("#mt5Rng button");
   for(var k=0;k<b.length;k++) b[k].className="";
   btn.className="on";
-  loadMarket(false);
+  document.getElementById("mt5Frame").src=mt5TvUrl(sym);
+  MT5.lastPrice=null; MT5.prevPrice=null;
+  refreshMt5Price();
 }
-function loadMarket(manual){
-  if(MKT.busy) return;
-  MKT.busy=true;
-  var stat=document.getElementById("mktStat");
-  if(manual) stat.textContent="刷新中…"; else stat.textContent="加载行情中…";
-  Promise.all([
-    fetchYahoo("GC=F",MKT.range,MKT.interval),
-    fetchYahoo("DX-Y.NYB",MKT.range,MKT.interval)
-  ]).then(function(res){
-    var g=res[0], d=res[1];
-    document.getElementById("chartGold").innerHTML=lineChartSVG(g.pts,560,180,"#e8b33c");
-    document.getElementById("chartDxy").innerHTML=lineChartSVG(d.pts,560,180,"#7fb3d5");
-    document.getElementById("volGold").innerHTML=barChartSVG(g.pts,560,150,"#e8b33c");
-    document.getElementById("volDxy").innerHTML=barChartSVG(d.pts,560,150,"#7fb3d5");
-    var gLast=g.pts[g.pts.length-1], gPrev=g.pts[Math.max(0,g.pts.length-2)];
-    var dLast=d.pts[d.pts.length-1], dPrev=d.pts[Math.max(0,d.pts.length-2)];
-    var gChg=gLast.c-gPrev.c, gPct=gChg/gPrev.c*100;
-    var dChg=dLast.c-dPrev.c, dPct=dChg/dPrev.c*100;
-    stat.innerHTML="<b>黄金期货</b> $"+fmtPrice(gLast.c)+"（"+(gChg>=0?"+":"")+gChg.toFixed(1)+" / "+(gPct>=0?"+":"")+gPct.toFixed(2)+"%）　|　<b>美元指数</b> "+fmtPrice(dLast.c)+"（"+(dChg>=0?"+":"")+dChg.toFixed(2)+" / "+(dPct>=0?"+":"")+dPct.toFixed(2)+"%）　|　更新："+new Date(gLast.t).toLocaleString("zh-CN");
-    MKT.loaded=true; MKT.busy=false;
-  }).catch(function(e){
-    stat.innerHTML="行情加载失败（公共代理可能临时不可用或网络受限）。请稍后点「刷新」重试；也可换网络环境再试。";
-    MKT.busy=false;
+function initMt5(){
+  if(MT5.loaded) return;
+  MT5.loaded=true;
+  document.getElementById("mt5Frame").src=mt5TvUrl(MT5.sym);
+  refreshMt5Price();
+}
+function stopMt5Ticker(){ if(MT5.timer){clearInterval(MT5.timer);MT5.timer=null;} }
+function startMt5Ticker(){
+  if(MT5.timer) return;
+  MT5.timer=setInterval(function(){
+    var sec=document.getElementById("mkt");
+    if(sec&&sec.className==="on") refreshMt5Price();
+  },15000);
+}
+function refreshMt5Price(){
+  var src=document.getElementById("mt5Source");
+  src.textContent="取价中…";
+  var urls=["https://xaus.com/api/v1/spot","https://api.gold-api.com/price/XAU"];
+  var fastest=null;
+  function fetchOne(url){
+    return fetch(url,{cache:"no-store"})
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        var p=null;
+        if(j&&j.spot_usd_oz) p=parseFloat(j.spot_usd_oz);
+        else if(j&&j.price) p=parseFloat(j.price);
+        if(p&&!fastest){ fastest={price:p,source:url.indexOf("xaus")>=0?"xaus.com":"gold-api"}; }
+        return p;
+      }).catch(function(){ return null; });
+  }
+  Promise.race([fetchOne(urls[0]),fetchOne(urls[1])]).then(function(p){
+    if(!p) throw new Error("no price");
+    updateMt5Quote(fastest?fastest.price:p, fastest?fastest.source:"gold-api");
+  }).catch(function(){
+    src.textContent="实时价获取失败（请检查网络）";
   });
 }
-function startAutoMarket(){
-  if(MKT.timer) return;
-  MKT.timer=setInterval(function(){
-    var sec=document.getElementById("mkt");
-    if(sec&&sec.className==="on") loadMarket(false);
-  },60000);
+function updateMt5Quote(price,source){
+  MT5.prevPrice=MT5.lastPrice||price; MT5.lastPrice=price;
+  var spread=MT5MAP[MT5.sym].spread;
+  var sell=price, buy=price+spread;
+  if(MT5.sym==="DXY"){ sell=price; buy=price+0.02; }
+  document.getElementById("sellPrice").textContent=fmtPrice(sell);
+  document.getElementById("buyPrice").textContent=fmtPrice(buy);
+  document.getElementById("mt5Big").textContent=fmtPrice(price);
+  document.getElementById("spreadVal").textContent=spread.toFixed(2);
+  var chg=price-MT5.prevPrice, pct=MT5.prevPrice?(chg/MT5.prevPrice*100):0;
+  var chgTxt=(chg>=0?"+":"")+chg.toFixed(2)+"（"+(pct>=0?"+":"")+pct.toFixed(2)+"%）";
+  document.getElementById("mt5Change").textContent=chgTxt;
+  document.getElementById("mt5Change").style.color=chg>=0?"#7fd87a":"#ff7a6e";
+  document.getElementById("mt5Source").textContent="来源："+(source==="xaus.com"?"xaus.com":"gold-api.com")+" · 约 30 秒刷新";
+  var oe=document.getElementById("posLongEntry");
+  if(!oe.value&&MT5.sym==="XAUUSD") oe.placeholder=price.toFixed(2);
 }
-function stopAutoMarket(){ if(MKT.timer){clearInterval(MKT.timer);MKT.timer=null;} }
+function calcPosMt5(){
+  var lotL=parseFloat(document.getElementById("posLong").value)||0;
+  var enL=parseFloat(document.getElementById("posLongEntry").value)||MT5.lastPrice||0;
+  var lotS=parseFloat(document.getElementById("posShort").value)||0;
+  var enS=parseFloat(document.getElementById("posShortEntry").value)||MT5.lastPrice||0;
+  var price=MT5.lastPrice;
+  if(!price){ document.getElementById("mt5PosOut").textContent="价格尚未获取，请稍等"; return; }
+  var unit=100; // MT5 XAUUSD 1 手 = 100 盎司
+  var pL=(price-enL)*lotL*unit;
+  var pS=(enS-price)*lotS*unit;
+  var total=pL+pS;
+  var html="<div style='margin-bottom:8px'><b>当前价：</b><span class='num'>$"+fmtPrice(price)+"</span></div>";
+  html+="<div>多单盈亏："+fmtMoney(pL)+"</div>";
+  html+="<div>空单盈亏："+fmtMoney(pS)+"</div>";
+  html+="<div style='margin-top:8px;border-top:1px solid #2a2520;padding-top:8px'><b>净盈亏：</b>"+fmtMoney(total)+"</div>";
+  document.getElementById("mt5PosOut").innerHTML=html;
+}
+function fmtMoney(n){
+  var cls=n>=0?"#7fd87a":"#ff7a6e";
+  return "<span class='num' style='color:"+cls+"'>$"+(n>=0?"":"")+Math.abs(n).toFixed(2)+"</span>";
+}
+
+/* ===== 新闻雷达 ===== */
+var NEWS={loaded:false,timer:null};
+var NEWS_FEEDS=[
+  {name:"FXStreet",url:"https://www.fxstreet.com/rss/news"},
+  {name:"Investing Gold",url:"https://www.investing.com/rss/commodities_Gold.rss"},
+  {name:"Kitco",url:"https://www.kitco.com/rss/news.rss"}
+];
+var NEWS_BULL=["降息","rate cut","fed cut","CPI","inflation","通胀","非农","NFP miss","避险","safe haven","war","冲突","地缘","recession","衰退","央行购金","gold buying","ETF增持","美元走弱","weak dollar","财政赤字","debt","危机","crisis","关税","tariff"];
+var NEWS_BEAR=["加息","rate hike","hawkish","强美元","美元涨","DXY surge","NFP beat","CPI下降","disinflation","经济强劲","risk on","ETF减持","gold selling","利率维持","利率不变","预期降息推迟"];
+function loadNews(manual){
+  var box=document.getElementById("newsList");
+  if(manual) box.innerHTML="刷新中…";
+  var api="https://api.rss2json.com/v1/api.json?rss_url=";
+  var jobs=NEWS_FEEDS.map(function(f){
+    return fetch(api+encodeURIComponent(f.url),{cache:"no-store"})
+      .then(function(r){ return r.json(); })
+      .then(function(j){ return {feed:f,items:(j.items||[]).slice(0,8)}; })
+      .catch(function(){ return {feed:f,items:[]}; });
+  });
+  Promise.all(jobs).then(function(results){
+    var all=[];
+    results.forEach(function(r){
+      r.items.forEach(function(it){
+        it.source=r.feed.name;
+        var score=scoreNews((it.title||"")+" "+(it.description||""));
+        it.score=score; it.cls=score>0?"bull":(score<0?"bear":"neu");
+        all.push(it);
+      });
+    });
+    all.sort(function(a,b){ return new Date(b.pubDate)-new Date(a.pubDate); });
+    renderNews(all.slice(0,20));
+    NEWS.loaded=true;
+  }).catch(function(){
+    box.innerHTML="<div class='mktEmpty'>新闻加载失败，请稍后刷新</div>";
+  });
+}
+function scoreNews(text){
+  var s=0, t=text.toLowerCase();
+  NEWS_BULL.forEach(function(w){ if(t.indexOf(w.toLowerCase())>=0) s++; });
+  NEWS_BEAR.forEach(function(w){ if(t.indexOf(w.toLowerCase())>=0) s--; });
+  return s;
+}
+function renderNews(list){
+  var box=document.getElementById("newsList");
+  if(!list.length){ box.innerHTML="<div class='mktEmpty'>暂无新闻</div>"; return; }
+  var bull=0,bear=0;
+  var html="";
+  list.forEach(function(it){
+    if(it.cls==="bull") bull++; else if(it.cls==="bear") bear++;
+    var date=new Date(it.pubDate).toLocaleString("zh-CN",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    var badge=it.cls==="bull"?"利好":(it.cls==="bear"?"利空":"中性");
+    html+='<div class="newsItem '+it.cls+'"><div class="newsBadge">'+badge+'</div><div class="newsBody">'
+      +'<div class="newsTitle"><a href="'+it.link+'" target="_blank" style="color:inherit;text-decoration:none">'+escHtml(it.title)+'</a></div>'
+      +'<div class="newsMeta">'+escHtml(it.source)+' · '+date+'</div>'
+      +'<div class="newsSum">'+escHtml((it.description||"").replace(/<[^>]+>/g," ").slice(0,160))+'…</div>'
+      +'</div></div>';
+  });
+  box.innerHTML=html;
+  var net=bull-bear, cls=net>0?"bull":(net<0?"bear":"neu"), txt=net>0?"偏多":(net<0?"偏空":"中性");
+  var sent=document.getElementById("newsSent");
+  sent.className="newsSent "+cls;
+  sent.textContent="市场情绪："+txt+"（利好 "+bull+" / 利空 "+bear+" / 中性 "+(list.length-bull-bear)+"）";
+}
+function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function startNewsTimer(){ if(NEWS.timer) return; NEWS.timer=setInterval(function(){ var sec=document.getElementById("news"); if(sec&&sec.className==="on") loadNews(false); },300000); }
+function stopNewsTimer(){ if(NEWS.timer){clearInterval(NEWS.timer);NEWS.timer=null;} }
 
 /* ===== 启动 ===== */
 loadSettings();
